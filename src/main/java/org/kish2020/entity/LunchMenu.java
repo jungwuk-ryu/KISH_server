@@ -1,9 +1,9 @@
 package org.kish2020.entity;
 
-public class LaunchMenu {
+public class LunchMenu {
     public String menu, detail, imageUrl;
 
-    public LaunchMenu(String menu, String detail, String imageUrl){
+    public LunchMenu(String menu, String detail, String imageUrl){
         this.menu = menu;
         this.detail = detail;
         this.imageUrl = imageUrl;

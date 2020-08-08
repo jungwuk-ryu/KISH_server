@@ -4,7 +4,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.kish2020.MainLogger;
-import org.kish2020.entity.LaunchMenu;
+import org.kish2020.entity.LunchMenu;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,12 +12,12 @@ import java.util.ArrayList;
 public class KishWebParser {
     public static final String ROOT_URL = "http://www.hanoischool.net/";
 
-    public static ArrayList<LaunchMenu> parseLaunch(){
-        return parseLaunch("");
+    public static ArrayList<LunchMenu> parseLunch(){
+        return parseLunch("");
     }
 
-    public static ArrayList<LaunchMenu> parseLaunch(String changeData){
-        ArrayList<LaunchMenu> list = new ArrayList<>();
+    public static ArrayList<LunchMenu> parseLunch(String changeData){
+        ArrayList<LunchMenu> list = new ArrayList<>();
         try {
             Document doc = Jsoup.connect(ROOT_URL + "?menu_no=47&ChangeDate=" + changeData).get();
             Elements items = doc.select(".mm_to");
@@ -33,7 +33,7 @@ public class KishWebParser {
                 if(elementImg.size() > 0){
                     imageUrl = elementImg.get(0).attr("src");
                 }
-                list.add(new LaunchMenu(menu, salt, imageUrl));
+                list.add(new LunchMenu(menu, salt, imageUrl));
             }));
         } catch (IOException e) {
             MainLogger.error("", e);

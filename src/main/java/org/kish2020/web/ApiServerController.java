@@ -5,7 +5,7 @@ import org.json.simple.JSONObject;
 import org.kish2020.DataBase;
 import org.kish2020.Kish2020Server;
 import org.kish2020.MainLogger;
-import org.kish2020.entity.LaunchMenu;
+import org.kish2020.entity.LunchMenu;
 import org.kish2020.utils.parsing.KishWebParser;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,11 +32,11 @@ public class ApiServerController {
         return "{\"num\":" + count + "}";
     }
 
-    @RequestMapping("/getLaunch")
-    public @ResponseBody String getLaunch(){
-        ArrayList<LaunchMenu> list = KishWebParser.parseLaunch("2020-07-1");
+    @RequestMapping("/getLunch")
+    public @ResponseBody String getLunch(){
+        ArrayList<LunchMenu> list = KishWebParser.parseLunch("2020-07-1");
         JSONArray jsonArray = new JSONArray();
-        for(LaunchMenu menu : list){
+        for(LunchMenu menu : list){
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("menu", menu.getMenu());
             jsonObject.put("detail", menu.getDetail());
