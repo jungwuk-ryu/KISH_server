@@ -2,9 +2,9 @@ package org.kish2020.entity;
 
 import org.json.simple.JSONObject;
 
-public class Post extends JSONObject {
+public class SimplePost extends JSONObject {
 
-    public Post(String postUrl, String postId, String title, String author, String postDate, String attachmentIconUrl){
+    public SimplePost(String postUrl, String postId, String title, String author, String postDate, String attachmentIconUrl){
         this.setPostUrl(postUrl);
         this.setPostId(postId);
         this.setTitle(title);
