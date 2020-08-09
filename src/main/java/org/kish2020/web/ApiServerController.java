@@ -6,7 +6,7 @@ import org.kish2020.DataBase;
 import org.kish2020.Kish2020Server;
 import org.kish2020.MainLogger;
 import org.kish2020.entity.LunchMenu;
-import org.kish2020.entity.Post;
+import org.kish2020.entity.SimplePost;
 import org.kish2020.utils.parser.KishWebParser;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +19,7 @@ import java.util.ArrayList;
 public class ApiServerController {
     private Kish2020Server main;
     private DataBase db;
-    Post post;
+    SimplePost simplePost;
 
     public ApiServerController(Kish2020Server kish2020Server){
         MainLogger.info("Api Server Controller 초기화중");
@@ -49,12 +49,10 @@ public class ApiServerController {
 
     @RequestMapping("/getPosts")
     public @ResponseBody String getPosts(){  // TODO : 캐싱
-        if(this.post == null) {
+        if(this.simplePost == null) {
             MainLogger.info("불러오는 중");
-             post = KishWebParser.parseMenu("25").get(0);
+             simplePost = KishWebParser.parseMenu("25").get(0);
         }
-        return post.getTitle() + "\n글쓴이 : " + post.getAuthor() + "\n첨부파일 url" + post.getAttachmentIconUrl();
+        return simplePost.getTitle() + "\n글쓴이 : " + simplePost.getAuthor() + "\n첨부파일 url" + simplePost.getAttachmentIconUrl();
     }
-
-
 }
