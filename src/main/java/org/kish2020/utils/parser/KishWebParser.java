@@ -2,16 +2,49 @@ package org.kish2020.utils.parser;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 import org.kish2020.MainLogger;
 import org.kish2020.entity.LunchMenu;
-import org.kish2020.entity.Post;
+import org.kish2020.entity.SimplePost;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 public class KishWebParser {
     public static final String ROOT_URL = "http://www.hanoischool.net/";
+
+    public static Document generateUrl(Document doc){
+        // src attribute 가 있는 엘리먼트들을 선택
+        try {
+            Elements elems = doc.select("[src]");
+            for (Element elem : elems) {
+                if (!elem.attr("src").equals(elem.attr("abs:src"))) {
+                    elem.attr("src", "abs:src");
+                }
+            }
+
+            // href attribute 가 있는 엘리먼트들을 선택
+            elems = doc.select("[href]");
+            for (Element elem : elems) {
+                if (!elem.attr("href").equals(elem.attr("abs:href"))) {
+                    String attr = elem.attr("abs:href");
+                    if(attr.contains("dfname=")){
+                        String[] split = attr.split("dfname=");
+                        /*다운로드 경로는 EUC-KR으로 인코드 해주지 않을 경우 404발생*/
+                        attr = split[0] + "dfname=" + URLEncoder.encode(split[1], "EUC-KR");
+                    }
+                    elem.attr("href", attr);
+                }
+            }
+        } catch (UnsupportedEncodingException e){
+            MainLogger.error("generateUrl에서 발생한 오류", e);
+        }
+        return doc;
+    }
 
     public static ArrayList<LunchMenu> parseLunch(){
         return parseLunch("");
@@ -56,12 +89,12 @@ public class KishWebParser {
 			<td><img src='http://upload70.withschool.co.kr/image/icon_PDF.gif' alt='첨부' border='0' /></td>
 		</tr>**/
 
-    public static ArrayList<Post> parseMenu(String id){
+    public static ArrayList<SimplePost> parseMenu(String id){
         return parseMenu(id, "1");
     }
 
-    public static ArrayList<Post> parseMenu(String id, String page){
-        ArrayList<Post> list = new ArrayList<>();
+    public static ArrayList<SimplePost> parseMenu(String id, String page){
+        ArrayList<SimplePost> list = new ArrayList<>();
         try {
             Document doc = Jsoup.connect(ROOT_URL + "?menu_no=" + id).get();
             Elements items = doc.select(".h_line_dot");
@@ -75,11 +108,46 @@ public class KishWebParser {
                 String attachmentIconUrl = items.select("img").attr("src");
                 String postUrl = ROOT_URL + items.select("a").attr("href");
 
-                list.add(new Post(postUrl, postId, title, author, postDate, attachmentIconUrl));
+                list.add(new SimplePost(postUrl, postId, title, author, postDate, attachmentIconUrl));
             }));
         } catch (IOException e) {
             MainLogger.error("", e);
         }
         return list;
+    }
+
+    public static String generatePostToNormal(String fullUrl){
+        try {
+            Document doc = Jsoup.connect(fullUrl).get();
+            generateUrl(doc);
+            Elements elements = doc.select("link");
+            for (Element element : elements) {
+                if("http://www.hanoischool.net/html/css/style.css?ver=1.0.0.0.0".equals(element.attr("href")))
+                    element.remove();
+            }
+            doc.head().append("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">");
+            doc.select("#nav").forEach((Node::remove));
+            doc.select("#skipnavigation").forEach(Node::remove);
+            doc.select("#header").forEach((Node::remove));
+            doc.select("#sub_visual").forEach((Node::remove));
+            doc.select("#footer").forEach(Node::remove);
+            doc.select("#sub_left").forEach(Node::remove);
+            doc.select(".h_board table").forEach(Node::remove);
+            doc.select(".h_btn_area2").forEach(Node::remove);
+            doc.select(".table_b5").forEach(Node::remove);
+            return doc.toString();
+            /*return "<html lang=\"ko\">\n" +
+                    "\t<head>\n" +
+                    "\n" +
+                    "\t\t<meta charset=\"euc-kr\">\n" +
+                    "\t\t<meta name=\"robots\" content=\"all\" />\n" +
+                    "\t\t<meta name=\"robots\" content=\"index, follow\" />\n" +
+                    "\t\t<meta name=\"content-language\" content=\"kr\" />\n" +
+                    "\t\t<meta name=\"build\" content=\"\" />\n" +
+                    "</head><body>" + doc.select("style") + doc.select("script") + doc.select(".h_body").get(0).html() + "</body></html>";
+*/        } catch (IOException e) {
+            MainLogger.error("", e);
+            return "";
+        }
     }
 }
