@@ -1,4 +1,4 @@
-package org.kish2020.utils.parsing;
+package org.kish2020.utils.parser;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

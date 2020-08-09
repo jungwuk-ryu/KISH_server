@@ -6,7 +6,7 @@ import org.kish2020.DataBase;
 import org.kish2020.Kish2020Server;
 import org.kish2020.MainLogger;
 import org.kish2020.entity.LunchMenu;
-import org.kish2020.utils.parsing.KishWebParser;
+import org.kish2020.utils.parser.KishWebParser;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
