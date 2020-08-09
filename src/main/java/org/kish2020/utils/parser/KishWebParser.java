@@ -72,10 +72,10 @@ public class KishWebParser {
                 String author = elements.get(2).text();
                 String postDate = elements.get(3).text();
 
-                String attachmentUrl = items.select("img").attr("src");
+                String attachmentIconUrl = items.select("img").attr("src");
                 String postUrl = ROOT_URL + items.select("a").attr("href");
 
-                list.add(new Post(postUrl, postId, title, author, postDate, attachmentUrl));
+                list.add(new Post(postUrl, postId, title, author, postDate, attachmentIconUrl));
             }));
         } catch (IOException e) {
             MainLogger.error("", e);

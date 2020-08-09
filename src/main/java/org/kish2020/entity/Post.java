@@ -4,14 +4,14 @@ import org.json.simple.JSONObject;
 
 public class Post extends JSONObject {
 
-    public Post(String postUrl, String postId, String title, String author, String postDate, String attachmentUrl){
+    public Post(String postUrl, String postId, String title, String author, String postDate, String attachmentIconUrl){
         this.setPostUrl(postUrl);
         this.setPostId(postId);
         this.setTitle(title);
         this.setAuthor(author);
         this.setPostDate(postDate);
 
-        this.setAttachmentUrl(attachmentUrl);
+        this.setAttachmentIconUrl(attachmentIconUrl);
     }
 
     public String getPostId() {
@@ -46,14 +46,13 @@ public class Post extends JSONObject {
         this.put("postDate", postDate);
     }
 
-    public String getAttachmentUrl() {
-        return (String) this.get("attachmentUrl");
+    public String getAttachmentIconUrl() {
+        return (String) this.get("attachmentIconUrl");
     }
 
-    public void setAttachmentUrl(String attachmentUrl) {
-        // AttachmentUrl은 첨부파일의 direct 다운로드 주소가 아닌 첨부파일 유형 이미지의 url입니다.
-        this.put("hasAttachment", !(attachmentUrl == null || attachmentUrl.isEmpty() || !attachmentUrl.contains("http")));
-        this.put("attachmentUrl", attachmentUrl);
+    public void setAttachmentIconUrl(String attachmentIconUrl) {
+        this.put("hasAttachment", !(attachmentIconUrl == null || attachmentIconUrl.isEmpty() || !attachmentIconUrl.contains("http")));
+        this.put("attachmentIconUrl", attachmentIconUrl);
     }
 
     public String getPostUrl() {

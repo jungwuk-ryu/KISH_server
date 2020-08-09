@@ -53,7 +53,7 @@ public class ApiServerController {
             MainLogger.info("불러오는 중");
              post = KishWebParser.parseMenu("25").get(0);
         }
-        return post.getTitle() + "\n글쓴이 : " + post.getAuthor() + "\n첨부파일 url" + post.getAttachmentUrl();
+        return post.getTitle() + "\n글쓴이 : " + post.getAuthor() + "\n첨부파일 url" + post.getAttachmentIconUrl();
     }
 
 
