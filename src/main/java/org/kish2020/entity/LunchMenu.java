@@ -1,35 +1,35 @@
 package org.kish2020.entity;
 
-public class LunchMenu {
-    public String menu, detail, imageUrl;
+import org.json.simple.JSONObject;
 
+public class LunchMenu extends JSONObject {
     public LunchMenu(String menu, String detail, String imageUrl){
-        this.menu = menu;
-        this.detail = detail;
-        this.imageUrl = imageUrl;
+        this.setMenu(menu);
+        this.setDetail(detail);
+        this.setImageUrl(imageUrl);
     }
 
     public String getMenu() {
-        return menu;
+        return (String) this.get("menu");
     }
 
     public void setMenu(String menu) {
-        this.menu = menu;
+        this.put("menu", menu);
     }
 
     public String getDetail() {
-        return detail;
+        return (String) this.get("detail");
     }
 
     public void setDetail(String detail) {
-        this.detail = detail;
+        this.put("detail", detail);
     }
 
     public String getImageUrl() {
-        return imageUrl;
+        return (String) this.get("imageUrl");
     }
 
     public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+        this.put("imageUrl", imageUrl);
     }
 }
