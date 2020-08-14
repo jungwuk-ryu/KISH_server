@@ -11,15 +11,6 @@ public class Kish2020Server {
     public static void main(String[] args) {
         mainDataBase = new DataBase("kish_main_db.json");
         SpringApplication.run(Kish2020Server.class, args);
-
-        Runtime rt = Runtime.getRuntime();
-        rt.addShutdownHook(new Thread(){
-            @Override
-            public void run(){
-                MainLogger.warn("저장하는 중 입니다.");
-                mainDataBase.save();
-            }
-        });
     }
 
     public DataBase getMainDataBase(){

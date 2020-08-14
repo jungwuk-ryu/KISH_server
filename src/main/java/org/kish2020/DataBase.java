@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.Set;
 
 public class DataBase {
+    public boolean doSave = true;
     public final String jsonName;
     public LinkedHashMap<String, Object> data = new LinkedHashMap<>();
 
@@ -36,9 +37,16 @@ public class DataBase {
         } catch (ParseException | IOException e) {
             MainLogger.error("DB 준비 중 오류가 발생하였습니다.", e);
         }
+        Runtime rt = Runtime.getRuntime();
+        rt.addShutdownHook(new Thread(() -> {
+            save();
+        }));
     }
 
     public void save(){
+        if(!this.doSave) return;
+        MainLogger.warn("저장하는 중 : " + jsonName);
+
         JSONObject jsonObject = new JSONObject();
         for(String key : this.data.keySet()){
             jsonObject.put(key, this.data.get(key));
@@ -60,5 +68,13 @@ public class DataBase {
         int decreasedNum = (int) this.data.getOrDefault(k, 0) - n;
         this.data.put(k, decreasedNum);
         return decreasedNum;
+    }
+
+    public boolean isDoSave() {
+        return doSave;
+    }
+
+    public void setDoSave(boolean doSave) {
+        this.doSave = doSave;
     }
 }
