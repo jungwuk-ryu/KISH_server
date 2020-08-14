@@ -7,9 +7,11 @@ import org.kish2020.Kish2020Server;
 import org.kish2020.MainLogger;
 import org.kish2020.entity.LunchMenu;
 import org.kish2020.entity.SimplePost;
+import org.kish2020.utils.WebUtils;
 import org.kish2020.utils.parser.KishWebParser;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.text.ParseException;
@@ -38,6 +40,29 @@ public class ApiServerController {
             e.printStackTrace();
         }
         this.testDatesJson = testDates.toJSONString();
+    }
+
+    /**
+     * <p>날씨 정보를 얻습니다</p>
+     * <p>추후 API 내용이 변경될 가능성이 있기때문에 클라이언트가 직접 api를 조회하지 않고
+     * 서버측에 요청합니다.</p>
+     *
+     * @param lat 위도(Latitude)
+     * @param lon 경도(Longitude)
+     */
+
+    // TODO : quota 구현, Null check
+    @RequestMapping("/getWeather")
+    public @ResponseBody String getWeather(@RequestParam String lat, @RequestParam String lon){
+        /*
+        아래 API는 Meteorogisk institutt의 api입니다.
+        관련 문서는 https://api.met.no/doc/ 을 참고하세요
+        SAMPLE : https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=21.043611&lon=105.773763
+        */
+
+        String url = "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=" + lat + "&lon=" + lon;
+        JSONObject result = WebUtils.getRequest(url);
+        return result.toJSONString();
     }
 
     @RequestMapping("/getCount")
