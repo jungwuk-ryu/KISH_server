@@ -70,7 +70,7 @@ public class DataBase {
         return decreasedNum;
     }
 
-    public boolean isDoSave() {
+    public boolean getDoSave() {
         return doSave;
     }
 
