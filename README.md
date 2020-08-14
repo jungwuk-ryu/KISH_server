@@ -5,6 +5,9 @@ KISH2020SERVER는 **KISH 2020**의 서버 처리를 담당하는 프로그램입
 
 자세한건 [여기](https://github.com/KISH-students/I-WANNA-JOIN) 를 참고해주세요.
 
+# Java-doc
+[java doc](https://ccc1.kro.kr/java-docs/kish2020Server/)
+
 ## 사용 라이브러리
 - Spring Boot
 - json-simple
