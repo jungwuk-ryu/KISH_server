@@ -12,11 +12,17 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 @Controller
 @RequestMapping("/api")
 public class ApiServerController {
+    public JSONArray testDates = new JSONArray();
+    public String testDatesJson;
+    public SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
+
     private Kish2020Server main;
     private DataBase db;
     SimplePost simplePost;
@@ -25,6 +31,13 @@ public class ApiServerController {
         MainLogger.info("Api Server Controller 초기화중");
         this.main = kish2020Server;
         this.db = this.main.getDataBase();
+
+        try {
+            testDates.add(sdf.parse("2020-08-11").getTime());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        this.testDatesJson = testDates.toJSONString();
     }
 
     @RequestMapping("/getCount")
@@ -54,5 +67,11 @@ public class ApiServerController {
              simplePost = KishWebParser.parseMenu("25").get(0);
         }
         return simplePost.getTitle() + "\n글쓴이 : " + simplePost.getAuthor() + "\n첨부파일 url" + simplePost.getAttachmentIconUrl();
+    }
+
+    @RequestMapping("/getExamDates")
+    public @ResponseBody String getExamDates(){
+        MainLogger.info("getExamDates 호출");
+        return this.testDatesJson;
     }
 }
