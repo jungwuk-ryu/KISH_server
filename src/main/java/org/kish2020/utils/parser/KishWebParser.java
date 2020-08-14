@@ -17,6 +17,10 @@ import java.util.ArrayList;
 public class KishWebParser {
     public static final String ROOT_URL = "http://www.hanoischool.net/";
 
+    /**
+     * <p>Document내 주소들을 절대 경로로 변환합니다.</p>
+     * <p>또한 다운로드 주소는 EUC-KR으로 인코딩합니다.</p>
+     */
     public static Document generateUrl(Document doc){
         // src attribute 가 있는 엘리먼트들을 선택
         try {
@@ -87,7 +91,8 @@ public class KishWebParser {
 			<td>2020-06-04</td>
 			<td>222</td>
 			<td><img src='http://upload70.withschool.co.kr/image/icon_PDF.gif' alt='첨부' border='0' /></td>
-		</tr>**/
+		</tr>
+     */
 
     public static ArrayList<SimplePost> parseMenu(String id){
         return parseMenu(id, "1");

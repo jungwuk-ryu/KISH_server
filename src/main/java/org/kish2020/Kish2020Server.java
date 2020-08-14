@@ -13,6 +13,9 @@ public class Kish2020Server {
         SpringApplication.run(Kish2020Server.class, args);
     }
 
+    /**
+     * @return 기본 데이터베이스
+     */
     public DataBase getMainDataBase(){
         return mainDataBase;
     }

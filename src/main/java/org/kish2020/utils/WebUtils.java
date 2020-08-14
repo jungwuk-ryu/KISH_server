@@ -15,7 +15,16 @@ import java.net.URL;
 public class WebUtils {
     private final static String USER_AGENT = "Mozilla/5.0";
 
+    /**
+     * Post요청을 보냅니다.
+     *
+     * @param fullUrl post요청을 할 url
+     * @param contentType RequestProperty의 Content-Type
+     * @param parameters post요청에 사용할 파라미터
+     * @return 요청에 성공할경우 JSONObject, 실패할경우 null
+     */
     // TODO : 테스트
+
     public static JSONObject postRequest(String fullUrl, ContentType contentType, String parameters){
         try {
             URL url = new URL(fullUrl);
@@ -68,7 +77,10 @@ public class WebUtils {
     }
 
     /**
+     * <p>Get 요청을 보냅니다</p>
+     *
      * @param fullUrl 파라미터를 포함한 url
+     * @return 요청에 성공할경우 JSONObject, 실패할경우 null
      */
 
     public static JSONObject getRequest(String fullUrl) {

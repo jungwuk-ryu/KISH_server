@@ -58,12 +58,18 @@ public class DataBase {
         }
     }
 
+    /**
+     * key에 해당하는 값을 n만큼 증가시킵니다.
+     */
     public int increase(String k, int n){
         int increasedNum = (int) this.data.getOrDefault(k, 0) + n;
         this.data.put(k, increasedNum);
         return increasedNum;
     }
 
+    /**
+     * key에 해당하는 값을 n만큼 감소시킵니다.
+     */
     public int decrease(String k, int n){
         int decreasedNum = (int) this.data.getOrDefault(k, 0) - n;
         this.data.put(k, decreasedNum);
