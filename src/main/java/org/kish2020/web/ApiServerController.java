@@ -30,7 +30,7 @@ public class ApiServerController {
     public ApiServerController(Kish2020Server kish2020Server){
         MainLogger.info("Api Server Controller 초기화중");
         this.main = kish2020Server;
-        this.db = this.main.getDataBase();
+        this.db = this.main.getMainDataBase();
 
         try {
             testDates.add(sdf.parse("2020-08-11").getTime());

@@ -5,11 +5,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class Kish2020Server {
-    public static DataBase dataBase = null;
+    public static DataBase mainDataBase = null;
     public int d = 1;
 
     public static void main(String[] args) {
-        dataBase = new DataBase("kish_main_db.json");
+        mainDataBase = new DataBase("kish_main_db.json");
         SpringApplication.run(Kish2020Server.class, args);
 
         Runtime rt = Runtime.getRuntime();
@@ -17,12 +17,12 @@ public class Kish2020Server {
             @Override
             public void run(){
                 MainLogger.warn("저장하는 중 입니다.");
-                dataBase.save();
+                mainDataBase.save();
             }
         });
     }
 
-    public DataBase getDataBase(){
-        return dataBase;
+    public DataBase getMainDataBase(){
+        return mainDataBase;
     }
 }
