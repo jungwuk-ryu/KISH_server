@@ -23,7 +23,7 @@ import java.util.ArrayList;
 public class ApiServerController {
     public JSONArray testDates = new JSONArray();
     public String testDatesJson;
-    public SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
+    public SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
     private Kish2020Server main;
     private DataBase db;
@@ -35,7 +35,7 @@ public class ApiServerController {
         this.db = this.main.getMainDataBase();
 
         try {
-            testDates.add(sdf.parse("2020-08-11").getTime());
+            testDates.add(sdf.parse("2020-09-07").getTime() / 1000);
         } catch (ParseException e) {
             e.printStackTrace();
         }
