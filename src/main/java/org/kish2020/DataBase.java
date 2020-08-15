@@ -11,10 +11,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
-public class DataBase {
+public class DataBase extends LinkedHashMap<String, Object>{
     public boolean doSave = true;
     public final String jsonName;
-    public LinkedHashMap<String, Object> data = new LinkedHashMap<>();
 
     public DataBase(String jsonName) {
         this.jsonName = jsonName;
@@ -31,8 +30,8 @@ public class DataBase {
             jsonObject = (JSONObject) (new JSONParser().parse(json));
             for(String key : (Set<String>) jsonObject.keySet()){
                 Object data = jsonObject.get(key);
-                if(data instanceof Long) this.data.put(key, ((Long) data).intValue());  //사실 그냥 Long으로 냅두면 어떨까 싶습니다.
-                else this.data.put(key, data);
+                if(data instanceof Long) this.put(key, ((Long) data).intValue());  //사실 그냥 Long으로 냅두면 어떨까 싶습니다.
+                else this.put(key, data);
             }
         } catch (ParseException | IOException e) {
             MainLogger.error("DB 준비 중 오류가 발생하였습니다.", e);
@@ -48,8 +47,8 @@ public class DataBase {
         MainLogger.warn("저장하는 중 : " + jsonName);
 
         JSONObject jsonObject = new JSONObject();
-        for(String key : this.data.keySet()){
-            jsonObject.put(key, this.data.get(key));
+        for(String key : this.keySet()){
+            jsonObject.put(key, this.get(key));
         }
         try {
             FileUtils.write(new File(jsonName), jsonObject.toJSONString(), StandardCharsets.UTF_8);
@@ -62,8 +61,8 @@ public class DataBase {
      * key에 해당하는 값을 n만큼 증가시킵니다.
      */
     public int increase(String k, int n){
-        int increasedNum = (int) this.data.getOrDefault(k, 0) + n;
-        this.data.put(k, increasedNum);
+        int increasedNum = (int) this.getOrDefault(k, 0) + n;
+        this.put(k, increasedNum);
         return increasedNum;
     }
 
@@ -71,8 +70,8 @@ public class DataBase {
      * key에 해당하는 값을 n만큼 감소시킵니다.
      */
     public int decrease(String k, int n){
-        int decreasedNum = (int) this.data.getOrDefault(k, 0) - n;
-        this.data.put(k, decreasedNum);
+        int decreasedNum = (int) this.getOrDefault(k, 0) - n;
+        this.put(k, decreasedNum);
         return decreasedNum;
     }
 
