@@ -2,7 +2,7 @@ package org.kish2020.web;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.kish2020.DataBase;
+import org.kish2020.DataBase.ExpandedDataBase;
 import org.kish2020.Kish2020Server;
 import org.kish2020.MainLogger;
 import org.kish2020.entity.LunchMenu;
@@ -26,7 +26,8 @@ public class ApiServerController {
     public SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
     private Kish2020Server main;
-    private DataBase db;
+    private ExpandedDataBase db;
+    private ExpandedDataBase lunchLikesDB;
     SimplePost simplePost;
 
     public ApiServerController(Kish2020Server kish2020Server){

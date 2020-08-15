@@ -1,7 +1,7 @@
 package org.kish2020.web;
 
 import org.json.simple.JSONObject;
-import org.kish2020.DataBase;
+import org.kish2020.DataBase.DataBase;
 import org.kish2020.Kish2020Server;
 import org.kish2020.MainLogger;
 import org.kish2020.utils.WebUtils;
