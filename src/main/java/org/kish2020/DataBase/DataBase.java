@@ -75,6 +75,14 @@ public class DataBase<V> extends LinkedHashMap<String, V>{
         }
     }
 
+    public boolean put(String key, V value, boolean overwrite){
+        if(this.containsKey(key)){
+            if(!overwrite) return false;
+        }
+        this.put(key, value);
+        return true;
+    }
+
     public boolean isLoaded() { return isLoaded; }
 
     public boolean getDoSave() {
