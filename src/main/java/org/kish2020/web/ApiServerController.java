@@ -73,8 +73,8 @@ public class ApiServerController {
     }
 
     @RequestMapping("/getLunch")
-    public @ResponseBody String getLunch(){ // TODO : 캐싱
-        ArrayList<LunchMenu> list = KishWebParser.parseLunch("2020-07-1");
+    public @ResponseBody String getLunch(@RequestParam(required = false, defaultValue = "") String date){ // TODO : 캐싱
+        ArrayList<LunchMenu> list = KishWebParser.parseLunch(date);
         JSONArray jsonArray = new JSONArray();
         for(LunchMenu menu : list){
             JSONObject jsonObject = new JSONObject();

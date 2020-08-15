@@ -54,10 +54,10 @@ public class KishWebParser {
         return parseLunch("");
     }
 
-    public static ArrayList<LunchMenu> parseLunch(String changeData){
+    public static ArrayList<LunchMenu> parseLunch(String changeDate){
         ArrayList<LunchMenu> list = new ArrayList<>();
         try {
-            Document doc = Jsoup.connect(ROOT_URL + "?menu_no=47&ChangeDate=" + changeData).get();
+            Document doc = Jsoup.connect(ROOT_URL + "?menu_no=47&ChangeDate=" + changeDate).get();
             Elements items = doc.select(".mm_to");
             items.forEach((element -> {
                 Elements info = element.select("p");
