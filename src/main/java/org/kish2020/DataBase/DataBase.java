@@ -59,6 +59,12 @@ public class DataBase<V> extends LinkedHashMap<String, V>{
         return map;
     }
 
+    public void remove(){
+        File file = new File(fileName);
+        file.delete();
+        MainLogger.warn("제거됨 : " + fileName);
+    }
+
     public void save(){
         if(!this.doSave) return;
         if(!this.isLoaded){
