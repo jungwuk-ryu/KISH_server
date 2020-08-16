@@ -30,11 +30,11 @@ public class PostApi {
     public ExpandedDataBase db;
     public HashSet<String> savedPost;
     /* 검색 관련 */
-    public DataBase<HashMap<String, Integer>> postInKeyword;
-    public LinkedHashMap<String, String> tempSrcTemp = new LinkedHashMap<>();   //토큰, 키워드
+    public DataBase<HashMap<String, Long>> postInKeyword;
+    public LinkedHashMap<String, HashSet<String>> tempSrcTemp = new LinkedHashMap<>();   //검색어, 결과
 
     public PostApi(){
-        this.postInKeyword = new DataBase<HashMap<String, Integer>>("post/keywordDB.json");
+        this.postInKeyword = new DataBase<HashMap<String, Long>>("post/keywordDB.json");
         if(!this.postInKeyword.isLoaded()){
             this.postInKeyword.reload();
             if(!this.postInKeyword.isLoaded()) {
@@ -83,12 +83,13 @@ public class PostApi {
     /* 테스트용 코드입니다 */
     @RequestMapping("/d")
     public @ResponseBody String dTest(@RequestParam String bno, @RequestParam String menu){
-        LinkedHashMap<String, Integer> m = Utils.getContentTokenMap(KishWebParser.getPostRawContent(
+        /*LinkedHashMap<String, Integer> m = Utils.getContentTokenMap(KishWebParser.getPostRawContent(
                 "http://hanoischool.net/default.asp?board_mode=view&menu_no=" + menu + "&bno=" + bno
-        ));
-        Utils.addPostToKeyword(menu + "," + bno,this.postInKeyword, m);
-        JSONObject a = new JSONObject(this.postInKeyword);
-        return a.toJSONString();
+        ));*/
+        Post post = KishWebParser.parsePost(menu, bno);
+        Utils.addPostToKeyword(post.getPostKey(), post.getTitle(), post.getAttachmentUrlMap(), this.postInKeyword, Utils.getContentTokenMap(post.getContent()));
+        MainLogger.warn(post.getPostKey());
+        return new JSONObject(post).toJSONString();
     }
 
     @RequestMapping("/searchPost")

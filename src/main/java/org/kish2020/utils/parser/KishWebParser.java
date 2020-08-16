@@ -1,7 +1,6 @@
 package org.kish2020.utils.parser;
 
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -9,6 +8,7 @@ import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 import org.kish2020.MainLogger;
 import org.kish2020.entity.LunchMenu;
+import org.kish2020.entity.Post;
 import org.kish2020.entity.SimplePost;
 
 import java.io.IOException;
@@ -100,10 +100,10 @@ public class KishWebParser {
         return parseMenu(id, "1");
     }
 
-    public static ArrayList<SimplePost> parseMenu(String id, String page){
+    public static ArrayList<SimplePost> parseMenu(String menuId, String page){
         ArrayList<SimplePost> list = new ArrayList<>();
         try {
-            String url = ROOT_URL + "?menu_no=" + id + "&page=" + page;
+            String url = ROOT_URL + "?menu_no=" + menuId + "&page=" + page;
             Document doc = Jsoup.connect(url).get();
             Elements items = doc.select(".h_line_dot");
             items.addAll(doc.select(".h_line_color"));
@@ -121,7 +121,7 @@ public class KishWebParser {
                 String attachmentIconUrl = elements.select("img").attr("src");
                 String postUrl = ROOT_URL + elements.select("a").attr("href");
 
-                list.add(new SimplePost(postUrl, postId, title, author, postDate, attachmentIconUrl));
+                list.add(new SimplePost(postUrl, menuId, postId, title, author, postDate, attachmentIconUrl));
             }));
         } catch (IOException e) {
             MainLogger.error("", e);
@@ -129,26 +129,25 @@ public class KishWebParser {
         return list;
     }
 
-    public static String generatePostToNormal(String fullUrl){
-        try {
-            Document doc = Jsoup.connect(fullUrl).get();
-            generateUrl(doc);
-            Elements elements = doc.select("link");
-            for (Element element : elements) {
-                if("http://www.hanoischool.net/html/css/style.css?ver=1.0.0.0.0".equals(element.attr("href")))
-                    element.remove();
-            }
-            doc.head().append("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">");
-            doc.select("#nav").forEach((Node::remove));
-            doc.select("#skipnavigation").forEach(Node::remove);
-            doc.select("#header").forEach((Node::remove));
-            doc.select("#sub_visual").forEach((Node::remove));
-            doc.select("#footer").forEach(Node::remove);
-            doc.select("#sub_left").forEach(Node::remove);
-            doc.select(".h_board table").forEach(Node::remove);
-            doc.select(".h_btn_area2").forEach(Node::remove);
-            doc.select(".table_b5").forEach(Node::remove);
-            return doc.toString();
+    public static String generatePostToNormal(Document doc){
+        doc = doc.clone();
+        generateUrl(doc);
+        Elements elements = doc.select("link");
+        for (Element element : elements) {
+            if("http://www.hanoischool.net/html/css/style.css?ver=1.0.0.0.0".equals(element.attr("href")))
+                element.remove();
+        }
+        doc.head().append("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">");
+        doc.select("#nav").forEach((Node::remove));
+        doc.select("#skipnavigation").forEach(Node::remove);
+        doc.select("#header").forEach((Node::remove));
+        doc.select("#sub_visual").forEach((Node::remove));
+        doc.select("#footer").forEach(Node::remove);
+        doc.select("#sub_left").forEach(Node::remove);
+        doc.select(".h_board table").forEach(Node::remove);
+        doc.select(".h_btn_area2").forEach(Node::remove);
+        doc.select(".table_b5").forEach(Node::remove);
+        return doc.toString();
             /*return "<html lang=\"ko\">\n" +
                     "\t<head>\n" +
                     "\n" +
@@ -158,28 +157,54 @@ public class KishWebParser {
                     "\t\t<meta name=\"content-language\" content=\"kr\" />\n" +
                     "\t\t<meta name=\"build\" content=\"\" />\n" +
                     "</head><body>" + doc.select("style") + doc.select("script") + doc.select(".h_body").get(0).html() + "</body></html>";
-*/        } catch (IOException e) {
-            MainLogger.error("", e);
-            return "";
-        }
+*/
     }
 
-    public static String getPostRawContent(String url){
+    public static Post parsePost(String menuID, String postID){
+        Post post = new Post(menuID, postID);
         try {
-            Document doc = Jsoup.connect(url).get();
-            Elements elements = doc.select("#bbs_view_contents");
-            Element content = elements.get(0);
-            content.select("p").forEach(element -> {
-                /*if(element.tagName().equals("p") || element.tagName().equals("br") || element.tagName().equals("span")){
-                    if(element.select("br").size() > 0) element.after("\\n");
-                }*/
-                element.after("\\n");
-            });
-            return StringUtils.replace(content.text(), "\\n", "\n");
+            Document doc = Jsoup.connect("http://hanoischool.net/default.asp?menu_no=" + menuID + "&board_mode=view&bno=" + postID).get();
+            Elements elements = doc.select(".h_board").get(0).getAllElements();
+            Elements thElements = elements.select("th");
+            Elements titleElements = elements.select(".h_view_title");
+
+            post.setMenuId(menuID);
+            post.setPostId(postID);
+            post.getFullHtml(doc.html());
+            post.setTitle(thElements.get(0).text());
+            post.setAuthor(titleElements.get(0).text());
+            post.setPostDate(titleElements.get(1).text().split(" ")[0]);
+            post.setContent(KishWebParser.getPostRawContent(doc));
+
+            //첨부파일
+            generateUrl(doc);
+            Elements attachmentElements = titleElements.get(2).select("a");
+            if(attachmentElements.size() < 1){
+                post.setHasAttachment(false);
+            }else{
+                post.setHasAttachment(true);
+                attachmentElements.forEach(element -> {
+                    post.addAttachmentUrl(element.text(), element.attr("href"));
+                });
+            }
         } catch (IOException e) {
-            MainLogger.error("", e);
-            return "";
+            MainLogger.error("postKey : " + menuID + "," + postID, e);
+            return null;
         }
+        return post;
+    }
+
+    public static String getPostRawContent(Document doc){
+        doc = doc.clone();
+        Elements elements = doc.select("#bbs_view_contents");
+        Element content = elements.get(0);
+        content.select("p").forEach(element -> {
+            /*if(element.tagName().equals("p") || element.tagName().equals("br") || element.tagName().equals("span")){
+                if(element.select("br").size() > 0) element.after("\\n");
+            }*/
+            element.after("\\n");
+        });
+        return StringUtils.replace(content.text(), "\\n", "\n");
     }
 
 }

@@ -1,20 +1,31 @@
 package org.kish2020.entity;
 
 import org.json.simple.JSONObject;
+import org.kish2020.DataBase.DataBase;
 
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 
-public class Post extends JSONObject {
+public class Post extends DataBase<Object> {
+    public Post(String menuID, String postID){
+        super("post/posts/" + menuID + "/" + postID + ".json");
+        this.setAttachmentUrlMap(new LinkedHashMap<>());
+        this.setMenuId(menuID);
+        this.setPostId(postID);
+    }
+
     public Post(JSONObject jsonObject){
+        super("post/posts/" + jsonObject.get("menuId") + "," + jsonObject.get("postID") + ".json");
         this.put("title", jsonObject.get("title"));
         this.put("content", jsonObject.get("content"));
         this.put("author", jsonObject.get("author"));
         this.put("postDate", jsonObject.get("postDate"));
         this.put("hasAttachment", jsonObject.get("hasAttachment"));
-        this.put("attachmentUrl", jsonObject.get("attachmentUrl"));
-        this.put("postId", jsonObject.get("postId"));
-        this.put("menuID", jsonObject.get("menuId"));
+        this.put("attachmentUrlMap", jsonObject.get("attachmentUrlMap"));
+        this.put("postID", jsonObject.get("postID"));
+        this.put("menuID", jsonObject.get("menuID"));
         this.put("registeredKeyword", jsonObject.get("registeredKeyword"));
+        this.put("fullHtml", jsonObject.get("fullHtml"));
     }
 
     public String getTitle() {
@@ -49,20 +60,26 @@ public class Post extends JSONObject {
         this.put("postDate", postDate);
     }
 
-    public String getAttachmentUrl() {
-        return (String) this.get("attachmentUrl");
+    public LinkedHashMap<String, String> getAttachmentUrlMap() {
+        return (LinkedHashMap<String, String>) this.getOrDefault("attachmentUrlMap", new LinkedHashMap<>());
     }
 
-    public void setAttachmentUrl(String attachmentUrl) {
-        this.put("attachmentUrl", attachmentUrl);
+    public void setAttachmentUrlMap(LinkedHashMap<String, String> attachmentUrlMap) {
+        this.put("attachmentUrlMap", attachmentUrlMap);
+    }
+    
+    public void addAttachmentUrl(String name, String url){
+        LinkedHashMap<String, String> map = this.getAttachmentUrlMap();
+        map.put(name, url);
+        this.setAttachmentUrlMap(map);
     }
 
     public String getPostId() {
-        return (String) this.get("postId");
+        return (String) this.get("postID");
     }
 
-    public void setPostId(String postId) {
-        this.put("postId", postId);
+    public void setPostId(String postID) {
+        this.put("postID", postID);
     }
 
     public String getMenuId() {
@@ -73,7 +90,7 @@ public class Post extends JSONObject {
         this.put("menuId", menuId);
     }
 
-    public boolean isHasAttachment() {
+    public boolean HasAttachment() {
         return (boolean) this.get("hasAttachment");
     }
 
@@ -87,5 +104,17 @@ public class Post extends JSONObject {
 
     public void setRegisteredKeyword(HashSet<String> registeredKeyword) {
         this.put("registeredKeyword", registeredKeyword);
+    }
+
+    public String getFullHtml(){
+        return (String) this.get("fullHtml");
+    }
+
+    public void getFullHtml(String html){
+        this.put("fullHtml", html);
+    }
+
+    public String getPostKey(){
+        return this.getMenuId() + "," + this.getPostId();
     }
 }
