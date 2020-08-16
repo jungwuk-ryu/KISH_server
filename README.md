@@ -14,3 +14,7 @@ KISH2020SERVER는 **KISH 2020**의 서버 처리를 담당하는 프로그램입
 - log4j-core
 - commons-io
 - jsoup 
+- firebase-admin
+- auto-value
+- commons-lang3
+- [KoreanTextMatcher](https://github.com/bangjunyoung/KoreanTextMatcher)
