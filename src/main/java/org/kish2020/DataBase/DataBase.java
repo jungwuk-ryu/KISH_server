@@ -14,12 +14,12 @@ import java.util.Set;
 
 public class DataBase<V> extends LinkedHashMap<String, V>{
     public boolean doSave = true;
-    public final String jsonName;
+    public final String fileName;
 
     private boolean isLoaded = false;
 
-    public DataBase(String jsonName) {
-        this.jsonName = jsonName;
+    public DataBase(String fileName) {
+        this.fileName = fileName;
         this.reload();
         Runtime rt = Runtime.getRuntime();
         rt.addShutdownHook(new Thread(() -> {
@@ -28,7 +28,7 @@ public class DataBase<V> extends LinkedHashMap<String, V>{
     }
 
     public void reload(){
-        File jsonFile = new File(jsonName);
+        File jsonFile = new File(fileName);
         MainLogger.warn("DB 불러오는 중 : " + jsonFile.getAbsolutePath());
         try {
             String json;
@@ -62,14 +62,14 @@ public class DataBase<V> extends LinkedHashMap<String, V>{
             MainLogger.error("DB가 정상적으로 로드되지 않아 데이터 손실 방지를 위해 저장되지 않습니다.");
             return;
         }
-        MainLogger.warn("저장하는 중 : " + jsonName);
+        MainLogger.warn("저장하는 중 : " + fileName);
 
         JSONObject jsonObject = new JSONObject();
         for(String key : this.keySet()){
             jsonObject.put(key, this.get(key));
         }
         try {
-            FileUtils.write(new File(jsonName), jsonObject.toJSONString(), StandardCharsets.UTF_8);
+            FileUtils.write(new File(fileName), jsonObject.toJSONString(), StandardCharsets.UTF_8);
         } catch (IOException e) {
             MainLogger.error("DB 저장중 오류가 발생하였습니다.", e);
         }

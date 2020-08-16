@@ -6,8 +6,8 @@ import java.util.LinkedHashMap;
 import java.util.Set;
 
 public class ExpandedDataBase extends DataBase<Object> {
-    public ExpandedDataBase(String jsonName) {
-        super(jsonName);
+    public ExpandedDataBase(String fileName) {
+        super(fileName);
     }
 
     @Override
