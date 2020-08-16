@@ -133,13 +133,8 @@ public class PostApi {
     /* 테스트용 코드입니다 */
     @RequestMapping("/d")
     public @ResponseBody String dTest(@RequestParam String bno, @RequestParam String menu){
-        /*LinkedHashMap<String, Integer> m = Utils.getContentTokenMap(KishWebParser.getPostRawContent(
-                "http://hanoischool.net/default.asp?board_mode=view&menu_no=" + menu + "&bno=" + bno
-        ));*/
-        Post post = KishWebParser.parsePost(menu, bno);
-        Utils.addPostToKeyword(post.getPostKey(), post.getTitle(), post.getAttachmentUrlMap(), this.postInKeyword, Utils.getContentTokenMap(post.getContent()));
-        MainLogger.warn(post.getPostKey());
-        return new JSONObject(post).toJSONString();
+        //this.parseAllPosts();
+        return "ok";
     }
 
     @RequestMapping("/searchPost")
@@ -156,5 +151,38 @@ public class PostApi {
             }));
         }
         return array.toJSONString();
+    }
+
+    /**
+     * 검색기능을 위해 학교 홈페이지 내 모든 게시글을 불러옵니다
+     */
+    private void parseAllPosts(){
+        MainLogger.warn("이 작업 후 프로그램 재시작을 추천드립니다.");
+        Thread thread = new Thread( () -> {
+            int cnt = 0;
+            int postCount = 0;
+            int totalMenuCount =  MenuID.values().length;
+            for(MenuID menuId : MenuID.values()){
+                MainLogger.info((cnt++) + " / " + totalMenuCount);
+                String id = menuId.id;
+                int i = 1;
+                while(true) {
+                    ArrayList<SimplePost> list = KishWebParser.parseMenu(id, Integer.toString(i));
+                    if(list.size() < 1) break;
+                    for (SimplePost sp : list){
+                        this.getPostFromServer(sp.getMenuId(), sp.getPostId());
+                        postCount++;
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e) {
+                            MainLogger.error("", e);
+                        }
+                    }
+                    i++;
+                }
+            }
+            MainLogger.info("총 " + postCount + "개의 게시물이 저장되었습니다.");
+        });
+        thread.start();
     }
 }

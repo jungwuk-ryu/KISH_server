@@ -4,6 +4,8 @@ import io.github.bangjunyoung.KoreanChar;
 import org.apache.commons.lang3.StringUtils;
 import org.kish2020.MainLogger;
 import org.kish2020.MenuID;
+import org.kish2020.entity.SimplePost;
+import org.kish2020.utils.parser.KishWebParser;
 
 import java.io.File;
 import java.util.*;
@@ -97,18 +99,6 @@ public class Utils {
             }
         }
         return treeMap;
-    }
-
-    /**
-     * 검색기능을 위해 학교 홈페이지 내 모든 게시글을 불러옵니다
-     */
-    public static void parseAllPosts(){
-        MainLogger.warn("이 작업 후 프로그램 재시작을 추천드립니다.");
-        Thread thread = new Thread( () -> {
-            for(MenuID menuId : MenuID.values()){
-                String id = menuId.toString();
-            }
-        });
     }
 
     /**
