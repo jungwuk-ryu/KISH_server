@@ -91,6 +91,9 @@ public enum MenuID {
     PREVIOUS_NOTICE("69"),
     /** 이전 서식자료실 메뉴 ID */
     PREVIOUS_FORMATTING("81");
-    
-    MenuID(String menuId){}
+
+    public String id;
+    MenuID(String menuId){
+        this.id = menuId;
+    }
 }

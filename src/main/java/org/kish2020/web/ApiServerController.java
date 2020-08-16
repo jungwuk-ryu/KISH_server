@@ -25,10 +25,9 @@ public class ApiServerController {
     public String testDatesJson;
     public SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-    private Kish2020Server main;
+    private final Kish2020Server main;
     private ExpandedDataBase db;
     private ExpandedDataBase lunchLikesDB;
-    SimplePost simplePost;
 
     public ApiServerController(Kish2020Server kish2020Server){
         MainLogger.info("Api Server Controller 초기화중");
@@ -84,15 +83,6 @@ public class ApiServerController {
             jsonArray.add(jsonObject);
         }
         return jsonArray.toJSONString();
-    }
-
-    @RequestMapping("/getPosts")
-    public @ResponseBody String getPosts(){  // TODO : 캐싱
-        if(this.simplePost == null) {
-            MainLogger.info("불러오는 중");
-             simplePost = KishWebParser.parseMenu("25").get(0);
-        }
-        return simplePost.getTitle() + "\n글쓴이 : " + simplePost.getAuthor() + "\n첨부파일 url" + simplePost.getAttachmentIconUrl();
     }
 
     @RequestMapping("/getExamDates")
