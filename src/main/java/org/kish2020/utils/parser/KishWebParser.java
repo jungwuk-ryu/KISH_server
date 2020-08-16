@@ -101,7 +101,7 @@ public class KishWebParser {
     public static ArrayList<SimplePost> parseMenu(String id, String page){
         ArrayList<SimplePost> list = new ArrayList<>();
         try {
-            Document doc = Jsoup.connect(ROOT_URL + "?menu_no=" + id).get();
+            Document doc = Jsoup.connect(ROOT_URL + "?menu_no=" + id + "&page=" + page).get();
             Elements items = doc.select(".h_line_dot");
             items.forEach((element -> {
                 Elements elements = items.select("td");
