@@ -104,14 +104,14 @@ public class KishWebParser {
             Document doc = Jsoup.connect(ROOT_URL + "?menu_no=" + id + "&page=" + page).get();
             Elements items = doc.select(".h_line_dot");
             items.forEach((element -> {
-                Elements elements = items.select("td");
+                Elements elements = element.select("td");
                 String postId = elements.get(0).text();
                 String title = elements.get(1).text();
                 String author = elements.get(2).text();
                 String postDate = elements.get(3).text();
 
-                String attachmentIconUrl = items.select("img").attr("src");
-                String postUrl = ROOT_URL + items.select("a").attr("href");
+                String attachmentIconUrl = elements.select("img").attr("src");
+                String postUrl = ROOT_URL + elements.select("a").attr("href");
 
                 list.add(new SimplePost(postUrl, postId, title, author, postDate, attachmentIconUrl));
             }));
