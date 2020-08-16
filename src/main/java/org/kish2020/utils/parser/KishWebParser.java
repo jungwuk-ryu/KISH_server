@@ -101,8 +101,14 @@ public class KishWebParser {
     public static ArrayList<SimplePost> parseMenu(String id, String page){
         ArrayList<SimplePost> list = new ArrayList<>();
         try {
-            Document doc = Jsoup.connect(ROOT_URL + "?menu_no=" + id + "&page=" + page).get();
+            String url = ROOT_URL + "?menu_no=" + id + "&page=" + page;
+            Document doc = Jsoup.connect(url).get();
             Elements items = doc.select(".h_line_dot");
+            items.addAll(doc.select(".h_line_color"));
+            if(items.size() > 11){
+                MainLogger.warn("다음 페이지의 게시물 개수가 옳바르지 않습니다.");
+                MainLogger.warn(url);
+            }
             items.forEach((element -> {
                 Elements elements = element.select("td");
                 String postId = elements.get(0).text();
