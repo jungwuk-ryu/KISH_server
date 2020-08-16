@@ -98,4 +98,29 @@ public class Utils {
         }
         return treeMap;
     }
+
+    /**
+     * 검색기능을 위해 학교 홈페이지 내 모든 게시글을 불러옵니다
+     */
+    public static void parseAllPosts(){
+        MainLogger.warn("이 작업 후 프로그램 재시작을 추천드립니다.");
+        Thread thread = new Thread( () -> {
+            for(MenuID menuId : MenuID.values()){
+                String id = menuId.toString();
+            }
+        });
+    }
+
+    /**
+     * post/posts/에 저장된 게시물인지 확인합니다.
+     */
+    public static boolean isSavedPost(String postKey){
+        String[] tokens = postKey.split(",");
+        return isSavedPost(tokens[0], tokens[1]);
+    }
+
+    public static boolean isSavedPost(String menuId, String postId){
+        File file = new File("post/posts/" + menuId + "/" + postId + ".json");
+        return file.exists();
+    }
 }

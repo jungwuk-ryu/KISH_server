@@ -4,12 +4,13 @@ import org.json.simple.JSONObject;
 
 public class SimplePost extends JSONObject {
 
-    public SimplePost(String postUrl, String postId, String title, String author, String postDate, String attachmentIconUrl){
+    public SimplePost(String postUrl, String menuID, String postId, String title, String author, String postDate, String attachmentIconUrl){
         this.setPostUrl(postUrl);
         this.setPostId(postId);
         this.setTitle(title);
         this.setAuthor(author);
         this.setPostDate(postDate);
+        this.setMenuId(menuID);
 
         this.setAttachmentIconUrl(attachmentIconUrl);
     }
@@ -70,4 +71,12 @@ public class SimplePost extends JSONObject {
     /*public void setHasAttachment(boolean hasAttachment) {
         this.hasAttachment = hasAttachment;
     }*/
+
+    public String getMenuId(){
+        return (String) this.get("menuID");
+    }
+
+    public void setMenuId(String menuId){
+        this.put("menuID", menuId);
+    }
 }

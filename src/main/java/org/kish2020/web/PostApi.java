@@ -10,6 +10,7 @@ import org.kish2020.DataBase.ExpandedDataBase;
 import org.kish2020.MainLogger;
 import org.kish2020.MenuID;
 import org.kish2020.entity.Post;
+import org.kish2020.entity.SimplePost;
 import org.kish2020.utils.Utils;
 import org.kish2020.utils.parser.KishWebParser;
 import org.springframework.stereotype.Controller;
@@ -17,9 +18,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.rmi.CORBA.Util;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -28,7 +31,7 @@ import java.util.LinkedHashMap;
 @RequestMapping("/api/post")
 public class PostApi {
     public ExpandedDataBase db;
-    public HashSet<String> savedPost;
+    public LinkedHashMap<String, Post> loadedPosts = new LinkedHashMap<>();
     /* 검색 관련 */
     public DataBase<HashMap<String, Long>> postInKeyword;
     public LinkedHashMap<String, HashSet<String>> tempSrcTemp = new LinkedHashMap<>();   //검색어, 결과
@@ -49,18 +52,49 @@ public class PostApi {
         });
     }
 
+    /**
+     * 저장된 게시물을 불러옵니다.
+     */
     public Post getPost(String postKey){
-        if(!this.savedPost.contains(postKey)){
+        if(this.loadedPosts.containsKey(postKey)){
+            return this.loadedPosts.get(postKey);
+        }
+        String[] tokens = postKey.split(",");
+        if(!Utils.isSavedPost(tokens[0], tokens[1])) return null;
+        Post post = new Post(tokens[0], tokens[1]);
+        this.loadedPosts.put(postKey, post);
+        return post;
+    }
+
+    public Post getPostFromServer(String menuId, String postID){
+        MainLogger.info("서버에서 받아오는 중 : " + menuId + "," + postID);
+        boolean isNew = false;
+        if(!Utils.isSavedPost(menuId, postID)) isNew = true;
+        Post post = KishWebParser.parsePost(menuId, postID);
+        if(post == null){
+            if(Utils.isSavedPost(menuId, postID)){
+                this.removePost(getPost(menuId + "," + postID));
+            }
             return null;
         }
-        JSONObject jsonObject;
-        try {
-             jsonObject = (JSONObject) new JSONParser().parse(FileUtils.readFileToString(new File("post/posts/" + postKey), StandardCharsets.UTF_8));
-        } catch (IOException | ParseException e) {
-            MainLogger.error("", e);
-            return null;
-        }
-        return new Post(jsonObject);
+        if(isNew) registerPostKeywords(post);
+        this.loadedPosts.put(post.getPostKey(), post);
+        return post;
+    }
+
+    public void registerPostKeywords(Post post){
+        Utils.addPostToKeyword(post.getPostKey(), post.getTitle(), post.getAttachmentUrlMap(), this.postInKeyword, Utils.getContentTokenMap(post.getContent()));
+    }
+
+    public void unRegisterPostKeyWords(Post post){
+        Utils.removePostFromKeyword(post.getPostKey(), post.getTitle(), post.getAttachmentUrlMap(), this.postInKeyword, Utils.getContentTokenMap(post.getContent()));
+    }
+
+    public void removePost(Post post){
+        post.remove();
+        post.setDoSave(false);
+        this.loadedPosts.remove(post.getPostKey());
+        unRegisterPostKeyWords(post);
     }
 
     @RequestMapping("/getMenuIds")
@@ -72,11 +106,27 @@ public class PostApi {
         return jsonObject.toJSONString();
     }
 
-    @RequestMapping("/getPosts")
-    public @ResponseBody String getPostsApi(@RequestParam String menuId, @RequestParam(required = false, defaultValue = "1") String page){
+    @RequestMapping("/getPostsFromMenu")
+    public @ResponseBody String getPostsFromMenuApi(@RequestParam String menuId, @RequestParam(required = false, defaultValue = "1") String page){
         JSONArray jsonArray = new JSONArray();
         MainLogger.info("메뉴 게시글 불러오는 중 : " + menuId);
-        jsonArray.addAll(KishWebParser.parseMenu(menuId, page));
+        ArrayList<SimplePost> result = KishWebParser.parseMenu(menuId, page);
+        jsonArray.addAll(result);
+        Thread thread = new Thread(() -> {
+            result.forEach(sp -> {
+                String postKey = sp.getMenuId() + sp.getPostId();
+                if(this.loadedPosts.containsKey(postKey)) return;
+                if(!Utils.isSavedPost(sp.getMenuId(), sp.getPostId())){
+                    getPostFromServer(sp.getMenuId(), sp.getPostId());
+                }
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    MainLogger.error("", e);
+                }
+            });
+        });
+        thread.start();
         return jsonArray.toJSONString();
     }
 
@@ -94,8 +144,17 @@ public class PostApi {
 
     @RequestMapping("/searchPost")
     public @ResponseBody String searchPostApi(@RequestParam String keyword){
+        MainLogger.info("검색요청 : " + keyword);
         JSONArray array = new JSONArray();
-        array.addAll(Utils.search(this.postInKeyword, keyword));
+        if(!this.tempSrcTemp.containsKey(keyword)) {
+            Utils.search(this.postInKeyword, keyword).forEach(((key, value) -> {
+                for(String postKey : value){
+                    Post post = getPost(postKey);
+                    if(post == null) continue;
+                    array.add(post);
+                }
+            }));
+        }
         return array.toJSONString();
     }
 }
