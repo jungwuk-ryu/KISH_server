@@ -59,7 +59,7 @@ public class PostApi {
                     MainLogger.info("update task : " + (cnt++) + " / " + totalMenuCount);
                     String id = menuId.id;
                     ArrayList<SimplePost> list = KishWebParser.parseMenu(id, "1");
-                    if (list.size() < 1) break;
+                    if (list.size() < 1) continue;
                     for (SimplePost sp : list) {
                         if(Utils.isSavedPost(sp.getMenuId(), sp.getPostId())){
                             break;
