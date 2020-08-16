@@ -107,7 +107,7 @@ public class KishWebParser {
             Document doc = Jsoup.connect(url).get();
             Elements items = doc.select(".h_line_dot");
             items.addAll(doc.select(".h_line_color"));
-            if(items.size() > 11){
+            if(items.size() > 15){
                 MainLogger.warn("다음 페이지의 게시물 개수가 옳바르지 않습니다.");
                 MainLogger.warn(url);
             }
