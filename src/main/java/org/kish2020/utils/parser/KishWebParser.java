@@ -1,5 +1,7 @@
 package org.kish2020.utils.parser;
 
+import org.apache.commons.lang3.StringUtils;
+import org.json.simple.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -161,4 +163,23 @@ public class KishWebParser {
             return "";
         }
     }
+
+    public static String getPostRawContent(String url){
+        try {
+            Document doc = Jsoup.connect(url).get();
+            Elements elements = doc.select("#bbs_view_contents");
+            Element content = elements.get(0);
+            content.select("p").forEach(element -> {
+                /*if(element.tagName().equals("p") || element.tagName().equals("br") || element.tagName().equals("span")){
+                    if(element.select("br").size() > 0) element.after("\\n");
+                }*/
+                element.after("\\n");
+            });
+            return StringUtils.replace(content.text(), "\\n", "\n");
+        } catch (IOException e) {
+            MainLogger.error("", e);
+            return "";
+        }
+    }
+
 }
