@@ -22,10 +22,7 @@ import javax.rmi.CORBA.Util;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
+import java.util.*;
 
 @Controller
 @RequestMapping("/api/post")
@@ -50,6 +47,44 @@ public class PostApi {
         this.postInKeyword.setDataChangeListener(() -> {
             if(!tempSrcTemp.isEmpty()) tempSrcTemp.clear();
         });
+
+        Timer scheduler = new Timer();
+        scheduler.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                int cnt = 0;
+                int postCount = 0;
+                int totalMenuCount =  MenuID.values().length;
+                for(MenuID menuId : MenuID.values()) {
+                    MainLogger.info("update task : " + (cnt++) + " / " + totalMenuCount);
+                    String id = menuId.id;
+                    ArrayList<SimplePost> list = KishWebParser.parseMenu(id, "1");
+                    if (list.size() < 1) break;
+                    for (SimplePost sp : list) {
+                        if(Utils.isSavedPost(sp.getMenuId(), sp.getPostId())){
+                            break;
+                        }
+                        if(loadedPosts.containsKey(sp.getMenuId() + "," + sp.getPostId())){
+                            MainLogger.error(sp.getMenuId() + "," + sp.getPostId() + "가 이미 로드되어있습니다. skip...");
+                            continue;
+                        }
+                        getPostFromServer(sp.getMenuId(), sp.getPostId());
+                        postCount++;
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e) {
+                            MainLogger.error("", e);
+                        }
+                    }
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        MainLogger.error("", e);
+                    }
+                }
+                MainLogger.info("새로운 " + postCount + "개의 게시물이 추가되었습니다.");
+            }
+        }, 1000 * 60 * 60, 1000 * 60 * 60 * 12);
     }
 
     /**
@@ -172,6 +207,10 @@ public class PostApi {
                     for (SimplePost sp : list){
                         if(Utils.isSavedPost(sp.getMenuId(), sp.getPostId())){
                             MainLogger.warn(sp.getMenuId() + "," + sp.getPostId() + "가 이미 저장되어있습니다. skip...");
+                            continue;
+                        }
+                        if(this.loadedPosts.containsKey(sp.getMenuId() + "," + sp.getPostId())){
+                            MainLogger.error(sp.getMenuId() + "," + sp.getPostId() + "가 이미 로드되어있습니다. skip...");
                             continue;
                         }
                         this.getPostFromServer(sp.getMenuId(), sp.getPostId());

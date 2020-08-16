@@ -115,6 +115,14 @@ public class KishWebParser {
                 Elements elements = element.select("td");
                 Element aElement = element.select("a").get(0);
                 String postId = aElement.attr("href").split("bno=")[1].split("&")[0];
+                String no = elements.get(0).text().trim();
+                if(no.equals("공지")) return;
+                try {
+                    Integer.parseInt(no);
+                }catch (NumberFormatException e){
+                    MainLogger.error(menuId + "의" + postId + "를 가져오는 도중 잘못된 no값을 확인하였습니다. skip...", e);
+                    return;
+                }
                 String title = elements.get(1).text();
                 String author = elements.get(2).text();
                 String postDate = elements.get(3).text();
