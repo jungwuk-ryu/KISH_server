@@ -102,8 +102,8 @@ public class KishWebParser {
 
     public static ArrayList<SimplePost> parseMenu(String menuId, String page){
         ArrayList<SimplePost> list = new ArrayList<>();
+        String url = ROOT_URL + "?menu_no=" + menuId + "&page=" + page;
         try {
-            String url = ROOT_URL + "?menu_no=" + menuId + "&page=" + page;
             Document doc = Jsoup.connect(url).get();
             Elements items = doc.select(".h_line_dot");
             items.addAll(doc.select(".h_line_color"));
@@ -113,7 +113,8 @@ public class KishWebParser {
             }
             items.forEach((element -> {
                 Elements elements = element.select("td");
-                String postId = elements.get(0).text();
+                Element aElement = element.select("a").get(0);
+                String postId = aElement.attr("href").split("bno=")[1].split("&")[0];
                 String title = elements.get(1).text();
                 String author = elements.get(2).text();
                 String postDate = elements.get(3).text();
@@ -123,8 +124,8 @@ public class KishWebParser {
 
                 list.add(new SimplePost(postUrl, menuId, postId, title, author, postDate, attachmentIconUrl));
             }));
-        } catch (IOException e) {
-            MainLogger.error("", e);
+        } catch (IOException | ArrayIndexOutOfBoundsException | NullPointerException e) {
+            MainLogger.error("parseMenu 작업중 오류 발생 : " + url, e);
         }
         return list;
     }
