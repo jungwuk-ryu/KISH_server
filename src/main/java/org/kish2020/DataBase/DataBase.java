@@ -10,13 +10,16 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.BiFunction;
 
 public class DataBase<V> extends LinkedHashMap<String, V>{
     public boolean doSave = true;
     public final String fileName;
 
     private boolean isLoaded = false;
+    private Runnable dataChangeListener;
 
     public DataBase(String fileName) {
         this.fileName = fileName;
@@ -75,12 +78,72 @@ public class DataBase<V> extends LinkedHashMap<String, V>{
         }
     }
 
+    @Override
+    public V put(String key, V value) {
+        V returnValue = super.put(key, value);
+        this.runListener();
+        return returnValue;
+    }
+
     public boolean put(String key, V value, boolean overwrite){
         if(this.containsKey(key)){
             if(!overwrite) return false;
         }
         this.put(key, value);
         return true;
+    }
+
+    @Override
+    public V putIfAbsent(String key, V value) {
+        V returnValue = super.putIfAbsent(key, value);
+        this.runListener();
+        return returnValue;
+    }
+
+    @Override
+    public void putAll(Map<? extends String, ? extends V> m) {
+        super.putAll(m);
+        this.runListener();
+    }
+
+    @Override
+    public V remove(Object key) {
+        V returnValue = super.remove(key);
+        this.runListener();
+        return returnValue;
+    }
+
+    @Override
+    public boolean remove(Object key, Object value) {
+        boolean returnValue = super.remove(key, value);
+        this.runListener();
+        return returnValue;
+    }
+
+    @Override
+    protected boolean removeEldestEntry(Map.Entry<String, V> eldest) {
+        boolean returnValue =  super.removeEldestEntry(eldest);
+        this.runListener();
+        return returnValue;
+    }
+
+    @Override
+    public V replace(String key, V value) {
+        V returnValue = super.replace(key, value);
+        this.runListener();
+        return returnValue;
+    }
+
+    @Override
+    public void replaceAll(BiFunction<? super String, ? super V, ? extends V> function) {
+        super.replaceAll(function);
+        this.runListener();
+    }
+
+    @Override
+    public void clear() {
+        super.clear();
+        this.runListener();
     }
 
     public boolean isLoaded() { return isLoaded; }
@@ -91,5 +154,14 @@ public class DataBase<V> extends LinkedHashMap<String, V>{
 
     public void setDoSave(boolean doSave) {
         this.doSave = doSave;
+    }
+
+    public void setDataChangeListener(Runnable r){
+        this.dataChangeListener = r;
+    }
+
+    private void runListener(){
+        if(this.dataChangeListener == null) return;
+        this.dataChangeListener.run();
     }
 }
