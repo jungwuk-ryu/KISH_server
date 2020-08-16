@@ -42,6 +42,11 @@ public class Utils {
     }
 
     public static void addPostToKeyword(String postKey, String title, LinkedHashMap<String, String> attachmentUrlMap, LinkedHashMap<String, HashMap<String, Long>> targetKeywordMap, LinkedHashMap<String, Integer> tokenMap){
+        if(tokenMap == null){
+            MainLogger.error(postKey + "의 tokenMap이 null입니다.");
+            MainLogger.error("해당 게시물의 본문이 비어있음을 뜻할 수 있습니다.");
+            return;
+        }
         tokenMap = (LinkedHashMap<String, Integer>) tokenMap.clone();
         tokenMap.putAll(Utils.getContentTokenMap(title));
         for(String attachmentName : attachmentUrlMap.keySet()) {
