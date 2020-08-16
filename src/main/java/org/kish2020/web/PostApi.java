@@ -170,6 +170,10 @@ public class PostApi {
                     ArrayList<SimplePost> list = KishWebParser.parseMenu(id, Integer.toString(i));
                     if(list.size() < 1) break;
                     for (SimplePost sp : list){
+                        if(Utils.isSavedPost(sp.getMenuId(), sp.getPostId())){
+                            MainLogger.warn(sp.getMenuId() + "," + sp.getPostId() + "가 이미 저장되어있습니다. skip...");
+                            continue;
+                        }
                         this.getPostFromServer(sp.getMenuId(), sp.getPostId());
                         postCount++;
                         try {
