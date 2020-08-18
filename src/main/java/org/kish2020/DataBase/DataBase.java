@@ -1,5 +1,6 @@
 package org.kish2020.DataBase;
 
+import com.google.gson.Gson;
 import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -73,12 +74,13 @@ public class DataBase<V> extends LinkedHashMap<String, V>{
         }
         MainLogger.warn("저장하는 중 : " + fileName);
 
-        JSONObject jsonObject = new JSONObject();
+        /*JSONObject jsonObject = new JSONObject();
         for(String key : this.keySet()){
             jsonObject.put(key, this.get(key));
-        }
+        }*/
+        Gson gson = new Gson();
         try {
-            FileUtils.write(new File(fileName), jsonObject.toJSONString(), StandardCharsets.UTF_8);
+            FileUtils.write(new File(fileName), gson.toJson(this) , StandardCharsets.UTF_8);
         } catch (IOException e) {
             MainLogger.error("DB 저장중 오류가 발생하였습니다.", e);
         }
