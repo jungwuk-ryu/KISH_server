@@ -31,8 +31,7 @@ public class PostApi {
     public LinkedHashMap<String, Post> loadedPosts = new LinkedHashMap<>();
     /* 검색 관련 */
     public DataBase<HashMap<String, Long>> postInKeyword;
-    public DataBase<HashMap<String, String>> postInfo;
-    public LinkedHashMap<String, HashSet<String>> tempSrcTemp = new LinkedHashMap<>();   //검색어, 결과
+    public LinkedHashMap<String, HashSet<String>> tempSrcResult = new LinkedHashMap<>();   //검색어, 결과
 
     public PostApi(){
         this.postInKeyword = new DataBase<HashMap<String, Long>>("post/keywordDB.json");
@@ -46,7 +45,7 @@ public class PostApi {
 
         //this.savedPost = (HashSet<String>) db.getOrDefault("savedPost", new HashSet<>());
         this.postInKeyword.setDataChangeListener(() -> {
-            if(!tempSrcTemp.isEmpty()) tempSrcTemp.clear();
+            if(!tempSrcResult.isEmpty()) tempSrcResult.clear();
         });
 
         Timer scheduler = new Timer();
@@ -181,7 +180,7 @@ public class PostApi {
     public @ResponseBody String searchPostApi(@RequestParam String keyword){
         MainLogger.info("검색요청 : " + keyword);
         JSONArray array = new JSONArray();
-        if(!this.tempSrcTemp.containsKey(keyword)) {
+        if(!this.tempSrcResult.containsKey(keyword)) {
             Utils.search(this.postInKeyword, keyword).forEach(((key, value) -> {
                 for(String postKey : value){
                     Post post = getPost(postKey);
