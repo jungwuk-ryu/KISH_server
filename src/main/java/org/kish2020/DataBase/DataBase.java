@@ -32,8 +32,9 @@ public class DataBase<V> extends LinkedHashMap<String, V>{
         }));
     }
 
-    public DataBase(String fileName, boolean doSaveOnShutdown) {
+    public DataBase(String fileName, boolean isLoggingEnabled, boolean doSaveOnShutdown) {
         this.fileName = fileName;
+        this.setIsLoggingEnabled(isLoggingEnabled);
         this.reload();
         Runtime rt = Runtime.getRuntime();
         if(doSaveOnShutdown) {
