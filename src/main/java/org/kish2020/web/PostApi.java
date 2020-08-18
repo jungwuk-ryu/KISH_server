@@ -52,39 +52,42 @@ public class PostApi {
         scheduler.schedule(new TimerTask() {
             @Override
             public void run() {
-                int cnt = 0;
-                int postCount = 0;
-                int totalMenuCount =  MenuID.values().length;
-                for(MenuID menuId : MenuID.values()) {
-                    MainLogger.info("update task : " + (cnt++) + " / " + totalMenuCount);
-                    String id = menuId.id;
-                    ArrayList<SimplePost> list = KishWebParser.parseMenu(id, "1");
-                    if (list.size() < 1) break;
-                    for (SimplePost sp : list) {
-                        if(Utils.isSavedPost(sp.getMenuId(), sp.getPostId())){
-                            break;
-                        }
-                        if(loadedPosts.containsKey(sp.getMenuId() + "," + sp.getPostId())){
-                            MainLogger.error(sp.getMenuId() + "," + sp.getPostId() + "가 이미 로드되어있습니다. skip...");
-                            continue;
-                        }
-                        getPostFromServer(sp.getMenuId(), sp.getPostId());
-                        postCount++;
-                        try {
-                            Thread.sleep(500);
-                        } catch (InterruptedException e) {
-                            MainLogger.error("", e);
-                        }
-                    }
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        MainLogger.error("", e);
-                    }
-                }
-                MainLogger.info("새로운 " + postCount + "개의 게시물이 추가되었습니다.");
+                checkNewPost();
             }
         }, 1000 * 60 * 60, 1000 * 60 * 60 * 12);
+    }
+
+    public void checkNewPost(){
+        int cnt = 0;
+        int postCount = 0;
+        int totalMenuCount =  MenuID.values().length;
+        for(MenuID menuId : MenuID.values()) {
+            MainLogger.info("update task : " + (cnt++) + " / " + totalMenuCount);
+            String id = menuId.id;
+            ArrayList<SimplePost> list = KishWebParser.parseMenu(id, "1");
+            if (list.size() < 1) break;
+            for (SimplePost sp : list) {
+                if(Utils.isSavedPost(sp.getMenuId(), sp.getPostId())){
+                    break;
+                }
+                if(loadedPosts.containsKey(sp.getMenuId() + "," + sp.getPostId())){
+                    continue;
+                }
+                getPostFromServer(sp.getMenuId(), sp.getPostId());
+                postCount++;
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    MainLogger.error("", e);
+                }
+            }
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                MainLogger.error("", e);
+            }
+        }
+        MainLogger.info("새로운 " + postCount + "개의 게시물이 추가되었습니다.");
     }
 
     /**
