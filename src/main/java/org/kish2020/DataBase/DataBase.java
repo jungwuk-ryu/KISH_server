@@ -32,6 +32,17 @@ public class DataBase<V> extends LinkedHashMap<String, V>{
         }));
     }
 
+    public DataBase(String fileName, boolean doSaveOnShutdown) {
+        this.fileName = fileName;
+        this.reload();
+        Runtime rt = Runtime.getRuntime();
+        if(doSaveOnShutdown) {
+            rt.addShutdownHook(new Thread(() -> {
+                save();
+            }));
+        }
+    }
+
     public void reload(){
         File jsonFile = new File(fileName);
         if(this.isLoggingEnabled) MainLogger.warn("DB 불러오는 중 : " + jsonFile.getAbsolutePath());
