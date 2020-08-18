@@ -15,7 +15,7 @@ public class Post extends DataBase<Object> {
     }
 
     public Post(String menuID, String postID, boolean doSaveOnShutdown){
-        super("post/posts/" + menuID + "/" + postID + ".json", doSaveOnShutdown);
+        super("post/posts/" + menuID + "/" + postID + ".json", false, doSaveOnShutdown);
         this.setAttachmentUrlMap(new LinkedHashMap<>());
         this.setMenuId(menuID);
         this.setPostId(postID);
@@ -27,7 +27,7 @@ public class Post extends DataBase<Object> {
     }
 
     public Post(JSONObject jsonObject, boolean doSaveOnShutdown){
-        super("post/posts/" + jsonObject.get("menuId") + "," + jsonObject.get("postID") + ".json", doSaveOnShutdown);
+        super("post/posts/" + jsonObject.get("menuId") + "," + jsonObject.get("postID") + ".json", false, doSaveOnShutdown);
         initWithJson(jsonObject);
     }
 
