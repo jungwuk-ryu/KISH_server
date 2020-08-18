@@ -10,8 +10,8 @@ public class ExpandedDataBase extends DataBase<Object> {
         super(fileName);
     }
 
-    public ExpandedDataBase(String fileName, boolean doSaveOnShutdown) {
-        super(fileName, doSaveOnShutdown);
+    public ExpandedDataBase(String fileName, boolean isLoggingEnabled, boolean doSaveOnShutdown) {
+        super(fileName, isLoggingEnabled, doSaveOnShutdown);
     }
 
     @Override
