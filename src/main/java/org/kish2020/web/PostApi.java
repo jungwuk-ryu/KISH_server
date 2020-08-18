@@ -31,6 +31,7 @@ public class PostApi {
     public LinkedHashMap<String, Post> loadedPosts = new LinkedHashMap<>();
     /* 검색 관련 */
     public DataBase<HashMap<String, Long>> postInKeyword;
+    public DataBase<HashMap<String, String>> postInfo;
     public LinkedHashMap<String, HashSet<String>> tempSrcTemp = new LinkedHashMap<>();   //검색어, 결과
 
     public PostApi(){
@@ -54,7 +55,7 @@ public class PostApi {
             public void run() {
                 checkNewPost();
             }
-        }, 1000 * 60 * 60, 1000 * 60 * 60 * 12);
+        }, 1000 * 60 * 60, 1000 * 60 * 60);     // 1시간마다 반복
     }
 
     public void checkNewPost(){
@@ -108,7 +109,7 @@ public class PostApi {
         MainLogger.info("서버에서 받아오는 중 : " + menuId + "," + postID);
         boolean isNew = false;
         if(!Utils.isSavedPost(menuId, postID)) isNew = true;
-        Post post = KishWebParser.parsePost(menuId, postID);
+        Post post = KishWebParser.parsePost(menuId, postID, false);
         if(post == null){
             if(Utils.isSavedPost(menuId, postID)){
                 this.removePost(getPost(menuId + "," + postID));
@@ -117,6 +118,7 @@ public class PostApi {
         }
         if(isNew) registerPostKeywords(post);
         this.loadedPosts.put(post.getPostKey(), post);
+        post.save();
         return post;
     }
 
