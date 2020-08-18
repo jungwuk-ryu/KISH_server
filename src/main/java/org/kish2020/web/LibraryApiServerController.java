@@ -36,7 +36,7 @@ public class LibraryApiServerController {
     @RequestMapping(value = "/checkID", method = RequestMethod.POST)    //TODO : 테스트
     public @ResponseBody String checkID(@RequestParam String seq, @RequestParam String id, @RequestParam String pwd, @RequestParam(required = false, defaultValue = "") String ck){
         String parameters;
-        /*ID_EXIST_CHECK 값이 무엇을 의미하는지는 모르겠습니다만, 회원가입 중복확인시 0을 사용합니다*/
+        /*ID_EXIST_CHECK 값이 무엇을 의미하는지는 모르겠습니다만, 회원가입 중복확인시 0을 사용합니다 --> 1도 사용되네요..?*/
         parameters = "ID_EXIST_CHECK=" + 0;
         parameters += "&MEMBER_REG_SEQ=" + seq;
         parameters += "&MEMBER_REG_ID=" + id;
