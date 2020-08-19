@@ -85,6 +85,7 @@ public class Utils {
         MainLogger.info(postKey + "의 " + tokenMap.size() + "개의 토큰이 제거됨");
     }
 
+    // TODO : 검색결과 fix
     public static TreeMap<Long, HashSet<String>> search(LinkedHashMap<String, HashMap<String, Long>> sourceMap, String keyword){
         String choseongKeyword = Utils.makeChoseongSentence(keyword);
         String noSpaceKeyword = StringUtils.replace(keyword, " ", "");
