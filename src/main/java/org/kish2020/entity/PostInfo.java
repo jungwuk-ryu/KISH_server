@@ -1,8 +1,14 @@
 package org.kish2020.entity;
 
+import org.json.simple.JSONObject;
+
 import java.util.HashMap;
 
 public class PostInfo extends HashMap<String, Object> {
+
+    public PostInfo(JSONObject jsonObject){
+        super(jsonObject);
+    }
 
     public PostInfo(Post post){
         this.setPostID(post.getPostId());

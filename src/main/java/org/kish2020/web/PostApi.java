@@ -44,6 +44,13 @@ public class PostApi {
             }
         }
 
+        // TODO : 이 부분 해결하기,,
+        for(String key : this.postInfo.keySet()){
+            Object postInfo = this.postInfo.get(key);
+            if(postInfo instanceof JSONObject){     // 인텔리제이가 제거하라는데 안 해주면 안됩니다 ㅠㅠㅠㅠ
+                this.postInfo.put(key, new PostInfo((JSONObject) postInfo));
+            }
+        }
         //this.savedPost = (HashSet<String>) db.getOrDefault("savedPost", new HashSet<>());
         this.postInKeyword.setDataChangeListener(() -> {
             if(!tempSrcResult.isEmpty()) tempSrcResult.clear();
@@ -110,7 +117,8 @@ public class PostApi {
      */
 
     public PostInfo getPostInfo(String postKey){
-        return this.postInfo.get(postKey);
+        PostInfo postInfo = this.postInfo.get(postKey);
+        return postInfo;
     }
 
     public Post getPostFromServer(String menuId, String postID){
