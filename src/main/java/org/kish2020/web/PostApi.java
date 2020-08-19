@@ -59,7 +59,7 @@ public class PostApi {
             public void run() {
                 checkNewPost();
             }
-        }, 1000 * 60 * 60, 1000 * 60 * 30);     // 30분 마다 반복
+        }, 1000 * 60 * 5, 1000 * 60 * 30);     // 30분 마다 반복
     }
 
     public void checkNewPost(){
