@@ -1,6 +1,7 @@
 package org.kish2020.utils;
 
 import io.github.bangjunyoung.KoreanChar;
+import org.apache.commons.lang3.StringUtils;
 import org.kish2020.MainLogger;
 import org.kish2020.entity.Post;
 import org.kish2020.entity.PostInfo;
@@ -84,17 +85,67 @@ public class Utils {
         MainLogger.info(postKey + "의 " + tokenMap.size() + "개의 토큰이 제거됨");
     }
 
-    // TODO : 검색결과 fix
-    public static ArrayList<String> search(LinkedHashMap<String, HashMap<String, Long>> keywordMap, String searchSentence, int index){
+    // TODO : 검색결과 향상 및 최적화 매우 필요 ( 약 20 ~ 90ms 소요 )
+    public static ArrayList<String> search(LinkedHashMap<String, HashMap<String, Long>> keywordMap, HashMap<String, PostInfo> postInfoMap, String searchSentence, int index){
+        //long start = System.currentTimeMillis();
         //임시
-        HashMap<String, Integer> srcMap = new HashMap<>();
+        HashMap<String, Double> srcMap = new HashMap<>();
         String[] keywords = searchSentence.split(" ");
-        for(String key : keywordMap.keySet()){
-            for(String token : keywords){
-                token = token.trim();
-                if(key.contains(token)) {
-                    for (String postKey : keywordMap.get(key).keySet()) {
-                        srcMap.put(postKey, srcMap.getOrDefault(postKey, 0) + 1);
+        List<String> tokens = new ArrayList<>();
+        for(String token : keywords){
+            token = token.trim();
+            tokens.add(token);
+        }
+
+        String[] arrayTokens = tokens.toArray(new String[0]);
+        String noSpace = StringUtils.deleteWhitespace(searchSentence);
+        HashSet<Character> noSpaceCharSet = new HashSet<>();
+        char[] noSpaceChars = noSpace.toCharArray();
+        for(char c : noSpaceChars) noSpaceCharSet.add(c);
+        postInfoMap.forEach( (k, v) -> {
+            int matchCount = 0;
+            String noSpaceTitle = StringUtils.deleteWhitespace(v.getTitle());
+            for(char c : noSpaceCharSet) {
+                matchCount += StringUtils.countMatches(noSpaceTitle, c);
+            }
+            srcMap.put(k, 0.4 * matchCount);
+        });
+        for(String keyword : keywordMap.keySet()){
+            for(String token : arrayTokens){
+                if(keyword.length() > 1){
+                    if(keyword.equals(token)){
+                        for (String postKey : keywordMap.get(keyword).keySet()) {
+                            srcMap.put(postKey, srcMap.getOrDefault(postKey, 0D) + 1.5);
+                        }
+                        continue;
+                    }
+                    if(keyword.contains(token)) {
+                        for (String postKey : keywordMap.get(keyword).keySet()) {
+                            srcMap.put(postKey, srcMap.getOrDefault(postKey, 0D) + 1);
+                        }
+                        continue;
+                    }
+                    if(token.contains(keyword)){
+                        for (String postKey : keywordMap.get(keyword).keySet()) {
+                            srcMap.put(postKey, srcMap.getOrDefault(postKey, 0D) + 0.7);
+                        }
+                    }else{
+                        if(token.length() > 4){
+                            int matchCount = StringUtils.countMatches(token, keyword);
+                            if(matchCount > (token.length() / 2)){
+                                for (String postKey : keywordMap.get(keyword).keySet()) {
+                                    srcMap.put(postKey, srcMap.getOrDefault(postKey, 0D) + 0.05 * matchCount);
+                                }
+                            }
+                        }
+                    }
+                }else{
+                    if(token.length() == 1){
+                        if(keyword.equals(token)){
+                            for (String postKey : keywordMap.get(keyword).keySet()) {
+                                srcMap.put(postKey, srcMap.getOrDefault(postKey, 0D) + 0.2);
+                            }
+                        }
                     }
                 }
             }
@@ -112,6 +163,9 @@ public class Utils {
                 resultKeyList.add(keyList.get(i));
             }
         }
+
+        /*long stop = System.currentTimeMillis();
+        MainLogger.warn(" 소요 " + (stop - start));*/
         return resultKeyList;
     }
 

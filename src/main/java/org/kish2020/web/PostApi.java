@@ -196,7 +196,7 @@ public class PostApi {
     public @ResponseBody String searchPostApi(@RequestParam String keyword, @RequestParam int index){
         MainLogger.info("검색요청 : " + keyword);
         ArrayList<PostInfo> result = new ArrayList<>();
-        Utils.search(this.postInKeyword, keyword, index).forEach(postKey -> {
+        Utils.search(this.postInKeyword, this.postInfo, keyword, index).forEach(postKey -> {
             PostInfo postInfo = this.getPostInfo(postKey);
             if(postInfo == null) return;
             result.add(postInfo);
