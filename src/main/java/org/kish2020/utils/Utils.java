@@ -3,9 +3,8 @@ package org.kish2020.utils;
 import io.github.bangjunyoung.KoreanChar;
 import org.apache.commons.lang3.StringUtils;
 import org.kish2020.MainLogger;
-import org.kish2020.MenuID;
-import org.kish2020.entity.SimplePost;
-import org.kish2020.utils.parser.KishWebParser;
+import org.kish2020.entity.Post;
+import org.kish2020.entity.PostInfo;
 
 import java.io.File;
 import java.util.*;
@@ -117,5 +116,31 @@ public class Utils {
     public static boolean isSavedPost(String menuId, String postId){
         File file = new File("post/posts/" + menuId + "/" + postId + ".json");
         return file.exists();
+    }
+
+    /**
+     * ./post/posts 에 저장된 게시물들을 postInfo로 가져옵니다.
+     */
+    public static LinkedHashMap<String, PostInfo> getAllPostInfoFromPost(){
+        LinkedHashMap<String, PostInfo> map = new LinkedHashMap<>();
+        File[] indexes = (new File("post/posts")).listFiles();
+        for(File indexFolder : indexes){
+            if(indexFolder.isDirectory()){
+                String menuID = indexFolder.getName();
+                File[] files = indexFolder.listFiles();
+                for(File postFile : files){
+                    String[] tokens = postFile.getName().split("[.]");
+                    if(tokens.length < 2){
+                        MainLogger.info("post id 분석 실패 : " + postFile.getName());
+                        continue;
+                    }
+                    String PostID = tokens[0];
+                    Post post = new Post(menuID, PostID, false);
+                    PostInfo postInfo = new PostInfo(post);
+                    map.put(menuID + "," + PostID, postInfo);
+                }
+            }
+        }
+        return map;
     }
 }
