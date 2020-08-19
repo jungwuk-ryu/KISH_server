@@ -1,15 +1,12 @@
 package org.kish2020.web;
 
-import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.kish2020.DataBase.DataBase;
-import org.kish2020.DataBase.ExpandedDataBase;
 import org.kish2020.MainLogger;
 import org.kish2020.MenuID;
 import org.kish2020.entity.Post;
+import org.kish2020.entity.PostInfo;
 import org.kish2020.entity.SimplePost;
 import org.kish2020.utils.Utils;
 import org.kish2020.utils.parser.KishWebParser;
@@ -18,27 +15,31 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.rmi.CORBA.Util;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Controller
 @RequestMapping("/api/post")
 public class PostApi {
-    public ExpandedDataBase db;
+    public DataBase<PostInfo> postInfo;
     public LinkedHashMap<String, Post> loadedPosts = new LinkedHashMap<>();
     /* 검색 관련 */
     public DataBase<HashMap<String, Long>> postInKeyword;
     public LinkedHashMap<String, HashSet<String>> tempSrcResult = new LinkedHashMap<>();   //검색어, 결과
 
     public PostApi(){
+        this.postInfo = new DataBase<>("post/postInfoDB.json");
         this.postInKeyword = new DataBase<HashMap<String, Long>>("post/keywordDB.json");
         if(!this.postInKeyword.isLoaded()){
             this.postInKeyword.reload();
             if(!this.postInKeyword.isLoaded()) {
-                MainLogger.error("postDB를 불러올 수 없습니다.");
+                MainLogger.error("postInKeywordDB를 불러올 수 없습니다.");
+                Runtime.getRuntime().exit(0);
+            }
+        }
+        if(!this.postInfo.isLoaded()){
+            this.postInfo.reload();
+            if(!this.postInfo.isLoaded()) {
+                MainLogger.error("postInfoDB를 불러올 수 없습니다.");
                 Runtime.getRuntime().exit(0);
             }
         }
@@ -104,6 +105,14 @@ public class PostApi {
         return post;
     }
 
+    /**
+     * 간략한 게시물 정보를 불러옵니다
+     */
+
+    public PostInfo getPostInfo(String postKey){
+        return this.postInfo.get(postKey);
+    }
+
     public Post getPostFromServer(String menuId, String postID){
         MainLogger.info("서버에서 받아오는 중 : " + menuId + "," + postID);
         boolean isNew = false;
@@ -115,7 +124,10 @@ public class PostApi {
             }
             return null;
         }
-        if(isNew) registerPostKeywords(post);
+        if(isNew){
+            registerPostKeywords(post);
+            this.postInfo.put(post.getPostKey(), new PostInfo(post));
+        }
         this.loadedPosts.put(post.getPostKey(), post);
         post.save();
         return post;
@@ -134,6 +146,7 @@ public class PostApi {
         post.setDoSave(false);
         this.loadedPosts.remove(post.getPostKey());
         unRegisterPostKeyWords(post);
+        this.postInfo.remove(post.getPostKey());
     }
 
     @RequestMapping("/getMenuIds")
@@ -183,9 +196,9 @@ public class PostApi {
         if(!this.tempSrcResult.containsKey(keyword)) {
             Utils.search(this.postInKeyword, keyword).forEach(((key, value) -> {
                 for(String postKey : value){
-                    Post post = getPost(postKey);
-                    if(post == null) continue;
-                    array.add(post);
+                    PostInfo postInfo = this.getPostInfo(postKey);
+                    if(postInfo == null) continue;
+                    array.add(postInfo);
                 }
             }));
         }
