@@ -8,7 +8,7 @@ import java.util.LinkedHashMap;
 
 public class Post extends DataBase<Object> {
     public Post(String menuID, String postID){
-        super("post/posts/" + menuID + "/" + postID + ".json");
+        super("post/posts/" + menuID + "/" + postID + ".json", false, true);
         this.setAttachmentUrlMap(new LinkedHashMap<>());
         this.setMenuId(menuID);
         this.setPostId(postID);
@@ -22,7 +22,7 @@ public class Post extends DataBase<Object> {
     }
 
     public Post(JSONObject jsonObject){
-        super("post/posts/" + jsonObject.get("menuId") + "," + jsonObject.get("postID") + ".json");
+        super("post/posts/" + jsonObject.get("menuId") + "," + jsonObject.get("postID") + ".json", false, true);
         initWithJson(jsonObject);
     }
 
