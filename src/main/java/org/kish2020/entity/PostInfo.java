@@ -5,7 +5,6 @@ import org.json.simple.JSONObject;
 import java.util.HashMap;
 
 public class PostInfo extends HashMap<String, Object> {
-
     public PostInfo(JSONObject jsonObject){
         super(jsonObject);
     }
@@ -37,10 +36,12 @@ public class PostInfo extends HashMap<String, Object> {
 
     public void setPostID(String postID){
         this.put("postID", postID);
+        this.put("url", "http://www.hanoischool.net/default.asp?board_mode=view&menu_no=" + getMenuID() + "&bno=" + postID);
     }
 
     public void setMenuID(String menuID){
         this.put("menuID", menuID);
+        this.put("url", "http://www.hanoischool.net/default.asp?board_mode=view&menu_no=" + menuID + "&bno=" + this.getPostID());
     }
 
     public String getTitle(){
@@ -65,6 +66,10 @@ public class PostInfo extends HashMap<String, Object> {
 
     public String getMenuID(){
         return (String) this.get("menuID");
+    }
+
+    public String getUrl(){
+        return (String) this.get("url");
     }
 
 }
