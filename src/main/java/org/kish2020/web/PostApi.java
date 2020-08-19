@@ -62,15 +62,13 @@ public class PostApi {
             public void run() {
                 checkNewPost();
             }
-        }, 1000 * 60 * 60, 1000 * 60 * 60);     // 1시간마다 반복
+        }, 1000 * 60 * 60, 1000 * 60 * 30);     // 30분 마다 반복
     }
 
     public void checkNewPost(){
-        int cnt = 0;
         int postCount = 0;
-        int totalMenuCount =  MenuID.values().length;
+        MainLogger.info("task 실행");
         for(MenuID menuId : MenuID.values()) {
-            MainLogger.info("update task : " + (cnt++) + " / " + totalMenuCount);
             String id = menuId.id;
             ArrayList<SimplePost> list = KishWebParser.parseMenu(id, "1");
             if (list.size() < 1) break;
