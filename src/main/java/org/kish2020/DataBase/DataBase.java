@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 
 public class DataBase<V> extends LinkedHashMap<String, V>{
+    public static final Gson gson = new Gson();
     public boolean doSave = true;
     public boolean isLoggingEnabled = true;
     public final String fileName;
@@ -91,7 +92,6 @@ public class DataBase<V> extends LinkedHashMap<String, V>{
         for(String key : this.keySet()){
             jsonObject.put(key, this.get(key));
         }*/
-        Gson gson = new Gson();
         try {
             FileUtils.write(new File(fileName), gson.toJson(this) , StandardCharsets.UTF_8);
         } catch (IOException e) {

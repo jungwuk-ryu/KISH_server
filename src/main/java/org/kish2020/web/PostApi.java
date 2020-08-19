@@ -20,6 +20,7 @@ import java.util.*;
 @Controller
 @RequestMapping("/api/post")
 public class PostApi {
+    public static final Gson gson = new Gson();
     public DataBase<PostInfo> postInfo;
     public LinkedHashMap<String, Post> loadedPosts = new LinkedHashMap<>();
     /* 검색 관련 */
