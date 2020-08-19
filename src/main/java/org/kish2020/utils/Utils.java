@@ -1,7 +1,6 @@
 package org.kish2020.utils;
 
 import io.github.bangjunyoung.KoreanChar;
-import org.apache.commons.lang3.StringUtils;
 import org.kish2020.MainLogger;
 import org.kish2020.entity.Post;
 import org.kish2020.entity.PostInfo;
@@ -86,41 +85,16 @@ public class Utils {
     }
 
     // TODO : 검색결과 fix
-    //TreeMap<Long, HashSet<String>>
-    public static ArrayList<String>  search(LinkedHashMap<String, HashMap<String, Long>> sourceMap, String keyword){
-        String choseongKeyword = Utils.makeChoseongSentence(keyword);
-        String noSpaceKeyword = StringUtils.replace(keyword, " ", "");
-        //TreeMap<Long, HashSet<String>> treeMap = new TreeMap<>();
-        HashSet<String> addedPost = new HashSet<>();
-        /*for(String key : sourceMap.keySet()){
-            if(keyword.contains(key) || choseongKeyword.equals(key) || noSpaceKeyword.contains(key) || key.contains(noSpaceKeyword)){
-            if(noSpaceKeyword.contains(key)){
-                for(String postKey : sourceMap.get(key).keySet()){
-                    if(addedPost.contains(postKey)) continue;
-                    long i = sourceMap.get(key).get(postKey);    // 횟수
-                    HashSet<String> set = treeMap.getOrDefault(i, new HashSet<>()); //treemap의 i에 있는 postkey set
-                    set.add(postKey);
-                    treeMap.put(i, set);
-                    addedPost.add(postKey);
-                }
-            }
-        }*/
-
+    public static ArrayList<String> search(LinkedHashMap<String, HashMap<String, Long>> keywordMap, String searchSentence, int index){
         //임시
         HashMap<String, Integer> srcMap = new HashMap<>();
-        String[] keywords = keyword.split(" ");
-        for(String key : sourceMap.keySet()){
+        String[] keywords = searchSentence.split(" ");
+        for(String key : keywordMap.keySet()){
             for(String token : keywords){
                 token = token.trim();
                 if(key.contains(token)) {
-                    for (String postKey : sourceMap.get(key).keySet()) {
+                    for (String postKey : keywordMap.get(key).keySet()) {
                         srcMap.put(postKey, srcMap.getOrDefault(postKey, 0) + 1);
-                        /*if (addedPost.contains(postKey)) continue;
-                        long i = sourceMap.get(key).get(postKey);    // 횟수
-                        HashSet<String> set = treeMap.getOrDefault(i, new HashSet<>()); //treemap의 i에 있는 postkey set
-                        set.add(postKey);
-                        treeMap.put(i, set);
-                        addedPost.add(postKey);*/
                     }
                 }
             }
@@ -128,7 +102,17 @@ public class Utils {
 
         ArrayList<String> keyList = new ArrayList<>(srcMap.keySet());
         Collections.sort(keyList, (o1, o2) -> (srcMap.get(o2).compareTo(srcMap.get(o1))));
-        return keyList;
+        ArrayList<String> resultKeyList = new ArrayList<>();
+        int max = keyList.size();
+        int maxPage = max / 20;
+        //index는 0부터 시작
+        if(maxPage >= index) {
+            for (int i = 20 * index; i < 20 * index + 20; i++) {
+                if(max <= i) continue;
+                resultKeyList.add(keyList.get(i));
+            }
+        }
+        return resultKeyList;
     }
 
     /**

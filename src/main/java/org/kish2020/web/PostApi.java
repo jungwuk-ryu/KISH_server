@@ -1,5 +1,6 @@
 package org.kish2020.web;
 
+import com.google.gson.Gson;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.kish2020.DataBase.DataBase;
@@ -25,7 +26,6 @@ public class PostApi {
     public LinkedHashMap<String, Post> loadedPosts = new LinkedHashMap<>();
     /* 검색 관련 */
     public DataBase<HashMap<String, Long>> postInKeyword;
-    public LinkedHashMap<String, HashSet<String>> tempSrcResult = new LinkedHashMap<>();   //검색어, 결과
 
     public PostApi(){
         this.postInfo = new DataBase<>("post/postInfoDB.json");
@@ -52,10 +52,6 @@ public class PostApi {
                 this.postInfo.put(key, new PostInfo((JSONObject) postInfo));
             }
         }
-        //this.savedPost = (HashSet<String>) db.getOrDefault("savedPost", new HashSet<>());
-        this.postInKeyword.setDataChangeListener(() -> {
-            if(!tempSrcResult.isEmpty()) tempSrcResult.clear();
-        });
 
         Timer scheduler = new Timer();
         scheduler.schedule(new TimerTask() {
@@ -197,24 +193,15 @@ public class PostApi {
     }
 
     @RequestMapping("/searchPost")
-    public @ResponseBody String searchPostApi(@RequestParam String keyword){
+    public @ResponseBody String searchPostApi(@RequestParam String keyword, @RequestParam int index){
         MainLogger.info("검색요청 : " + keyword);
-        JSONArray array = new JSONArray();
-        if(!this.tempSrcResult.containsKey(keyword)) {
-            Utils.search(this.postInKeyword, keyword).forEach(postKey -> {
-                PostInfo postInfo = this.getPostInfo(postKey);
-                if(postInfo == null) return;
-                array.add(postInfo);
-            });
-/*            Utils.search(this.postInKeyword, keyword).forEach(((key, value) -> {
-                for(String postKey : value){
-                    PostInfo postInfo = this.getPostInfo(postKey);
-                    if(postInfo == null) continue;
-                    array.add(postInfo);
-                }
-            }));*/
-        }
-        return array.toJSONString();
+        ArrayList<PostInfo> result = new ArrayList<>();
+        Utils.search(this.postInKeyword, keyword, index).forEach(postKey -> {
+            PostInfo postInfo = this.getPostInfo(postKey);
+            if(postInfo == null) return;
+            result.add(postInfo);
+        });
+        return gson.toJson(result);
     }
 
     /**
