@@ -86,13 +86,15 @@ public class Utils {
     }
 
     // TODO : 검색결과 fix
-    public static TreeMap<Long, HashSet<String>> search(LinkedHashMap<String, HashMap<String, Long>> sourceMap, String keyword){
+    //TreeMap<Long, HashSet<String>>
+    public static ArrayList<String>  search(LinkedHashMap<String, HashMap<String, Long>> sourceMap, String keyword){
         String choseongKeyword = Utils.makeChoseongSentence(keyword);
         String noSpaceKeyword = StringUtils.replace(keyword, " ", "");
-        TreeMap<Long, HashSet<String>> treeMap = new TreeMap<>();
+        //TreeMap<Long, HashSet<String>> treeMap = new TreeMap<>();
         HashSet<String> addedPost = new HashSet<>();
-        for(String key : sourceMap.keySet()){
+        /*for(String key : sourceMap.keySet()){
             if(keyword.contains(key) || choseongKeyword.equals(key) || noSpaceKeyword.contains(key) || key.contains(noSpaceKeyword)){
+            if(noSpaceKeyword.contains(key)){
                 for(String postKey : sourceMap.get(key).keySet()){
                     if(addedPost.contains(postKey)) continue;
                     long i = sourceMap.get(key).get(postKey);    // 횟수
@@ -102,8 +104,31 @@ public class Utils {
                     addedPost.add(postKey);
                 }
             }
+        }*/
+
+        //임시
+        HashMap<String, Integer> srcMap = new HashMap<>();
+        String[] keywords = keyword.split(" ");
+        for(String key : sourceMap.keySet()){
+            for(String token : keywords){
+                token = token.trim();
+                if(key.contains(token)) {
+                    for (String postKey : sourceMap.get(key).keySet()) {
+                        srcMap.put(postKey, srcMap.getOrDefault(postKey, 0) + 1);
+                        /*if (addedPost.contains(postKey)) continue;
+                        long i = sourceMap.get(key).get(postKey);    // 횟수
+                        HashSet<String> set = treeMap.getOrDefault(i, new HashSet<>()); //treemap의 i에 있는 postkey set
+                        set.add(postKey);
+                        treeMap.put(i, set);
+                        addedPost.add(postKey);*/
+                    }
+                }
+            }
         }
-        return treeMap;
+
+        ArrayList<String> keyList = new ArrayList<>(srcMap.keySet());
+        Collections.sort(keyList, (o1, o2) -> (srcMap.get(o2).compareTo(srcMap.get(o1))));
+        return keyList;
     }
 
     /**

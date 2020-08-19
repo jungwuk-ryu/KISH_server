@@ -200,13 +200,18 @@ public class PostApi {
         MainLogger.info("검색요청 : " + keyword);
         JSONArray array = new JSONArray();
         if(!this.tempSrcResult.containsKey(keyword)) {
-            Utils.search(this.postInKeyword, keyword).forEach(((key, value) -> {
+            Utils.search(this.postInKeyword, keyword).forEach(postKey -> {
+                PostInfo postInfo = this.getPostInfo(postKey);
+                if(postInfo == null) return;
+                array.add(postInfo);
+            });
+/*            Utils.search(this.postInKeyword, keyword).forEach(((key, value) -> {
                 for(String postKey : value){
                     PostInfo postInfo = this.getPostInfo(postKey);
                     if(postInfo == null) continue;
                     array.add(postInfo);
                 }
-            }));
+            }));*/
         }
         return array.toJSONString();
     }
