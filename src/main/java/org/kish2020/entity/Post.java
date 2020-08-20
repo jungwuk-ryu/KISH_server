@@ -8,14 +8,30 @@ import java.util.LinkedHashMap;
 
 public class Post extends DataBase<Object> {
     public Post(String menuID, String postID){
-        super("post/posts/" + menuID + "/" + postID + ".json");
+        super("post/posts/" + menuID + "/" + postID + ".json", false, true);
+        this.setAttachmentUrlMap(new LinkedHashMap<>());
+        this.setMenuId(menuID);
+        this.setPostId(postID);
+    }
+
+    public Post(String menuID, String postID, boolean doSaveOnShutdown){
+        super("post/posts/" + menuID + "/" + postID + ".json", false, doSaveOnShutdown);
         this.setAttachmentUrlMap(new LinkedHashMap<>());
         this.setMenuId(menuID);
         this.setPostId(postID);
     }
 
     public Post(JSONObject jsonObject){
-        super("post/posts/" + jsonObject.get("menuId") + "," + jsonObject.get("postID") + ".json");
+        super("post/posts/" + jsonObject.get("menuId") + "," + jsonObject.get("postID") + ".json", false, true);
+        initWithJson(jsonObject);
+    }
+
+    public Post(JSONObject jsonObject, boolean doSaveOnShutdown){
+        super("post/posts/" + jsonObject.get("menuId") + "," + jsonObject.get("postID") + ".json", false, doSaveOnShutdown);
+        initWithJson(jsonObject);
+    }
+
+    private void initWithJson(JSONObject jsonObject){
         this.put("title", jsonObject.get("title"));
         this.put("content", jsonObject.get("content"));
         this.put("author", jsonObject.get("author"));

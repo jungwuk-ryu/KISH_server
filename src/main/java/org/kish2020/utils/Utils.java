@@ -1,11 +1,9 @@
 package org.kish2020.utils;
 
 import io.github.bangjunyoung.KoreanChar;
-import org.apache.commons.lang3.StringUtils;
 import org.kish2020.MainLogger;
-import org.kish2020.MenuID;
-import org.kish2020.entity.SimplePost;
-import org.kish2020.utils.parser.KishWebParser;
+import org.kish2020.entity.Post;
+import org.kish2020.entity.PostInfo;
 
 import java.io.File;
 import java.util.*;
@@ -86,24 +84,35 @@ public class Utils {
         MainLogger.info(postKey + "의 " + tokenMap.size() + "개의 토큰이 제거됨");
     }
 
-    public static TreeMap<Long, HashSet<String>> search(LinkedHashMap<String, HashMap<String, Long>> sourceMap, String keyword){
-        String choseongKeyword = Utils.makeChoseongSentence(keyword);
-        String noSpaceKeyword = StringUtils.replace(keyword, " ", "");
-        TreeMap<Long, HashSet<String>> treeMap = new TreeMap<>();
-        HashSet<String> addedPost = new HashSet<>();
-        for(String key : sourceMap.keySet()){
-            if(keyword.contains(key) || choseongKeyword.equals(key) || noSpaceKeyword.contains(key) || key.contains(noSpaceKeyword)){
-                for(String postKey : sourceMap.get(key).keySet()){
-                    if(addedPost.contains(postKey)) continue;
-                    long i = sourceMap.get(key).get(postKey);    // 횟수
-                    HashSet<String> set = treeMap.getOrDefault(i, new HashSet<>()); //treemap의 i에 있는 postkey set
-                    set.add(postKey);
-                    treeMap.put(i, set);
-                    addedPost.add(postKey);
+    // TODO : 검색결과 fix
+    public static ArrayList<String> search(LinkedHashMap<String, HashMap<String, Long>> keywordMap, String searchSentence, int index){
+        //임시
+        HashMap<String, Integer> srcMap = new HashMap<>();
+        String[] keywords = searchSentence.split(" ");
+        for(String key : keywordMap.keySet()){
+            for(String token : keywords){
+                token = token.trim();
+                if(key.contains(token)) {
+                    for (String postKey : keywordMap.get(key).keySet()) {
+                        srcMap.put(postKey, srcMap.getOrDefault(postKey, 0) + 1);
+                    }
                 }
             }
         }
-        return treeMap;
+
+        ArrayList<String> keyList = new ArrayList<>(srcMap.keySet());
+        Collections.sort(keyList, (o1, o2) -> (srcMap.get(o2).compareTo(srcMap.get(o1))));
+        ArrayList<String> resultKeyList = new ArrayList<>();
+        int max = keyList.size();
+        int maxPage = max / 20;
+        //index는 0부터 시작
+        if(maxPage >= index) {
+            for (int i = 20 * index; i < 20 * index + 20; i++) {
+                if(max <= i) continue;
+                resultKeyList.add(keyList.get(i));
+            }
+        }
+        return resultKeyList;
     }
 
     /**
@@ -117,5 +126,31 @@ public class Utils {
     public static boolean isSavedPost(String menuId, String postId){
         File file = new File("post/posts/" + menuId + "/" + postId + ".json");
         return file.exists();
+    }
+
+    /**
+     * ./post/posts 에 저장된 게시물들을 postInfo로 가져옵니다.
+     */
+    public static LinkedHashMap<String, PostInfo> getAllPostInfoFromPost(){
+        LinkedHashMap<String, PostInfo> map = new LinkedHashMap<>();
+        File[] indexes = (new File("post/posts")).listFiles();
+        for(File indexFolder : indexes){
+            if(indexFolder.isDirectory()){
+                String menuID = indexFolder.getName();
+                File[] files = indexFolder.listFiles();
+                for(File postFile : files){
+                    String[] tokens = postFile.getName().split("[.]");
+                    if(tokens.length < 2){
+                        MainLogger.info("post id 분석 실패 : " + postFile.getName());
+                        continue;
+                    }
+                    String PostID = tokens[0];
+                    Post post = new Post(menuID, PostID, false);
+                    PostInfo postInfo = new PostInfo(post);
+                    map.put(menuID + "," + PostID, postInfo);
+                }
+            }
+        }
+        return map;
     }
 }

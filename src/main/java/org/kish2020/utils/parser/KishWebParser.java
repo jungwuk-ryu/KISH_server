@@ -170,6 +170,10 @@ public class KishWebParser {
     }
 
     public static Post parsePost(String menuID, String postID){
+        return parsePost(menuID, postID, true);
+    }
+
+    public static Post parsePost(String menuID, String postID, boolean doSaveOnShutdown){
         Post post = new Post(menuID, postID);
         try {
             Document doc = Jsoup.connect("http://hanoischool.net/default.asp?menu_no=" + menuID + "&board_mode=view&bno=" + postID).get();

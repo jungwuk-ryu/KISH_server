@@ -1,5 +1,6 @@
 package org.kish2020.DataBase;
 
+import com.google.gson.Gson;
 import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -15,7 +16,9 @@ import java.util.Set;
 import java.util.function.BiFunction;
 
 public class DataBase<V> extends LinkedHashMap<String, V>{
+    public static final Gson gson = new Gson();
     public boolean doSave = true;
+    public boolean isLoggingEnabled = true;
     public final String fileName;
 
     private boolean isLoaded = false;
@@ -30,9 +33,21 @@ public class DataBase<V> extends LinkedHashMap<String, V>{
         }));
     }
 
+    public DataBase(String fileName, boolean isLoggingEnabled, boolean doSaveOnShutdown) {
+        this.fileName = fileName;
+        this.setIsLoggingEnabled(isLoggingEnabled);
+        this.reload();
+        Runtime rt = Runtime.getRuntime();
+        if(doSaveOnShutdown) {
+            rt.addShutdownHook(new Thread(() -> {
+                save();
+            }));
+        }
+    }
+
     public void reload(){
         File jsonFile = new File(fileName);
-        MainLogger.warn("DB 불러오는 중 : " + jsonFile.getAbsolutePath());
+        if(this.isLoggingEnabled) MainLogger.warn("DB 불러오는 중 : " + jsonFile.getAbsolutePath());
         try {
             String json;
             if (!jsonFile.exists()) {
@@ -62,7 +77,7 @@ public class DataBase<V> extends LinkedHashMap<String, V>{
     public void remove(){
         File file = new File(fileName);
         file.delete();
-        MainLogger.warn("제거됨 : " + fileName);
+        if(isLoggingEnabled) MainLogger.warn("제거됨 : " + fileName);
     }
 
     public void save(){
@@ -71,14 +86,14 @@ public class DataBase<V> extends LinkedHashMap<String, V>{
             MainLogger.error("DB가 정상적으로 로드되지 않아 데이터 손실 방지를 위해 저장되지 않습니다.");
             return;
         }
-        MainLogger.warn("저장하는 중 : " + fileName);
+        if(isLoggingEnabled) MainLogger.warn("저장하는 중 : " + fileName);
 
-        JSONObject jsonObject = new JSONObject();
+        /*JSONObject jsonObject = new JSONObject();
         for(String key : this.keySet()){
             jsonObject.put(key, this.get(key));
-        }
+        }*/
         try {
-            FileUtils.write(new File(fileName), jsonObject.toJSONString(), StandardCharsets.UTF_8);
+            FileUtils.write(new File(fileName), gson.toJson(this) , StandardCharsets.UTF_8);
         } catch (IOException e) {
             MainLogger.error("DB 저장중 오류가 발생하였습니다.", e);
         }
@@ -160,6 +175,14 @@ public class DataBase<V> extends LinkedHashMap<String, V>{
 
     public void setDoSave(boolean doSave) {
         this.doSave = doSave;
+    }
+
+    public boolean isLoggingEnabled(){
+        return isLoggingEnabled;
+    }
+
+    public void setIsLoggingEnabled(boolean v){
+        this.isLoggingEnabled = v;
     }
 
     public void setDataChangeListener(Runnable r){

@@ -10,6 +10,10 @@ public class ExpandedDataBase extends DataBase<Object> {
         super(fileName);
     }
 
+    public ExpandedDataBase(String fileName, boolean isLoggingEnabled, boolean doSaveOnShutdown) {
+        super(fileName, isLoggingEnabled, doSaveOnShutdown);
+    }
+
     @Override
     public LinkedHashMap<String, Object> jsonToMap(JSONObject jsonObject){
         LinkedHashMap<String, Object> map = new LinkedHashMap<>();
