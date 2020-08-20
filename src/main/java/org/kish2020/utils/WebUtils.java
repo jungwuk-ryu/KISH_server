@@ -1,5 +1,6 @@
 package org.kish2020.utils;
 
+import com.google.gson.Gson;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -25,7 +26,18 @@ public class WebUtils {
      */
     // TODO : 테스트
 
-    public static JSONObject postRequest(String fullUrl, ContentType contentType, String parameters){
+    public static JSONObject postRequestWithJsonResult(String fullUrl, ContentType contentType, String parameters){
+        JSONParser parser = new JSONParser();
+        JSONObject resultJson = null;
+        try {
+            resultJson = (JSONObject) parser.parse(postRequest(fullUrl, contentType, parameters));
+        } catch (ParseException e) {
+            MainLogger.error("", e);
+        }
+        return resultJson;
+    }
+
+    public static String postRequest(String fullUrl, ContentType contentType, String parameters){
         try {
             URL url = new URL(fullUrl);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -53,9 +65,8 @@ public class WebUtils {
             con.disconnect();
 
             String resultJsonStr = resultJson.toString();
-            JSONParser parser = new JSONParser();
-            return (JSONObject) parser.parse(resultJsonStr);
-        } catch (IOException | ParseException e) {
+            return resultJsonStr;
+        } catch (IOException e) {
             MainLogger.error(fullUrl + "에 대한 post 요청 중 오류가 발생하였습니다.", e);
             return null;
         }
@@ -83,7 +94,18 @@ public class WebUtils {
      * @return 요청에 성공할경우 JSONObject, 실패할경우 null
      */
 
-    public static JSONObject getRequest(String fullUrl) {
+    public static JSONObject getRequestWithJsonResult(String fullUrl){
+        JSONParser parser = new JSONParser();
+        JSONObject resultJson = null;
+        try {
+            resultJson = (JSONObject) parser.parse(getRequest(fullUrl));
+        } catch (ParseException e) {
+            MainLogger.error("", e);
+        }
+        return resultJson;
+    }
+
+    public static String getRequest(String fullUrl) {
         URL url = null;
         JSONObject resultJsonObj = null;
         try {
@@ -105,10 +127,8 @@ public class WebUtils {
             con.disconnect();
 
             String resultJsonStr = resultJson.toString();
-            JSONParser parser = new JSONParser();
-            resultJsonObj = (JSONObject) parser.parse(resultJsonStr);
-            return resultJsonObj;
-        } catch (ParseException | IOException e) {
+            return resultJsonStr;
+        } catch (IOException e) {
             MainLogger.error( fullUrl + "에 대한 get요청 중 오류 발생", e);
             return null;
         }

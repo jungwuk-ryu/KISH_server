@@ -13,12 +13,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.HashMap;
 
 @Controller
 @RequestMapping("/api/library")
 public class LibraryApiServerController {
     private Kish2020Server main;
     private DataBase db;    // TODO : 책 목록 저장 및 불러오기
+
+    public HashMap<String, String> session = new HashMap<>();
 
     public LibraryApiServerController(Kish2020Server main){
         this.main = main;
@@ -47,7 +50,20 @@ public class LibraryApiServerController {
         * message : 결과 메세지
         * result가 0이면 사용 가능 아이디
         */
-        JSONObject response = WebUtils.postRequest("http://lib.hanoischool.net:81/front/member/checkID", WebUtils.ContentType.FORM, parameters);
+        JSONObject response = WebUtils.postRequestWithJsonResult("http://lib.hanoischool.net:81/front/member/checkID", WebUtils.ContentType.FORM, parameters);
+        return response.toJSONString();
+    }
+//http://lib.hanoischool.net:81/front/member/register
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    public @ResponseBody String register(@RequestParam String seq, @RequestParam String id, @RequestParam String pwd, @RequestParam String ck){
+        String parameters;
+        parameters = "ID_EXIST_CHECK=" + 1;
+        parameters += "&MEMBER_REG_SEQ=" + seq;
+        parameters += "&MEMBER_REG_ID=" + id;
+        parameters += "&MEMBER_REG_PWD=" + pwd;
+        parameters += "&MEMBER_PWD_CK=" + ck;
+
+        JSONObject response = WebUtils.postRequestWithJsonResult("http://lib.hanoischool.net:81/front/member/register", WebUtils.ContentType.FORM, parameters);
         return response.toJSONString();
     }
 
@@ -65,7 +81,10 @@ public class LibraryApiServerController {
             return "{\"message\":\"요청을 처리하는도중 오류가 발생하였습니다.\",\"result\":500}";
         }
         String parameters = "MEMBER_NM=" + name + "&MEMBER_SEQ=" + seq;
-        JSONObject result = WebUtils.postRequest("http://lib.hanoischool.net:81/front/member/formRegister", WebUtils.ContentType.FORM, parameters);
+        /* result 2 : 이미 가입된 (웹)회원
+           result 1 : 존재하지 않는 (도서관)회원
+         */
+        JSONObject result = WebUtils.postRequestWithJsonResult("http://lib.hanoischool.net:81/front/member/search", WebUtils.ContentType.FORM, parameters);
         return result.toJSONString();
     }
 
