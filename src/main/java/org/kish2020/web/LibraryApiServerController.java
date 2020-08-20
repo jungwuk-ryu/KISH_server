@@ -1,5 +1,6 @@
 package org.kish2020.web;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -88,6 +89,10 @@ public class LibraryApiServerController {
     @RequestMapping(value = "/getInfo", method = RequestMethod.GET)
     public @ResponseBody String getInfo(@RequestParam String uuid){
         JSONObject json = new JSONObject();
+        if(!this.session.containsKey(uuid)){
+            json.put("result", "1");
+            return json.toJSONString();
+        }
         String response = WebUtils.getRequest("http://lib.hanoischool.net:81/front/mypage/mypage", this.getCookie(uuid)).getResponse();
         Document doc = Jsoup.parse(response);
         Elements myPageBox = doc.select(".list-style01");
@@ -108,6 +113,31 @@ public class LibraryApiServerController {
         json.put("numberOverdueBooks", loanInfoElements.get(1).text());
         json.put("numberReservedBooks", loanInfoElements.get(2).text());
         return json.toJSONString();
+    }
+
+    @RequestMapping(value = "/getLoanedBooks")
+    public @ResponseBody String getLoanedBooks(@RequestParam String uuid){
+        if(!this.session.containsKey(uuid)){
+            return "[-1]";  // 비로그인 상태일경우 index 0에 -1 반환
+        }
+        JSONArray jsonArray = new JSONArray();
+        String response = WebUtils.getRequest("http://lib.hanoischool.net:81/front/mypage/bookLend?SC_BOOKSTATUS_CK=on&SC_BOOKSTATUS_FLAG=0", this.getCookie(uuid)).getResponse();
+        Document doc = Jsoup.parse(response);
+        Elements books = doc.select("tbody").get(1).select("tr");
+        for(Element book : books){
+            Elements infoElements = book.select("td");
+            MainLogger.error(infoElements.toString());
+            HashMap<String, String> map = new HashMap<>();
+            map.put("id", infoElements.get(0).text());
+            map.put("registrationNumber", infoElements.get(1).text());
+            map.put("billingSymbol", infoElements.get(2).text());
+            map.put("bookName", infoElements.get(3).text());
+            map.put("loanDate", infoElements.get(4).text());
+            map.put("returnScheduledDate", infoElements.get(5).text());
+            map.put("returnDate", infoElements.get(6).text());
+            jsonArray.add(map);
+        }
+        return jsonArray.toJSONString();
     }
 
     /**

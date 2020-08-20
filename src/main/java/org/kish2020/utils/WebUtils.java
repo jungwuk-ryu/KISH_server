@@ -198,7 +198,6 @@ public class WebUtils {
                 break;
             }
         }
-        MainLogger.info("마 이게 쿠키다 : " + cookie);
         return cookie;
     }
 }
