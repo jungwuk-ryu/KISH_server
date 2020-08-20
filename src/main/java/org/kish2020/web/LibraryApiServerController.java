@@ -1,9 +1,14 @@
 package org.kish2020.web;
 
 import org.json.simple.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.kish2020.DataBase.DataBase;
 import org.kish2020.Kish2020Server;
 import org.kish2020.MainLogger;
+import org.kish2020.entity.RequestResult;
 import org.kish2020.utils.WebUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -53,9 +58,10 @@ public class LibraryApiServerController {
         JSONObject response = WebUtils.postRequestWithJsonResult("http://lib.hanoischool.net:81/front/member/checkID", WebUtils.ContentType.FORM, parameters);
         return response.toJSONString();
     }
-//http://lib.hanoischool.net:81/front/member/register
+
+    //http://lib.hanoischool.net:81/front/member/register
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public @ResponseBody String register(@RequestParam String seq, @RequestParam String id, @RequestParam String pwd, @RequestParam String ck){
+    public @ResponseBody String register(@RequestParam String uuid, @RequestParam String seq, @RequestParam String id, @RequestParam String pwd, @RequestParam String ck){
         String parameters;
         parameters = "ID_EXIST_CHECK=" + 1;
         parameters += "&MEMBER_REG_SEQ=" + seq;
@@ -63,8 +69,45 @@ public class LibraryApiServerController {
         parameters += "&MEMBER_REG_PWD=" + pwd;
         parameters += "&MEMBER_PWD_CK=" + ck;
 
-        JSONObject response = WebUtils.postRequestWithJsonResult("http://lib.hanoischool.net:81/front/member/register", WebUtils.ContentType.FORM, parameters);
+        JSONObject response = WebUtils.postRequestWithJsonResult("http://lib.hanoischool.net:81/front/member/register", WebUtils.ContentType.FORM, parameters, this.getCookie(uuid));
         return response.toJSONString();
+    }
+
+    @RequestMapping(value = "/login", method = RequestMethod.GET)
+    public @ResponseBody String login(@RequestParam String uuid, @RequestParam String id, @RequestParam String pwd){
+        String parameters;
+        parameters = "REQ_URL=";
+        parameters += "&MEMBER_ID=" + id;
+        parameters += "&MEMBER_PWD=" + pwd;
+
+        RequestResult response = WebUtils.postRequest("http://lib.hanoischool.net:81/front/login", WebUtils.ContentType.FORM, parameters, this.getCookie(uuid));
+        String json = response.getResponse();
+        return json;
+    }
+
+    @RequestMapping(value = "/getInfo", method = RequestMethod.GET)
+    public @ResponseBody String getInfo(@RequestParam String uuid){
+        JSONObject json = new JSONObject();
+        String response = WebUtils.getRequest("http://lib.hanoischool.net:81/front/mypage/mypage", this.getCookie(uuid)).getResponse();
+        Document doc = Jsoup.parse(response);
+        Elements myPageBox = doc.select(".list-style01");
+        if(myPageBox.size() < 2){
+            json.put("result", "1");
+            return json.toJSONString();
+        }
+        Elements myInfoElements = myPageBox.get(0).select("span");
+        Elements loanInfoElements = myPageBox.get(1).select("span");
+        json.put("result", "0");
+        json.put("id", myInfoElements.get(0).text());
+        json.put("name", myInfoElements.get(1).text());
+        json.put("grade", myInfoElements.get(2).text());
+        json.put("numberLoanableBooks", myInfoElements.get(3).text());
+        json.put("loanRestrictionDate", myInfoElements.get(4).text());
+
+        json.put("numberLoanBooks", loanInfoElements.get(0).text());
+        json.put("numberOverdueBooks", loanInfoElements.get(1).text());
+        json.put("numberReservedBooks", loanInfoElements.get(2).text());
+        return json.toJSONString();
     }
 
     /**
@@ -88,5 +131,13 @@ public class LibraryApiServerController {
         return result.toJSONString();
     }
 
+    public String getCookie(String uuid){
+        String cookie;
+        if(!this.session.containsKey(uuid)) {
+            this.session.put(uuid, WebUtils.getNewCookie("http://lib.hanoischool.net:81/"));
+        }
+        cookie = this.session.get(uuid);
+        return cookie;
+    }
 
 }

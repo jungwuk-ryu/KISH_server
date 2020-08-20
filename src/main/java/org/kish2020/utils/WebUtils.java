@@ -1,10 +1,10 @@
 package org.kish2020.utils;
 
-import com.google.gson.Gson;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.kish2020.MainLogger;
+import org.kish2020.entity.RequestResult;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
+import java.util.Map;
 
 public class WebUtils {
     private final static String USER_AGENT = "Mozilla/5.0";
@@ -27,17 +29,25 @@ public class WebUtils {
     // TODO : 테스트
 
     public static JSONObject postRequestWithJsonResult(String fullUrl, ContentType contentType, String parameters){
+        return postRequestWithJsonResult(fullUrl, contentType, parameters, null);
+    }
+
+    public static JSONObject postRequestWithJsonResult(String fullUrl, ContentType contentType, String parameters, String cookie){
         JSONParser parser = new JSONParser();
         JSONObject resultJson = null;
         try {
-            resultJson = (JSONObject) parser.parse(postRequest(fullUrl, contentType, parameters));
+            resultJson = (JSONObject) parser.parse(postRequest(fullUrl, contentType, parameters).getResponse());
         } catch (ParseException e) {
             MainLogger.error("", e);
         }
         return resultJson;
     }
 
-    public static String postRequest(String fullUrl, ContentType contentType, String parameters){
+    public static RequestResult postRequest(String fullUrl, ContentType contentType, String parameters){
+        return postRequest(fullUrl, contentType, parameters, null);
+    }
+
+    public static RequestResult postRequest(String fullUrl, ContentType contentType, String parameters, String cookie){
         try {
             URL url = new URL(fullUrl);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -49,6 +59,11 @@ public class WebUtils {
             con.setUseCaches(false);
             con.setDoInput(true);
             con.setDoOutput(true);
+            if(cookie != null){
+                con.setRequestProperty("Cookie", cookie);
+            }else{
+                con.setRequestProperty("Cookie", "");
+            }
 
             DataOutputStream wr = new DataOutputStream(con.getOutputStream());
             wr.writeBytes(parameters);
@@ -64,8 +79,8 @@ public class WebUtils {
             bufferedReader.close();
             con.disconnect();
 
-            String resultJsonStr = resultJson.toString();
-            return resultJsonStr;
+            String resultStr = resultJson.toString();
+            return new RequestResult(resultStr, parseCookie(con.getHeaderFields()));
         } catch (IOException e) {
             MainLogger.error(fullUrl + "에 대한 post 요청 중 오류가 발생하였습니다.", e);
             return null;
@@ -95,17 +110,25 @@ public class WebUtils {
      */
 
     public static JSONObject getRequestWithJsonResult(String fullUrl){
+        return getRequestWithJsonResult(fullUrl, null);
+    }
+
+    public static JSONObject getRequestWithJsonResult(String fullUrl, String cookie){
         JSONParser parser = new JSONParser();
         JSONObject resultJson = null;
         try {
-            resultJson = (JSONObject) parser.parse(getRequest(fullUrl));
+            resultJson = (JSONObject) parser.parse(getRequest(fullUrl, cookie).getResponse());
         } catch (ParseException e) {
             MainLogger.error("", e);
         }
         return resultJson;
     }
 
-    public static String getRequest(String fullUrl) {
+    public static RequestResult getRequest(String fullUrl) {
+        return getRequest(fullUrl, null);
+    }
+
+    public static RequestResult getRequest(String fullUrl, String cookie) {
         URL url = null;
         JSONObject resultJsonObj = null;
         try {
@@ -117,6 +140,11 @@ public class WebUtils {
             con.setRequestMethod("GET");
             con.setRequestProperty("Accept-Charset", "UTF-8");
             con.setRequestProperty("Accept", "application/json");
+            if(cookie != null){
+                con.setRequestProperty("Cookie", cookie);
+            }else{
+                con.setRequestProperty("Cookie", "");
+            }
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(con.getInputStream()));
             String il;
             StringBuilder resultJson = new StringBuilder();
@@ -126,11 +154,51 @@ public class WebUtils {
             bufferedReader.close();
             con.disconnect();
 
-            String resultJsonStr = resultJson.toString();
-            return resultJsonStr;
+            String resultStr = resultJson.toString();
+            return new RequestResult(resultStr, parseCookie(con.getHeaderFields()));
         } catch (IOException e) {
             MainLogger.error( fullUrl + "에 대한 get요청 중 오류 발생", e);
             return null;
         }
+    }
+
+    public static String getNewCookie (String fullUrl){
+        //web.getHeaderField("Set-Cookie");
+        //web.setRequestProperty("Cookie", cookie);
+        URL url = null;
+        try {
+            url = new URL(fullUrl);
+
+            HttpURLConnection con = null;
+            con = (HttpURLConnection) url.openConnection();
+
+            con.setRequestMethod("GET");
+            con.setRequestProperty("Accept-Charset", "UTF-8");
+            con.setRequestProperty("Cookie", "");
+            con.disconnect();
+            Map<String, List<String>> map = con.getHeaderFields();
+            return parseCookie(map);
+        } catch (IOException e) {
+            MainLogger.error( fullUrl + "에 대한 get요청 중 오류 발생", e);
+            return null;
+        }
+    }
+
+    public static String parseCookie(Map<String, List<String>> map){
+        String cookie = "";
+        for(String field : map.keySet()) {
+            if("Set-Cookie".equalsIgnoreCase(field)) {
+                List<String> list = map.get(field);
+                int i = 0;
+                for(String cookieV : list){
+                    if(i > 0) cookie += "; ";
+                    cookie += cookieV.split(";\\s*")[0];
+                    i++;
+                }
+                break;
+            }
+        }
+        MainLogger.info("마 이게 쿠키다 : " + cookie);
+        return cookie;
     }
 }
