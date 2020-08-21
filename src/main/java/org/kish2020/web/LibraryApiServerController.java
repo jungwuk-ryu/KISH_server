@@ -209,7 +209,6 @@ public class LibraryApiServerController {
         String parameters = "USER_PW="+ pwd + "&USER_PW2=" + ck;
         // 아래 결과는 무조건 result값이 0임...
         String result = WebUtils.postRequest("http://lib.hanoischool.net:81/front/member/updatePwd", WebUtils.ContentType.FORM, parameters, this.getCookie(uuid)).getResponse();
-        MainLogger.info(result);
         return "{\"message\":\"성공적으로 비밀번호가 변경되었습니다.\",\"result\":0}";
     }
 
