@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 @Controller
@@ -126,7 +128,6 @@ public class LibraryApiServerController {
         Elements books = doc.select("tbody").get(1).select("tr");
         for(Element book : books){
             Elements infoElements = book.select("td");
-            MainLogger.error(infoElements.toString());
             HashMap<String, String> map = new HashMap<>();
             map.put("id", infoElements.get(0).text());
             map.put("registrationNumber", infoElements.get(1).text());
@@ -210,6 +211,51 @@ public class LibraryApiServerController {
         // 아래 결과는 무조건 result값이 0임...
         String result = WebUtils.postRequest("http://lib.hanoischool.net:81/front/member/updatePwd", WebUtils.ContentType.FORM, parameters, this.getCookie(uuid)).getResponse();
         return "{\"message\":\"성공적으로 비밀번호가 변경되었습니다.\",\"result\":0}";
+    }
+
+    // TODO : hasNextIndex fix
+    @RequestMapping(value = "/searchBooks", method = RequestMethod.GET)
+    public @ResponseBody String searchBooks(@RequestParam String keyword, @RequestParam(defaultValue = "1") int index){
+        Document doc = null;
+        try {
+            doc = Jsoup.connect(
+                    "http://lib.hanoischool.net:81/front/bookSearch/simple/list?U_CD=search_menu&M_CD=simpleSearch" +
+                            "&PAGE_NO=" + index + "&PAGE_SIZE=12&BLOCK_SIZE=10&BK_BIB_SEQ=&BK_ITEM_SEQ=&ORDER_COLUMN=BK_BIBAUTHOR&ORDER_METHOD=DESC&CHKTYPEALL=ALL&CHKTYPE0=&CHKTYPE2=&CHKTYPE3=&CHKLENDINCLUDE=1&CHKRESERVEINCLUDE=1&SC_LIST_TYPE=list" +
+                            "&SC_KEYWORD_FIRST=" + keyword + "&SC_KEY_SECOND=ALL&SC_KEYWORD_SECOND=").get();
+        } catch (IOException e) {
+            MainLogger.error("", e);
+            return "{\"message\":\"서버 처리 중 오류가 발생하였습니다\",\"result\":500}";
+        }
+
+        Elements books = doc.select("tbody").get(0).select("tr");
+        JSONObject jsonObject = new JSONObject();
+        ArrayList<HashMap<String, String>> bookList = new ArrayList<>();
+        for(Element book : books){
+            Elements infoElements = book.select("td");
+            HashMap<String, String> map = new HashMap<>();
+            map.put("id", infoElements.get(0).text());
+            map.put("title", infoElements.get(1).text());
+            map.put("author", infoElements.get(2).text());
+            map.put("publication", infoElements.get(3).text());
+            map.put("publishDate", infoElements.get(4).text());
+            map.put("loanable", infoElements.get(5).text());
+            bookList.add(map);
+        }
+        //fa-angle-right-wrap
+        Elements tempElements = doc.select(".active").get(0).select("li");
+        int indexSize = tempElements.size();
+        boolean hasNextIndex;
+        boolean hasNextBtn = tempElements.select(".fa-angle-right-wrap").size() > 0;
+        if(index % 10 == 0){
+            hasNextIndex = hasNextBtn;
+        }else {
+            hasNextIndex = indexSize > (index % 10);
+        }
+        jsonObject.put("bookList", bookList);
+        jsonObject.put("result", "0");
+        jsonObject.put("index", index);
+        jsonObject.put("hasNextIndex", hasNextIndex);
+        return jsonObject.toJSONString();
     }
 
     public String getCookie(String uuid){
