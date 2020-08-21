@@ -161,7 +161,7 @@ public class LibraryApiServerController {
         return result.toJSONString();
     }
 
-    @RequestMapping(value = "/findID", method = RequestMethod.GET)   // TODO : 테스트
+    @RequestMapping(value = "/findID", method = RequestMethod.POST)
     public @ResponseBody String findID(@RequestParam String name, @RequestParam String seq){
         try {
             name = URLEncoder.encode(name,"UTF-8");
@@ -172,6 +172,21 @@ public class LibraryApiServerController {
         String parameters = "FORM_MODE=ID&MEMBER_REG_ID=&MEMBER_NM=" + name + "&MEMBER_SEQ=" + seq;
         // result 0 : 성공, 1 : 아이디 존재 X
         JSONObject result = WebUtils.postRequestWithJsonResult("http://lib.hanoischool.net:81/front/member/searchID", WebUtils.ContentType.FORM, parameters, "");
+        return result.toJSONString();
+    }
+
+    @RequestMapping(value = "/findPWD", method = RequestMethod.POST)
+    public @ResponseBody String findPWD(@RequestParam String id, @RequestParam String name, @RequestParam String seq){
+        try {
+            name = URLEncoder.encode(name,"UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            MainLogger.error("name 인코딩중 오류가 발생하였습니다.", e);
+            return "{\"message\":\"요청을 처리하는도중 오류가 발생하였습니다.\",\"result\":1}";
+        }
+        String parameters = "FORM_MODE=PWD&MEMBER_REG_ID=" + id + "&MEMBER_NM=" + name + "&MEMBER_SEQ=" + seq;
+        // result 0 : 성공, 1 : 정보 일치 회원 X
+        // RESULT_VALUE에 설정된 임시 pwd 전달됨
+        JSONObject result = WebUtils.postRequestWithJsonResult("http://lib.hanoischool.net:81/front/member/searchPWD", WebUtils.ContentType.FORM, parameters, "");
         return result.toJSONString();
     }
 
