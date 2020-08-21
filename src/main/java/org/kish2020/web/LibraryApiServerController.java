@@ -167,7 +167,7 @@ public class LibraryApiServerController {
             name = URLEncoder.encode(name,"UTF-8");
         } catch (UnsupportedEncodingException e) {
             MainLogger.error("name 인코딩중 오류가 발생하였습니다.", e);
-            return "{\"message\":\"요청을 처리하는도중 오류가 발생하였습니다.\",\"result\":1}";
+            return "{\"message\":\"요청을 처리하는도중 오류가 발생하였습니다.\",\"result\":500}";
         }
         String parameters = "FORM_MODE=ID&MEMBER_REG_ID=&MEMBER_NM=" + name + "&MEMBER_SEQ=" + seq;
         // result 0 : 성공, 1 : 아이디 존재 X
@@ -181,13 +181,36 @@ public class LibraryApiServerController {
             name = URLEncoder.encode(name,"UTF-8");
         } catch (UnsupportedEncodingException e) {
             MainLogger.error("name 인코딩중 오류가 발생하였습니다.", e);
-            return "{\"message\":\"요청을 처리하는도중 오류가 발생하였습니다.\",\"result\":1}";
+            return "{\"message\":\"요청을 처리하는도중 오류가 발생하였습니다.\",\"result\":500}";
         }
         String parameters = "FORM_MODE=PWD&MEMBER_REG_ID=" + id + "&MEMBER_NM=" + name + "&MEMBER_SEQ=" + seq;
         // result 0 : 성공, 1 : 정보 일치 회원 X
         // RESULT_VALUE에 설정된 임시 pwd 전달됨
         JSONObject result = WebUtils.postRequestWithJsonResult("http://lib.hanoischool.net:81/front/member/searchPWD", WebUtils.ContentType.FORM, parameters, "");
         return result.toJSONString();
+    }
+
+    @RequestMapping(value = "/changePWD", method = RequestMethod.POST)
+    public @ResponseBody String changePWD(@RequestParam String uuid, @RequestParam String pwd, @RequestParam String ck){
+        if(!this.session.containsKey(uuid)){
+            return "{\"message\":\"로그인을 해주세요.\",\"result\":3}";
+        }
+        /* 페이지 비밀번호 규정
+        비밀번호는 8~12자 영대문자, 영소문자,
+        숫자 및 특수문자 중 2종류 이상으로 구성시 최소 10자리 이상이며,
+         3종류 이상 구성시 최소 8자리 이상으로 구성하여야 합니다 . */
+        // TODO : 규정에 맞도록 필터링
+        if(pwd.length() < 8 || pwd.length() > 12){
+            return "{\"message\":\"입력한 비밀번호는 8~12자로 구성되어야 합니다.\",\"result\":4}";
+        }
+        if(!pwd.equals(ck)){
+            return "{\"message\":\"입력한 비밀번호가 다릅니다.\",\"result\":2}";
+        }
+        String parameters = "USER_PW="+ pwd + "&USER_PW2=" + ck;
+        // 아래 결과는 무조건 result값이 0임...
+        String result = WebUtils.postRequest("http://lib.hanoischool.net:81/front/member/updatePwd", WebUtils.ContentType.FORM, parameters, this.getCookie(uuid)).getResponse();
+        MainLogger.info(result);
+        return "{\"message\":\"성공적으로 비밀번호가 변경되었습니다.\",\"result\":0}";
     }
 
     public String getCookie(String uuid){
