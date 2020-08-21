@@ -9,7 +9,6 @@ public class Kish2020Server {
     public static ExpandedDataBase mainDataBase = null;
     public static ExpandedDataBase mainSettings = null;
     public static FirebaseManager firebaseManager = null;
-    public int d = 1;
 
     public static void main(String[] args) {
         mainDataBase = new ExpandedDataBase("kish_main_db.json");

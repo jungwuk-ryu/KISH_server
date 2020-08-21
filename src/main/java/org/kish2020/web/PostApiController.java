@@ -48,7 +48,7 @@ public class PostApiController {
         // TODO : 이 부분 해결하기,,
         for(String key : this.postInfo.keySet()){
             Object postInfo = this.postInfo.get(key);
-            if(postInfo instanceof JSONObject){     // 인텔리제이가 제거하라는데 안 해주면 안됩니다 ㅠㅠㅠㅠ
+            if(postInfo instanceof JSONObject){     // 인텔리제이가 제거하라는데 안 해주면 안 됩니다 ㅠㅠㅠㅠ
                 this.postInfo.put(key, new PostInfo((JSONObject) postInfo));
             }
         }
@@ -64,18 +64,13 @@ public class PostApiController {
 
     public void checkNewPost(){
         int postCount = 0;
-        MainLogger.info("task 실행");
         for(MenuID menuId : MenuID.values()) {
             String id = menuId.id;
             ArrayList<SimplePost> list = KishWebParser.parseMenu(id, "1");
             if (list.size() < 1) break;
             for (SimplePost sp : list) {
-                if(Utils.isSavedPost(sp.getMenuId(), sp.getPostId())){
-                    break;
-                }
-                if(loadedPosts.containsKey(sp.getMenuId() + "," + sp.getPostId())){
-                    continue;
-                }
+                if(Utils.isSavedPost(sp.getMenuId(), sp.getPostId())) break;
+                if(loadedPosts.containsKey(sp.getMenuId() + "," + sp.getPostId())) continue;
                 getPostFromServer(sp.getMenuId(), sp.getPostId());
                 postCount++;
                 try {
@@ -183,13 +178,6 @@ public class PostApiController {
         });
         thread.start();
         return jsonArray.toJSONString();
-    }
-
-    /* 테스트용 코드입니다 */
-    @RequestMapping("/d")
-    public @ResponseBody String dTest(@RequestParam String bno, @RequestParam String menu){
-        //this.parseAllPosts();
-        return "ok";
     }
 
     @RequestMapping("/searchPost")
