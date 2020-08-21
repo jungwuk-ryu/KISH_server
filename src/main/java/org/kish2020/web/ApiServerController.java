@@ -61,7 +61,7 @@ public class ApiServerController {
         */
 
         String url = "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=" + lat + "&lon=" + lon;
-        JSONObject result = WebUtils.getRequest(url);
+        JSONObject result = WebUtils.getRequestWithJsonResult(url);
         return result.toJSONString();
     }
 

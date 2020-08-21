@@ -20,14 +20,14 @@ import java.util.*;
 
 @Controller
 @RequestMapping("/api/post")
-public class PostApi {
+public class PostApiController {
     public static final Gson gson = new Gson();
     public DataBase<PostInfo> postInfo;
     public LinkedHashMap<String, Post> loadedPosts = new LinkedHashMap<>();
     /* 검색 관련 */
     public DataBase<HashMap<String, Long>> postInKeyword;
 
-    public PostApi(){
+    public PostApiController(){
         this.postInfo = new DataBase<>("post/postInfoDB.json");
         this.postInKeyword = new DataBase<HashMap<String, Long>>("post/keywordDB.json");
         if(!this.postInKeyword.isLoaded()){
