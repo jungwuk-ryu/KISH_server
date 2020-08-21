@@ -213,7 +213,6 @@ public class LibraryApiServerController {
         return "{\"message\":\"성공적으로 비밀번호가 변경되었습니다.\",\"result\":0}";
     }
 
-    // TODO : hasNextIndex fix
     @RequestMapping(value = "/searchBooks", method = RequestMethod.GET)
     public @ResponseBody String searchBooks(@RequestParam String keyword, @RequestParam(defaultValue = "1") int index){
         Document doc = null;
@@ -241,11 +240,11 @@ public class LibraryApiServerController {
             map.put("loanable", infoElements.get(5).text());
             bookList.add(map);
         }
-        //fa-angle-right-wrap
-        Elements tempElements = doc.select(".active").get(0).select("li");
+        Elements tempElements = doc.select(".pagination-sm").get(0).select("li");
         int indexSize = tempElements.size();
         boolean hasNextIndex;
         boolean hasNextBtn = tempElements.select(".fa-angle-right-wrap").size() > 0;
+        if(hasNextBtn) indexSize --;
         if(index % 10 == 0){
             hasNextIndex = hasNextBtn;
         }else {
