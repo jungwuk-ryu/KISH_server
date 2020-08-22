@@ -1,6 +1,7 @@
 package org.kish2020.DataBase;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -16,9 +17,11 @@ import java.util.Set;
 import java.util.function.BiFunction;
 
 public class DataBase<V> extends LinkedHashMap<String, V>{
-    public static final Gson gson = new Gson();
+    public static final Gson GSON = new Gson();
+    public static final Gson PRETTY_GSON = new GsonBuilder().setPrettyPrinting().create();
     public boolean doSave = true;
     public boolean isLoggingEnabled = true;
+    public boolean saveWithPrettyGson = false;
     public final String fileName;
 
     private boolean isLoaded = false;
@@ -93,7 +96,11 @@ public class DataBase<V> extends LinkedHashMap<String, V>{
             jsonObject.put(key, this.get(key));
         }*/
         try {
-            FileUtils.write(new File(fileName), gson.toJson(this) , StandardCharsets.UTF_8);
+            if(saveWithPrettyGson){
+                FileUtils.write(new File(fileName), PRETTY_GSON.toJson(this), StandardCharsets.UTF_8);
+            }else {
+                FileUtils.write(new File(fileName), GSON.toJson(this), StandardCharsets.UTF_8);
+            }
         } catch (IOException e) {
             MainLogger.error("DB 저장중 오류가 발생하였습니다.", e);
         }
@@ -187,6 +194,10 @@ public class DataBase<V> extends LinkedHashMap<String, V>{
 
     public void setDataChangeListener(Runnable r){
         this.dataChangeListener = r;
+    }
+
+    public void setSaveWithPrettyGson(boolean b){
+        this.saveWithPrettyGson = b;
     }
 
     private void runListener(){

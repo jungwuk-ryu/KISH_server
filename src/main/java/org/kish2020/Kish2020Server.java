@@ -13,6 +13,7 @@ public class Kish2020Server {
     public static void main(String[] args) {
         mainDataBase = new ExpandedDataBase("kish_main_db.json");
         mainSettings = new ExpandedDataBase("kish2020.json");
+        mainSettings.setSaveWithPrettyGson(true);
         firebaseManager = new FirebaseManager();
         SpringApplication.run(Kish2020Server.class, args);
     }
