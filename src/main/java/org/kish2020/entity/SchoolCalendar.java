@@ -15,7 +15,7 @@ public class SchoolCalendar extends DataBase<HashSet<String>> {
     private String json;
 
     public SchoolCalendar() {
-        super("schoolCalendarDB.json", true, true);
+        super("db/schoolCalendarDB.json", true, true);
         this.commit();
     }
 
