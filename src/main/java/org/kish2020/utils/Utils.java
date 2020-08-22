@@ -2,6 +2,8 @@ package org.kish2020.utils;
 
 import io.github.bangjunyoung.KoreanChar;
 import org.apache.commons.lang3.StringUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.kish2020.MainLogger;
 import org.kish2020.entity.Post;
 import org.kish2020.entity.PostInfo;
@@ -206,5 +208,11 @@ public class Utils {
             }
         }
         return map;
+    }
+
+    public static Document postToDocument(Post post){
+        Document doc = Jsoup.parse(post.getFullHtml());
+        doc.setBaseUri("http://www.hanoischool.net/?menu_no=" + post.getMenuId() + "&board_mode=view&bno=" + post.getPostId());
+        return doc;
     }
 }

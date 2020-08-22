@@ -22,22 +22,26 @@ public class KishWebParser {
     /**
      * <p>Document내 주소들을 절대 경로로 변환합니다.</p>
      * <p>또한 다운로드 주소는 EUC-KR으로 인코딩합니다.</p>
+     * <p>https://stove99.tistory.com/129 을 이용하였습니다.</p>
      */
     public static Document generateUrl(Document doc){
+        if(doc.baseUri().isEmpty()){
+            throw new IllegalArgumentException("주어진 Document에 baseUrl이 설정되어 있지 않습니다.");
+        }
         // src attribute 가 있는 엘리먼트들을 선택
         try {
             Elements elems = doc.select("[src]");
             for (Element elem : elems) {
-                if (!elem.attr("src").equals(elem.attr("abs:src"))) {
-                    elem.attr("src", "abs:src");
+                if (!elem.attr("src").equals(elem.absUrl("src"))) {
+                    elem.attr("src", elem.absUrl("src"));
                 }
             }
 
             // href attribute 가 있는 엘리먼트들을 선택
             elems = doc.select("[href]");
             for (Element elem : elems) {
-                if (!elem.attr("href").equals(elem.attr("abs:href"))) {
-                    String attr = elem.attr("abs:href");
+                if (!elem.attr("href").equals(elem.absUrl("href"))) {
+                    String attr = elem.absUrl("href");
                     if(attr.contains("dfname=")){
                         String[] split = attr.split("dfname=");
                         /*다운로드 경로는 EUC-KR으로 인코드 해주지 않을 경우 404발생*/
@@ -138,6 +142,7 @@ public class KishWebParser {
         return list;
     }
 
+    // TODO : 최적화
     public static String generatePostToNormal(Document doc){
         doc = doc.clone();
         generateUrl(doc);
@@ -156,6 +161,14 @@ public class KishWebParser {
         doc.select(".h_board table").forEach(Node::remove);
         doc.select(".h_btn_area2").forEach(Node::remove);
         doc.select(".table_b5").forEach(Node::remove);
+        doc.select(".fr").forEach(Node::remove);
+        doc.select(".sub_title").forEach(Node::remove);
+        doc.select(".h_board").get(1).remove();
+        doc.select("caption").forEach(Node::remove);
+        Elements trElements = doc.select(".h_board").get(0).select("tr");
+        for(int i = 0; i < 4; i++) {
+            trElements.get(i).remove();
+        }
         return doc.toString();
             /*return "<html lang=\"ko\">\n" +
                     "\t<head>\n" +
@@ -174,7 +187,7 @@ public class KishWebParser {
     }
 
     public static Post parsePost(String menuID, String postID, boolean doSaveOnShutdown){
-        Post post = new Post(menuID, postID);
+        Post post = new Post(menuID, postID, doSaveOnShutdown);
         try {
             Document doc = Jsoup.connect("http://hanoischool.net/default.asp?menu_no=" + menuID + "&board_mode=view&bno=" + postID).get();
             Elements elements = doc.select(".h_board").get(0).getAllElements();

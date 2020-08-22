@@ -3,6 +3,9 @@ package org.kish2020.web;
 import com.google.gson.Gson;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.kish2020.DataBase.DataBase;
 import org.kish2020.MainLogger;
 import org.kish2020.MenuID;
@@ -92,12 +95,16 @@ public class PostApiController {
      * 저장된 게시물을 불러옵니다.
      */
     public Post getPost(String postKey){
+        return this.getPost(postKey, true);
+    }
+
+    public Post getPost(String postKey, boolean saveOnShutdown){
         if(this.loadedPosts.containsKey(postKey)){
             return this.loadedPosts.get(postKey);
         }
         String[] tokens = postKey.split(",");
         if(!Utils.isSavedPost(tokens[0], tokens[1])) return null;
-        Post post = new Post(tokens[0], tokens[1]);
+        Post post = new Post(tokens[0], tokens[1], saveOnShutdown);
         this.loadedPosts.put(postKey, post);
         return post;
     }
@@ -113,8 +120,7 @@ public class PostApiController {
 
     public Post getPostFromServer(String menuId, String postID){
         MainLogger.info("서버에서 받아오는 중 : " + menuId + "," + postID);
-        boolean isNew = false;
-        if(!Utils.isSavedPost(menuId, postID)) isNew = true;
+        boolean isNew = !Utils.isSavedPost(menuId, postID);
         Post post = KishWebParser.parsePost(menuId, postID, false);
         if(post == null){
             if(Utils.isSavedPost(menuId, postID)){
@@ -190,6 +196,17 @@ public class PostApiController {
             result.add(postInfo);
         });
         return gson.toJson(result);
+    }
+
+    @RequestMapping(value = "/getPost")
+    public @ResponseBody String getPostApi(@RequestParam String menuID, @RequestParam String postID){
+        Post post = this.getPostFromServer(menuID, postID);
+        Document doc = Utils.postToDocument(post);
+        post.put("bodyHtml", KishWebParser.generatePostToNormal(doc));
+        post.remove("registeredKeyword");
+        post.remove("fullHtml");
+        post.remove("content");
+        return (new JSONObject(post).toJSONString());
     }
 
     /**
