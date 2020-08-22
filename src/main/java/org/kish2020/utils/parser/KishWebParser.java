@@ -26,20 +26,27 @@ public class KishWebParser {
         ArrayList<LunchMenu> list = new ArrayList<>();
         try {
             Document doc = Jsoup.connect(ROOT_URL + "?menu_no=47&ChangeDate=" + changeDate).get();
-            Elements items = doc.select(".mm_to");
+            Elements items = doc.select(".h_line_dot");
+            items.addAll(doc.select(".h_line_color"));
+
+            String temp = doc.select("caption").get(0).text();
+            String[] tempArray = temp.split("년");
+            String yyyymm = tempArray[0].trim() + "-" + tempArray[1].split("월")[0].trim() + "-";
+
             items.forEach((element -> {
-                Elements info = element.select("p");
-                Elements elementImg = element.select("img");
-                String menu = info.get(0).text();
+                String date = yyyymm + (element.select(".h_view_name").text()).split("일")[0].trim();
+                Elements bodyElements = element.select(".mm_to");
+                String menu = "정보 없음";
                 String salt = "정보 없음";
-                String imageUrl = "";  // 염도, 이미지 url
-                if(info.size() > 1){
-                    salt = info.get(1).text();
+                String imageUrl = "";
+                if(bodyElements.size() > 0) {
+                    Elements info = bodyElements.select("p");
+                    Elements elementImg = bodyElements.select("img");
+                    menu = info.get(0).text();
+                    if (info.size() > 1) salt = info.get(1).text();
+                    if (elementImg.size() > 0) imageUrl = elementImg.get(0).attr("src");
                 }
-                if(elementImg.size() > 0){
-                    imageUrl = elementImg.get(0).attr("src");
-                }
-                list.add(new LunchMenu(menu, salt, imageUrl));
+                list.add(new LunchMenu(date, menu, salt, imageUrl));
             }));
         } catch (IOException e) {
             MainLogger.error("", e);

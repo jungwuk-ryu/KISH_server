@@ -11,12 +11,14 @@ import org.kish2020.utils.WebUtils;
 import org.kish2020.utils.parser.KishWebParser;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 
 @Controller
@@ -35,7 +37,7 @@ public class ApiServerController {
         MainLogger.info("Api Server Controller 초기화중");
         this.main = kish2020Server;
         this.db = this.main.getMainDataBase();
-
+        this.lunchLikesDB = new ExpandedDataBase("db/lunchLikesDB.json");
         try {
             testDates.add(sdf.parse("2020-09-07").getTime() / 1000);
         } catch (ParseException e) {
@@ -81,12 +83,32 @@ public class ApiServerController {
         ArrayList<LunchMenu> list = KishWebParser.parseLunch(date);
         JSONArray jsonArray = new JSONArray();
         for(LunchMenu menu : list){
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("menu", menu.getMenu());
-            jsonObject.put("detail", menu.getDetail());
-            jsonArray.add(jsonObject);
+            HashSet<String> likes = (HashSet<String>) this.lunchLikesDB.getOrDefault(menu.getDate(), new HashSet<String>());
+            menu.put("likes", likes.size());
+            jsonArray.add(menu);
         }
         return jsonArray.toJSONString();
+    }
+
+    @RequestMapping(value = "/toggleLunchLikes", method = RequestMethod.POST)
+    public @ResponseBody String toggleLunchLikes(@RequestParam String uid, @RequestParam String lunchDate, @RequestParam String method){
+        JSONObject resultJson = new JSONObject();
+        if(this.main.getFirebaseManager().isExistUser(uid)) {
+            HashSet<String> likes = (HashSet<String>) this.lunchLikesDB.getOrDefault(lunchDate, new HashSet<String>());
+            if(method.equals("add")) {
+                resultJson.put("result", "0");
+                likes.add(uid);
+            }else{
+                resultJson.put("result", "1");
+                likes.remove(uid);
+            }
+            this.lunchLikesDB.put(lunchDate, likes);
+            resultJson.put("num", likes.size());
+        }else{
+            resultJson.put("result", "500");
+            resultJson.put("msg", "로그인 상태를 확인할 수 없습니다.");
+        }
+        return resultJson.toJSONString();
     }
 
     @RequestMapping("/getExamDates")

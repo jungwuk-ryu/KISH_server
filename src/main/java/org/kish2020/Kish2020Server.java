@@ -28,4 +28,8 @@ public class Kish2020Server {
     public ExpandedDataBase getMainSettings(){
         return mainSettings;
     }
+
+    public FirebaseManager getFirebaseManager(){
+        return firebaseManager;
+    }
 }

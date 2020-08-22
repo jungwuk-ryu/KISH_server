@@ -3,10 +3,18 @@ package org.kish2020.entity;
 import org.json.simple.JSONObject;
 
 public class LunchMenu extends JSONObject {
-    public LunchMenu(String menu, String detail, String imageUrl){
+    public LunchMenu(String date, String menu, String detail, String imageUrl){
         this.setMenu(menu);
         this.setDetail(detail);
         this.setImageUrl(imageUrl);
+    }
+
+    public String getDate(){
+        return (String) this.get("date");
+    }
+
+    public void setDate(String date){
+        this.put("date", date);
     }
 
     public String getMenu() {

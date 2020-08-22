@@ -5,7 +5,6 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
-import com.google.firebase.auth.UserRecord;
 import org.kish2020.DataBase.ExpandedDataBase;
 
 import java.io.File;
@@ -45,9 +44,9 @@ public class FirebaseManager {
     }
 
     public boolean isExistUser(String uid){
-        UserRecord userRecord = null;
+        if(this.firebaseApp == null) return false;
         try {
-            userRecord = FirebaseAuth.getInstance().getUser(uid);
+            FirebaseAuth.getInstance().getUser(uid);
         } catch (FirebaseAuthException ignore) {
             return false;
         }
