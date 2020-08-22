@@ -10,51 +10,13 @@ import org.kish2020.MainLogger;
 import org.kish2020.entity.LunchMenu;
 import org.kish2020.entity.Post;
 import org.kish2020.entity.SimplePost;
+import org.kish2020.utils.Utils;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 
 public class KishWebParser {
     public static final String ROOT_URL = "http://www.hanoischool.net/";
-
-    /**
-     * <p>Document내 주소들을 절대 경로로 변환합니다.</p>
-     * <p>또한 다운로드 주소는 EUC-KR으로 인코딩합니다.</p>
-     * <p>https://stove99.tistory.com/129 을 이용하였습니다.</p>
-     */
-    public static Document generateUrl(Document doc){
-        if(doc.baseUri().isEmpty()){
-            throw new IllegalArgumentException("주어진 Document에 baseUrl이 설정되어 있지 않습니다.");
-        }
-        // src attribute 가 있는 엘리먼트들을 선택
-        try {
-            Elements elems = doc.select("[src]");
-            for (Element elem : elems) {
-                if (!elem.attr("src").equals(elem.absUrl("src"))) {
-                    elem.attr("src", elem.absUrl("src"));
-                }
-            }
-
-            // href attribute 가 있는 엘리먼트들을 선택
-            elems = doc.select("[href]");
-            for (Element elem : elems) {
-                if (!elem.attr("href").equals(elem.absUrl("href"))) {
-                    String attr = elem.absUrl("href");
-                    if(attr.contains("dfname=")){
-                        String[] split = attr.split("dfname=");
-                        /*다운로드 경로는 EUC-KR으로 인코드 해주지 않을 경우 404발생*/
-                        attr = split[0] + "dfname=" + URLEncoder.encode(split[1], "EUC-KR");
-                    }
-                    elem.attr("href", attr);
-                }
-            }
-        } catch (UnsupportedEncodingException e){
-            MainLogger.error("generateUrl에서 발생한 오류", e);
-        }
-        return doc;
-    }
 
     public static ArrayList<LunchMenu> parseLunch(){
         return parseLunch("");
@@ -145,7 +107,7 @@ public class KishWebParser {
     // TODO : 최적화
     public static String generatePostToNormal(Document doc){
         doc = doc.clone();
-        generateUrl(doc);
+        Utils.generateUrl(doc);
         Elements elements = doc.select("link");
         for (Element element : elements) {
             if("http://www.hanoischool.net/html/css/style.css?ver=1.0.0.0.0".equals(element.attr("href")))
@@ -203,7 +165,7 @@ public class KishWebParser {
             post.setContent(KishWebParser.getPostRawContent(doc));
 
             //첨부파일
-            generateUrl(doc);
+            Utils.generateUrl(doc);
             Elements attachmentElements = titleElements.get(2).select("a");
             if(attachmentElements.size() < 1){
                 post.setHasAttachment(false);
