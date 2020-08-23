@@ -116,6 +116,25 @@ public class ApiServerController {
         return resultJson.toJSONString();
     }
 
+    @RequestMapping("/subscribeNotification")
+    public @ResponseBody String subscribeNoti(@RequestParam String topic, @RequestParam String token){
+        this.main.getFirebaseManager().addNotificationUser(topic, token);
+        return "";
+    }
+
+    @RequestMapping("/unsubscribeNotification")
+    public @ResponseBody String unsubscribeNoti(@RequestParam String topic, @RequestParam String token){
+        this.main.getFirebaseManager().removeNotificationUser(topic, token);
+        return "";
+    }
+
+    @RequestMapping("/checkSubscription")
+    public @ResponseBody String checkSubscription(@RequestParam String topic, @RequestParam String token){
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("result", this.main.getFirebaseManager().isNotificationUser(topic, token) ? 0 : 1);
+        return jsonObject.toJSONString();
+    }
+
     @RequestMapping("/getExamDates")
     public @ResponseBody String getExamDates(){
         MainLogger.info("getExamDates 호출");
