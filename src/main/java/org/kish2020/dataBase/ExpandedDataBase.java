@@ -30,18 +30,34 @@ public class ExpandedDataBase extends DataBase<Object> {
      * key에 해당하는 값을 n만큼 증가시킵니다.
      */
     public int increase(String k, int n){
-        int increasedNum = (int) this.getOrDefault(k, 0) + n;
-        this.put(k, increasedNum);
-        return increasedNum;
+        Object num = this.getOrDefault(k, 0);
+        if(num instanceof Long){
+            Long longNum = (Long) num;
+            int increasedNum = (int) longNum.intValue() + n;
+            this.put(k, increasedNum);
+            return increasedNum;
+        } else {
+            int increasedNum = ((int) num) + n;
+            this.put(k, increasedNum);
+            return increasedNum;
+        }
     }
 
     /**
      * key에 해당하는 값을 n만큼 감소시킵니다.
      */
     public int decrease(String k, int n){
-        int decreasedNum = (int) this.getOrDefault(k, 0) - n;
-        this.put(k, decreasedNum);
-        return decreasedNum;
+        Object num = this.getOrDefault(k, 0);
+        if(num instanceof Long){
+            Long longNum = (Long) num;
+            int decreasedNum = (int) longNum.intValue() - n;
+            this.put(k, decreasedNum);
+            return decreasedNum;
+        } else {
+            int decreasedNum = ((int) num) - n;
+            this.put(k, decreasedNum);
+            return decreasedNum;
+        }
     }
 
     public long getLong(String k){
