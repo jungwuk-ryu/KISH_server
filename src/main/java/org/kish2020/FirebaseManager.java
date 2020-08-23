@@ -5,17 +5,29 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.messaging.*;
+import org.kish2020.dataBase.DataBase;
 import org.kish2020.dataBase.ExpandedDataBase;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 public class FirebaseManager {
     public FirebaseApp firebaseApp;
+    public DataBase<HashSet<String>> notificationUser;
 
     public FirebaseManager(){
         ExpandedDataBase settings = Kish2020Server.mainSettings;
+        this.notificationUser = new DataBase<>("db/notificationUser.json");
+        for(String key : this.notificationUser.keySet()){
+            this.notificationUser.put(key, new HashSet<>(notificationUser.get(key)));
+        }
+
         settings.put("Firebase_path_serviceAccountKey", "serviceAccountKey json파일의 경로를 입력해주세요", false);
         settings.put("Firebase_DatabaseUrl", "Firebase DB주소를 입력해주세요. ex) https://DB이름.firebaseio.com", false);
 
@@ -51,5 +63,58 @@ public class FirebaseManager {
             return false;
         }
         return true;
+    }
+
+    public void sendFCM(String topic, String title, String content, Map<String, String> data) {
+        FirebaseMessaging firebaseMessaging = FirebaseMessaging.getInstance();
+        HashSet<String> userSet = this.notificationUser.get(topic);
+        ArrayList<String> users = new ArrayList<>(userSet);
+        if(users.size() < 1) return;
+
+        MulticastMessage message = MulticastMessage.builder()
+                .setAndroidConfig(AndroidConfig.builder()
+                        .setTtl(3600 * 1000)
+                        .setPriority(AndroidConfig.Priority.NORMAL)
+                        .setNotification(AndroidNotification.builder()
+                                .setColor("#344aba")
+                                .build())
+                        .build())
+                .setNotification(new Notification(title, content))
+                .putAllData(data)
+                .addAllTokens(users)
+                .build();
+
+        try {
+            BatchResponse response = FirebaseMessaging.getInstance().sendMulticast(message);
+            if (response.getFailureCount() > 0) {
+                List<SendResponse> responses = response.getResponses();
+                for (int i = 0; i < responses.size(); i++) {
+                    if (!responses.get(i).isSuccessful()) {
+                        if(responses.get(i).getException().getErrorCode().equals("invalid-argument")) userSet.remove(users.get(i));
+                    }
+                }
+            }
+        }catch (FirebaseMessagingException e){
+            MainLogger.error("", e);
+        }
+        this.notificationUser.put(topic, userSet);
+    }
+
+    public void addNotificationUser(String topic, String userToken){
+        HashSet<String> map = this.notificationUser.getOrDefault(topic, new HashSet<>());
+        map.add(userToken);
+        this.notificationUser.put(topic, map);
+    }
+
+    public void removeNotificationUser(String topic, String userToken){
+        HashSet<String> map = this.notificationUser.getOrDefault(topic, new HashSet<>());
+        map.remove(userToken);
+        this.notificationUser.put(topic, map);
+    }
+
+    public boolean isNotificationUser(String topic, String userToken){
+        if(!this.notificationUser.containsKey(topic)) return false;
+        HashSet<String> map = this.notificationUser.get(topic);
+        return map.contains(userToken);
     }
 }
