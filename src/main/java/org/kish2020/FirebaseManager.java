@@ -28,8 +28,16 @@ public class FirebaseManager {
             this.notificationUser.put(key, new HashSet<>(notificationUser.get(key)));
         }
 
+        settings.put("Firebase_operator_messaging_tokens", new ArrayList<>(), false);
         settings.put("Firebase_path_serviceAccountKey", "serviceAccountKey json파일의 경로를 입력해주세요", false);
         settings.put("Firebase_DatabaseUrl", "Firebase DB주소를 입력해주세요. ex) https://DB이름.firebaseio.com", false);
+
+        Object admins = settings.get("Firebase_operator_messaging_tokens");
+        if(admins instanceof ArrayList){
+            this.notificationUser.put("operators", new HashSet<>((ArrayList) admins));
+        }else{
+            this.notificationUser.put("operators", (HashSet<String>) admins);
+        }
 
         String jsonPath = (String) settings.get("Firebase_path_serviceAccountKey");
         File file = new File(jsonPath);
@@ -63,6 +71,10 @@ public class FirebaseManager {
             return false;
         }
         return true;
+    }
+
+    public void sendFCMToAdmin(String title, String content, Map<String, String> data){
+        this.sendFCM("operators", title, content, data);
     }
 
     public void sendFCM(String topic, String title, String content, Map<String, String> data) {
