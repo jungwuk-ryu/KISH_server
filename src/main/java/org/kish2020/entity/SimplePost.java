@@ -2,6 +2,10 @@ package org.kish2020.entity;
 
 import org.json.simple.JSONObject;
 
+/**
+ *  메뉴에서 얻을 수 있는 게시물의 정보입니다.
+ *  PostInfo와는 다르게 첨부파일 다운로드 url은 존재하지 않으며 첨부파일 icon url이 존재합니다.
+ */
 @SuppressWarnings("unchecked")
 public class SimplePost extends JSONObject {
 

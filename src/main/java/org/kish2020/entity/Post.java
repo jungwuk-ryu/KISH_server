@@ -6,6 +6,11 @@ import org.kish2020.dataBase.DataBase;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 
+/**
+ *  게시글의 본문과 같은 내용을 포함하고 있는 클래스입니다.
+ *  DataBase를 상속받아 save() 메소드를 사용할경우 post/posts/{메뉴ID}/{postID}.json 에 저장됩니다.
+ *  또한 postKey는 {메뉴ID},{postID}의 형태로서 95,28 같은 String입니다.
+ */
 @SuppressWarnings("unchecked")
 public class Post extends DataBase<Object> {
     public Post(String menuID, String postID){
