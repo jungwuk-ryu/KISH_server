@@ -4,6 +4,9 @@ import org.kish2020.dataBase.ExpandedDataBase;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.util.Date;
+import java.util.HashMap;
+
 @SpringBootApplication
 public class Kish2020Server {
     public static ExpandedDataBase mainDataBase = null;
@@ -16,6 +19,8 @@ public class Kish2020Server {
         mainSettings.setSaveWithPrettyGson(true);
         firebaseManager = new FirebaseManager();
         SpringApplication.run(Kish2020Server.class, args);
+
+        firebaseManager.sendFCMToAdmin("Server started", "서버가 시작되었습니다.\n" + new Date().toString(), new HashMap<>());
     }
 
     /**
