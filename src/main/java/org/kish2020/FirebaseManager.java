@@ -66,38 +66,42 @@ public class FirebaseManager {
     }
 
     public void sendFCM(String topic, String title, String content, Map<String, String> data) {
-        FirebaseMessaging firebaseMessaging = FirebaseMessaging.getInstance();
-        HashSet<String> userSet = this.notificationUser.get(topic);
-        ArrayList<String> users = new ArrayList<>(userSet);
-        if(users.size() < 1) return;
+        Thread thread = new Thread(() -> {
+            FirebaseMessaging firebaseMessaging = FirebaseMessaging.getInstance();
+            HashSet<String> userSet = this.notificationUser.get(topic);
+            ArrayList<String> users = new ArrayList<>(userSet);
+            if (users.size() < 1) return;
 
-        MulticastMessage message = MulticastMessage.builder()
-                .setAndroidConfig(AndroidConfig.builder()
-                        .setTtl(3600 * 1000)
-                        .setPriority(AndroidConfig.Priority.NORMAL)
-                        .setNotification(AndroidNotification.builder()
-                                .setColor("#344aba")
-                                .build())
-                        .build())
-                .setNotification(new Notification(title, content))
-                .putAllData(data)
-                .addAllTokens(users)
-                .build();
+            MulticastMessage message = MulticastMessage.builder()
+                    .setAndroidConfig(AndroidConfig.builder()
+                            .setTtl(3600 * 1000)
+                            .setPriority(AndroidConfig.Priority.NORMAL)
+                            .setNotification(AndroidNotification.builder()
+                                    .setColor("#344aba")
+                                    .build())
+                            .build())
+                    .setNotification(new Notification(title, content))
+                    .putAllData(data)
+                    .addAllTokens(users)
+                    .build();
 
-        try {
-            BatchResponse response = FirebaseMessaging.getInstance().sendMulticast(message);
-            if (response.getFailureCount() > 0) {
-                List<SendResponse> responses = response.getResponses();
-                for (int i = 0; i < responses.size(); i++) {
-                    if (!responses.get(i).isSuccessful()) {
-                        if(responses.get(i).getException().getErrorCode().equals("invalid-argument")) userSet.remove(users.get(i));
+            try {
+                BatchResponse response = firebaseMessaging.sendMulticast(message);
+                if (response.getFailureCount() > 0) {
+                    List<SendResponse> responses = response.getResponses();
+                    for (int i = 0; i < responses.size(); i++) {
+                        if (!responses.get(i).isSuccessful()) {
+                            if (responses.get(i).getException().getErrorCode().equals("invalid-argument"))
+                                userSet.remove(users.get(i));
+                        }
                     }
                 }
+            } catch (FirebaseMessagingException e) {
+                MainLogger.error("", e);
             }
-        }catch (FirebaseMessagingException e){
-            MainLogger.error("", e);
-        }
-        this.notificationUser.put(topic, userSet);
+            this.notificationUser.put(topic, userSet);
+        });
+        thread.start();
     }
 
     public void addNotificationUser(String topic, String userToken){
