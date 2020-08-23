@@ -26,8 +26,6 @@ public class WebUtils {
      * @param parameters post요청에 사용할 파라미터
      * @return 요청에 성공할경우 JSONObject, 실패할경우 null
      */
-    // TODO : 테스트
-
     public static JSONObject postRequestWithJsonResult(String fullUrl, ContentType contentType, String parameters){
         return postRequestWithJsonResult(fullUrl, contentType, parameters, null);
     }
@@ -36,7 +34,9 @@ public class WebUtils {
         JSONParser parser = new JSONParser();
         JSONObject resultJson = null;
         try {
-            resultJson = (JSONObject) parser.parse(postRequest(fullUrl, contentType, parameters).getResponse());
+            String jsonResult = postRequest(fullUrl, contentType, parameters).getResponse();
+            if(jsonResult == null) return null;
+            resultJson = (JSONObject) parser.parse(jsonResult);
         } catch (ParseException e) {
             MainLogger.error("", e);
         }

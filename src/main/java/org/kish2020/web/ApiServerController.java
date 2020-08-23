@@ -57,7 +57,6 @@ public class ApiServerController {
      * @param lon 경도(Longitude)
      */
 
-    // TODO : quota 구현, Null check
     @RequestMapping("/getWeather")
     public @ResponseBody String getWeather(@RequestParam String lat, @RequestParam String lon){
         /*
@@ -68,6 +67,12 @@ public class ApiServerController {
 
         String url = "https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=" + lat + "&lon=" + lon;
         JSONObject result = WebUtils.getRequestWithJsonResult(url);
+        if(result == null){
+            result = new JSONObject();
+            result.put("result", "1");
+            return result.toJSONString();
+        }
+        result.put("result", "0");
         return result.toJSONString();
     }
 
@@ -79,7 +84,7 @@ public class ApiServerController {
     }
 
     @RequestMapping("/getLunch")
-    public @ResponseBody String getLunch(@RequestParam(required = false, defaultValue = "") String date){ // TODO : 캐싱
+    public @ResponseBody String getLunch(@RequestParam(required = false, defaultValue = "") String date){
         ArrayList<LunchMenu> list = KishWebParser.parseLunch(date);
         JSONArray jsonArray = new JSONArray();
         for(LunchMenu menu : list){

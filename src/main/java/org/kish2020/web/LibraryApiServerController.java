@@ -27,7 +27,7 @@ import java.util.HashMap;
 @RequestMapping("/api/library")
 public class LibraryApiServerController {
     private Kish2020Server main;
-    private DataBase db;    // TODO : 책 목록 저장 및 불러오기
+    private DataBase db;
 
     public HashMap<String, String> session = new HashMap<>();
 
@@ -44,7 +44,7 @@ public class LibraryApiServerController {
      * @param ck 재입력 비밀번호
      * */
 
-    @RequestMapping(value = "/checkID", method = RequestMethod.POST)    //TODO : 테스트
+    @RequestMapping(value = "/checkID", method = RequestMethod.POST)
     public @ResponseBody String checkID(@RequestParam String seq, @RequestParam String id, @RequestParam String pwd, @RequestParam(required = false, defaultValue = "") String ck){
         String parameters;
         /*ID_EXIST_CHECK 값이 무엇을 의미하는지는 모르겠습니다만, 회원가입 중복확인시 0을 사용합니다 --> 1도 사용되네요..?*/
@@ -146,7 +146,7 @@ public class LibraryApiServerController {
      * @param name 본명
      * @param seq 도서관 회원 ID (대출증 id)*/
 
-    @RequestMapping(value = "/isMember", method = RequestMethod.POST)   // TODO : 테스트
+    @RequestMapping(value = "/isMember", method = RequestMethod.POST)
     public @ResponseBody String isMember(@RequestParam String name, @RequestParam String seq){
         try {
             name = URLEncoder.encode(name,"UTF-8");

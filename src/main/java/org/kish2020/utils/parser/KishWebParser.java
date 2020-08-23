@@ -111,7 +111,6 @@ public class KishWebParser {
         return list;
     }
 
-    // TODO : 최적화
     public static String generatePostToNormal(Document doc){
         doc = doc.clone();
         Utils.generateUrl(doc);

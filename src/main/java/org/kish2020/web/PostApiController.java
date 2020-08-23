@@ -3,8 +3,6 @@ package org.kish2020.web;
 import com.google.gson.Gson;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.kish2020.DataBase.DataBase;
 import org.kish2020.MainLogger;
@@ -48,7 +46,6 @@ public class PostApiController {
             }
         }
 
-        // TODO : 이 부분 해결하기,,
         for(String key : this.postInfo.keySet()){
             Object postInfo = this.postInfo.get(key);
             if(postInfo instanceof JSONObject){     // 인텔리제이가 제거하라는데 안 해주면 안 됩니다 ㅠㅠㅠㅠ
@@ -210,9 +207,10 @@ public class PostApiController {
     }
 
     /**
-     * 검색기능을 위해 학교 홈페이지 내 모든 게시글을 불러옵니다
+     * <p>검색기능을 위해 학교 홈페이지 내 모든 게시글을 불러옵니다</p>
+     * <p>(최초 실행시 필요할 수 있음)</p>
      */
-    private void parseAllPosts(){
+    public void parseAllPosts(){
         MainLogger.warn("이 작업 후 프로그램 재시작을 추천드립니다.");
         Thread thread = new Thread( () -> {
             int cnt = 0;

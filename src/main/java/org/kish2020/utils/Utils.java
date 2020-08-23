@@ -91,7 +91,6 @@ public class Utils {
         MainLogger.info(postKey + "의 " + tokenMap.size() + "개의 토큰이 제거됨");
     }
 
-    // TODO : 검색결과 향상 및 최적화 매우 필요 ( 약 20 ~ 90ms 소요 )
     public static ArrayList<String> search(LinkedHashMap<String, HashMap<String, Long>> keywordMap, HashMap<String, PostInfo> postInfoMap, String searchSentence, int index){
         //long start = System.currentTimeMillis();
         //임시
