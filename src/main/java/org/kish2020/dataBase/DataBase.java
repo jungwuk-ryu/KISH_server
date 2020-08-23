@@ -1,4 +1,4 @@
-package org.kish2020.DataBase;
+package org.kish2020.dataBase;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiFunction;
 
+@SuppressWarnings("unchecked")
 public class DataBase<V> extends LinkedHashMap<String, V>{
     public static final Gson GSON = new Gson();
     public static final Gson PRETTY_GSON = new GsonBuilder().setPrettyPrinting().create();
@@ -58,7 +59,7 @@ public class DataBase<V> extends LinkedHashMap<String, V>{
             } else {
                 json = FileUtils.readFileToString(jsonFile, StandardCharsets.UTF_8);
             }
-            JSONObject jsonObject = null;
+            JSONObject jsonObject;
             jsonObject = (JSONObject) (new JSONParser().parse(json));
             this.putAll(jsonToMap(jsonObject));
         } catch (ParseException | IOException e) {

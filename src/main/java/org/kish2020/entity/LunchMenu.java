@@ -2,6 +2,7 @@ package org.kish2020.entity;
 
 import org.json.simple.JSONObject;
 
+@SuppressWarnings("unchecked")
 public class LunchMenu extends JSONObject {
     public LunchMenu(String date, String menu, String detail, String imageUrl){
         this.setMenu(menu);

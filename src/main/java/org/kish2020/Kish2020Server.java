@@ -1,6 +1,6 @@
 package org.kish2020;
 
-import org.kish2020.DataBase.ExpandedDataBase;
+import org.kish2020.dataBase.ExpandedDataBase;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

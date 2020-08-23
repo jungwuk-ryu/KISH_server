@@ -1,11 +1,12 @@
 package org.kish2020.entity;
 
 import org.json.simple.JSONObject;
-import org.kish2020.DataBase.DataBase;
+import org.kish2020.dataBase.DataBase;
 
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 
+@SuppressWarnings("unchecked")
 public class Post extends DataBase<Object> {
     public Post(String menuID, String postID){
         super("post/posts/" + menuID + "/" + postID + ".json", false, true);

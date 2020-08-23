@@ -6,7 +6,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.kish2020.DataBase.DataBase;
+import org.kish2020.dataBase.DataBase;
 import org.kish2020.Kish2020Server;
 import org.kish2020.MainLogger;
 import org.kish2020.entity.RequestResult;
@@ -23,11 +23,12 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+@SuppressWarnings("unchecked")
 @Controller
 @RequestMapping("/api/library")
 public class LibraryApiServerController {
-    private Kish2020Server main;
-    private DataBase db;
+    private final Kish2020Server main;
+    private final DataBase db;
 
     public HashMap<String, String> session = new HashMap<>();
 
@@ -84,8 +85,7 @@ public class LibraryApiServerController {
         parameters += "&MEMBER_PWD=" + pwd;
 
         RequestResult response = WebUtils.postRequest("http://lib.hanoischool.net:81/front/login", WebUtils.ContentType.FORM, parameters, this.getCookie(uuid));
-        String json = response.getResponse();
-        return json;
+        return response.getResponse();
     }
 
     @RequestMapping(value = "/getInfo", method = RequestMethod.GET)
@@ -209,7 +209,7 @@ public class LibraryApiServerController {
 
     @RequestMapping(value = "/searchBooks", method = RequestMethod.GET)
     public @ResponseBody String searchBooks(@RequestParam String keyword, @RequestParam(defaultValue = "1") int index){
-        Document doc = null;
+        Document doc;
         try {
             doc = Jsoup.connect(
                     "http://lib.hanoischool.net:81/front/bookSearch/simple/list?U_CD=search_menu&M_CD=simpleSearch" +

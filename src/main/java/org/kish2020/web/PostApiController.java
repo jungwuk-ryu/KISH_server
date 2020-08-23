@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.jsoup.nodes.Document;
-import org.kish2020.DataBase.DataBase;
+import org.kish2020.dataBase.DataBase;
 import org.kish2020.MainLogger;
 import org.kish2020.MenuID;
 import org.kish2020.entity.Post;
@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.*;
 
+@SuppressWarnings("unchecked")
 @Controller
 @RequestMapping("/api/post")
 public class PostApiController {
@@ -30,7 +31,7 @@ public class PostApiController {
 
     public PostApiController(){
         this.postInfo = new DataBase<>("post/postInfoDB.json");
-        this.postInKeyword = new DataBase<HashMap<String, Long>>("post/keywordDB.json");
+        this.postInKeyword = new DataBase<>("post/keywordDB.json");
         if(!this.postInKeyword.isLoaded()){
             this.postInKeyword.reload();
             if(!this.postInKeyword.isLoaded()) {
@@ -111,8 +112,7 @@ public class PostApiController {
      */
 
     public PostInfo getPostInfo(String postKey){
-        PostInfo postInfo = this.postInfo.get(postKey);
-        return postInfo;
+        return this.postInfo.get(postKey);
     }
 
     public Post getPostFromServer(String menuId, String postID){

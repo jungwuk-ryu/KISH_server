@@ -15,6 +15,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
 
+@SuppressWarnings("unchecked")
 public class Utils {
     public static String makeChoseongSentence(String sentence){
         StringBuilder choseongSb = new StringBuilder();
@@ -157,7 +158,7 @@ public class Utils {
         }
 
         ArrayList<String> keyList = new ArrayList<>(srcMap.keySet());
-        Collections.sort(keyList, (o1, o2) -> (srcMap.get(o2).compareTo(srcMap.get(o1))));
+        keyList.sort((o1, o2) -> (srcMap.get(o2).compareTo(srcMap.get(o1))));
         ArrayList<String> resultKeyList = new ArrayList<>();
         int max = keyList.size();
         int maxPage = max / 20;

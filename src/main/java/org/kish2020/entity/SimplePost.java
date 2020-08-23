@@ -2,6 +2,7 @@ package org.kish2020.entity;
 
 import org.json.simple.JSONObject;
 
+@SuppressWarnings("unchecked")
 public class SimplePost extends JSONObject {
 
     public SimplePost(String postUrl, String menuID, String postId, String title, String author, String postDate, String attachmentIconUrl){

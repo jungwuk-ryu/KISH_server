@@ -109,7 +109,6 @@ public final class KoreanTextMatch {
         if (_text == null)
             return EMPTY;
 
-        KoreanTextMatch match = _matcher.match(_text, _index + _value.length());
-        return match;
+        return _matcher.match(_text, _index + _value.length());
     }
 }

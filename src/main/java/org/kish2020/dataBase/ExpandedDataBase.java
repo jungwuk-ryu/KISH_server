@@ -1,10 +1,11 @@
-package org.kish2020.DataBase;
+package org.kish2020.dataBase;
 
 import org.json.simple.JSONObject;
 
 import java.util.LinkedHashMap;
 import java.util.Set;
 
+@SuppressWarnings("unchecked")
 public class ExpandedDataBase extends DataBase<Object> {
     public ExpandedDataBase(String fileName) {
         super(fileName);

@@ -2,7 +2,7 @@ package org.kish2020.web;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.kish2020.DataBase.ExpandedDataBase;
+import org.kish2020.dataBase.ExpandedDataBase;
 import org.kish2020.Kish2020Server;
 import org.kish2020.MainLogger;
 import org.kish2020.entity.LunchMenu;
@@ -19,8 +19,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 
+@SuppressWarnings("unchecked")
 @Controller
 @RequestMapping("/api")
 public class ApiServerController {
@@ -29,9 +29,9 @@ public class ApiServerController {
     public SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
     private final Kish2020Server main;
-    private ExpandedDataBase db;
-    private ExpandedDataBase lunchLikesDB;
-    private SchoolCalendar calendar;
+    private final ExpandedDataBase db;
+    private final ExpandedDataBase lunchLikesDB;
+    private final SchoolCalendar calendar;
 
     public ApiServerController(Kish2020Server kish2020Server){
         MainLogger.info("Api Server Controller 초기화중");

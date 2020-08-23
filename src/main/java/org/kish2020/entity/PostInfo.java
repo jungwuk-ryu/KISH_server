@@ -4,6 +4,7 @@ import org.json.simple.JSONObject;
 
 import java.util.HashMap;
 
+@SuppressWarnings("unchecked")
 public class PostInfo extends HashMap<String, Object> {
     public PostInfo(JSONObject jsonObject){
         super(jsonObject);

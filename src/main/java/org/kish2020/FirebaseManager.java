@@ -5,7 +5,7 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
-import org.kish2020.DataBase.ExpandedDataBase;
+import org.kish2020.dataBase.ExpandedDataBase;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,10 +29,10 @@ public class FirebaseManager {
             return;
         }
 
-        FileInputStream serviceAccount = null;
+        FileInputStream serviceAccount;
         try {
             serviceAccount = new FileInputStream(jsonPath);
-            FirebaseOptions options = null;
+            FirebaseOptions options;
             options = new FirebaseOptions.Builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                     .setDatabaseUrl((String) settings.get("Firebase_DatabaseUrl"))

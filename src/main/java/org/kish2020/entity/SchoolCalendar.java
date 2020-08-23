@@ -1,7 +1,7 @@
 package org.kish2020.entity;
 
 import com.google.gson.Gson;
-import org.kish2020.DataBase.DataBase;
+import org.kish2020.dataBase.DataBase;
 import org.kish2020.MainLogger;
 
 import java.text.ParseException;
@@ -10,8 +10,8 @@ import java.util.Calendar;
 import java.util.HashSet;
 
 public class SchoolCalendar extends DataBase<HashSet<String>> {
-    private static Gson gson = new Gson();
-    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private static final Gson gson = new Gson();
+    private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private String json;
 
     public SchoolCalendar() {
