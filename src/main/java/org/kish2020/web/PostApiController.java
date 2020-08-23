@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.jsoup.nodes.Document;
+import org.kish2020.Kish2020Server;
 import org.kish2020.dataBase.DataBase;
 import org.kish2020.MainLogger;
 import org.kish2020.MenuID;
@@ -24,12 +25,14 @@ import java.util.*;
 @RequestMapping("/api/post")
 public class PostApiController {
     public static final Gson gson = new Gson();
+    public final Kish2020Server main;
     public DataBase<PostInfo> postInfo;
     public LinkedHashMap<String, Post> loadedPosts = new LinkedHashMap<>();
     /* 검색 관련 */
     public DataBase<HashMap<String, Long>> postInKeyword;
 
-    public PostApiController(){
+    public PostApiController(Kish2020Server main){
+        this.main = main;
         this.postInfo = new DataBase<>("post/postInfoDB.json");
         this.postInKeyword = new DataBase<>("post/keywordDB.json");
         if(!this.postInKeyword.isLoaded()){
@@ -72,7 +75,13 @@ public class PostApiController {
             for (SimplePost sp : list) {
                 if(Utils.isSavedPost(sp.getMenuId(), sp.getPostId())) break;
                 if(loadedPosts.containsKey(sp.getMenuId() + "," + sp.getPostId())) continue;
-                getPostFromServer(sp.getMenuId(), sp.getPostId());
+                Post post = getPostFromServer(sp.getMenuId(), sp.getPostId());
+                HashMap<String, String> data= new HashMap<>();
+                data.put("type", "newPost");
+                data.put("menuID", post.getMenuId());
+                data.put("postID", post.getPostId());
+                this.main.getFirebaseManager().sendFCM("newPost", post.getTitle(),
+                        "새 글이 올라왔습니다. \n" + post.getContent().substring(0, 20), data);
                 postCount++;
                 try {
                     Thread.sleep(500);
