@@ -3,6 +3,8 @@ package org.kish2020;
 import org.kish2020.dataBase.ExpandedDataBase;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.event.EventListener;
+import org.springframework.web.context.support.RequestHandledEvent;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -36,5 +38,10 @@ public class Kish2020Server {
 
     public FirebaseManager getFirebaseManager(){
         return firebaseManager;
+    }
+
+    @EventListener
+    public void o(RequestHandledEvent e){
+        MainLogger.info(e.getShortDescription() + "(" + e.getProcessingTimeMillis() + "ms)");
     }
 }
