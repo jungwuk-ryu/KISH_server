@@ -41,7 +41,7 @@ public class Kish2020Server {
     }
 
     @EventListener
-    public void o(RequestHandledEvent e){
+    public void requestEventListener(RequestHandledEvent e){
         MainLogger.info(e.getShortDescription() + "(" + e.getProcessingTimeMillis() + "ms)");
     }
 }
