@@ -80,8 +80,18 @@ public class PostApiController {
                 data.put("type", "newPost");
                 data.put("menuID", post.getMenuId());
                 data.put("postID", post.getPostId());
+
+                String menuName;
+                try {
+                    MenuID menu = Utils.getMenuFromID(post.getMenuId());
+                    menuName = menu.name;
+                } catch(IllegalArgumentException e){
+                    menuName = "알 수 없음";
+                    MainLogger.error("", e);
+                }
+
                 this.main.getFirebaseManager().sendFCM("newPost", post.getTitle(),
-                        "새 글이 올라왔습니다. \n" + post.getContent().substring(0, 20), data);
+                        "새 글이 올라왔습니다.\n메뉴 : " + menuName + "\n작성자 : " + post.getAuthor(), data);
                 postCount++;
                 try {
                     Thread.sleep(500);

@@ -7,6 +7,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.kish2020.MainLogger;
+import org.kish2020.MenuID;
 import org.kish2020.entity.Post;
 import org.kish2020.entity.PostInfo;
 
@@ -34,6 +35,20 @@ public class Utils {
             list.add(st.nextToken());
         }
         return list;
+    }
+
+    public static MenuID getMenuFromID(String id){
+        for(MenuID menu : MenuID.values()){
+            if(menu.id.equals(id)) return menu;
+        }
+        throw new IllegalArgumentException("아이디 " + id + "에 해당하는 메뉴가 없습니다.");
+    }
+
+    public static MenuID getMenuFromName(String name){
+        for(MenuID menu : MenuID.values()){
+            if(menu.name.equals(name)) return menu;
+        }
+        throw new IllegalArgumentException("아이디 " + name + "에 해당하는 메뉴가 없습니다.");
     }
 
     public static LinkedHashMap<String, Integer> getContentTokenMap(String postContent){
