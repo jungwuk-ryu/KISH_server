@@ -23,7 +23,7 @@ import java.util.HashSet;
 @SuppressWarnings("unchecked")
 @Controller
 @RequestMapping("/api")
-public class ApiServerController {
+public class MainApiController {
     public JSONArray testDates = new JSONArray();
     public String testDatesJson;
     public SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -33,7 +33,7 @@ public class ApiServerController {
     private final ExpandedDataBase lunchLikesDB;
     private final SchoolCalendar calendar;
 
-    public ApiServerController(Kish2020Server kish2020Server){
+    public MainApiController(Kish2020Server kish2020Server){
         MainLogger.info("Api Server Controller 초기화중");
         this.main = kish2020Server;
         this.db = this.main.getMainDataBase();

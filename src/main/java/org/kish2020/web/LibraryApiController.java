@@ -26,13 +26,13 @@ import java.util.HashMap;
 @SuppressWarnings("unchecked")
 @Controller
 @RequestMapping("/api/library")
-public class LibraryApiServerController {
+public class LibraryApiController {
     private final Kish2020Server main;
     private final DataBase db;
 
     public HashMap<String, String> session = new HashMap<>();
 
-    public LibraryApiServerController(Kish2020Server main){
+    public LibraryApiController(Kish2020Server main){
         this.main = main;
         this.db = main.getMainDataBase();
     }
