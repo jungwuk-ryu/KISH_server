@@ -21,6 +21,8 @@ public class FirebaseManager {
     public FirebaseApp firebaseApp;
     public DataBase<HashSet<String>> notificationUser;
 
+    public boolean isReady = false;
+
     public FirebaseManager(){
         ExpandedDataBase settings = Kish2020Server.mainSettings;
         this.notificationUser = new DataBase<>("db/notificationUser.json");
@@ -61,6 +63,7 @@ public class FirebaseManager {
         } catch (IOException e) {
             MainLogger.error("FirebaseManager 초기화 중 오류 발생", e);
         }
+        this.isReady = true;
     }
 
     public boolean isExistUser(String uid){
@@ -78,6 +81,10 @@ public class FirebaseManager {
     }
 
     public void sendFCM(String topic, String title, String content, Map<String, String> data) {
+        if(!isReady) {
+            MainLogger.warn("Firebase is not ready.");
+            return;
+        }
         Thread thread = new Thread(() -> {
             FirebaseMessaging firebaseMessaging = FirebaseMessaging.getInstance();
             HashSet<String> userSet = this.notificationUser.get(topic);
