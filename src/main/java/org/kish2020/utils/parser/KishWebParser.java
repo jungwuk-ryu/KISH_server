@@ -211,14 +211,18 @@ public class KishWebParser {
     public static SchoolCalendar getSchoolCalendar(String year, String month){
         String targetDate = year + "-" + month + "-1";
         try {
-            Document doc = Jsoup.connect("http://www.hanoischool.net/?menu_no=41&" + targetDate).get();
+            Document doc = Jsoup.connect("http://www.hanoischool.net/?menu_no=41&ChangeDate=" + targetDate).get();
             SchoolCalendar calendar = new SchoolCalendar();
             //String thisYear = doc.select(".design_font").get(0).text();
 
             Elements dates = doc.select(".defTable2").get(0).select(".date");
             for (Element element : dates) {
-                String date = element.text();
-                if(date.isEmpty()) continue;
+                int date;
+                try {
+                    date = Integer.parseInt(element.text()) -1;
+                } catch (NumberFormatException e){
+                    continue;
+                }
 
                 Elements parentElements = element.parent().getAllElements().select("div");
                 String plans = "";
