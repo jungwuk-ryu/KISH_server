@@ -1,25 +1,23 @@
 package org.kish2020.entity;
 
-import com.google.gson.Gson;
-import org.kish2020.dataBase.DataBase;
+import org.json.simple.JSONObject;
 import org.kish2020.MainLogger;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 
 /**
  *  학사일정을 관리하는 클래스입니다.
  *  add, remove와 같은 메소드를 사용하고 commit을 꼭 해주셔야 getJson() 하실 때 변경된 부분이 적용됩니다.
  */
-public class SchoolCalendar extends DataBase<HashSet<String>> {
-    private static final Gson gson = new Gson();
+public class SchoolCalendar extends LinkedHashMap<String, HashSet<String>> {
     private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private String json;
 
     public SchoolCalendar() {
-        super("db/schoolCalendarDB.json", true, true);
         this.commit();
     }
 
@@ -68,7 +66,7 @@ public class SchoolCalendar extends DataBase<HashSet<String>> {
      * 변경된 정보들을 적용합니다.
      */
     public void commit(){
-        this.json = gson.toJson(this);
+        this.json = new JSONObject(this).toString();
     }
 
     public String getJson(){

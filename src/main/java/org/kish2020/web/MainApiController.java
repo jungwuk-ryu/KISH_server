@@ -17,8 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.*;
 
 @SuppressWarnings("unchecked")
 @Controller
@@ -31,7 +30,7 @@ public class MainApiController {
     private final Kish2020Server main;
     private final ExpandedDataBase db;
     private final ExpandedDataBase lunchLikesDB;
-    private final SchoolCalendar calendar;
+    private final JSONObject calendarMap = new JSONObject();
 
     public MainApiController(Kish2020Server kish2020Server){
         MainLogger.info("Api Server Controller 초기화중");
@@ -44,8 +43,16 @@ public class MainApiController {
             e.printStackTrace();
         }
         this.testDatesJson = testDates.toJSONString();
-        this.calendar = new SchoolCalendar();
+
+        MainLogger.info("학사일정 준비중");
         this.makeCalendar();
+        Timer scheduler = new Timer();
+        scheduler.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                makeCalendar();
+            }
+        }, 1000 * 60 * 50, 1000 * 60 * 50);
     }
 
     /**
@@ -142,17 +149,27 @@ public class MainApiController {
     }
 
     /**
-     * <p>학사일정 API입니다.</p>
-     * <p>http://www.hanoischool.net/?menu_no=41에 학사일정이 없는 관계로
-     * 직접 입력한 데이터를 사용해야합니다...</p>*/
+     * <p>학사일정을 반환하는 API입니다.</p>
+     */
     @RequestMapping("/getCalendar")
     public @ResponseBody String getCalendar(){
-        return this.calendar.getJson();
+        return new JSONObject(this.calendarMap).toJSONString();
+        //return this.calendar.getJson();
+    }
+
+    @RequestMapping("/getCalendarFromDate")
+    public @ResponseBody String getCalendarFromDate(@RequestParam String year, @RequestParam String month){
+        String key = year + "-" + month + "-1";
+        if(this.calendarMap.containsKey(key)){
+           return ((SchoolCalendar) this.calendarMap.get(key)).getJson();
+        }
+        return KishWebParser.getSchoolCalendar(year, month).getJson();
+        //return new JSONObject(KishWebParser.getSchoolCalendar()).toJSONString();
+        //return this.calendar.getJson();
     }
 
     private void makeCalendar(){
-        /*학사일정이 홈페이지에 등록되어있지 않기에 직접 입력해줍니다...*/
-        if(calendar.isEmpty()) {
+        /*if(calendar.isEmpty()) {
             calendar.add("2020-08-31", "1학기 종료")
                     .add("2020-09-01", "2학기 시작")
                     .add("2020-09-02", "외국어의 날")
@@ -197,6 +214,12 @@ public class MainApiController {
                     .add("2021-02-22", "전교직원 출근일", 4)
                     .add("2021-02-23", "전교직원 워크숍", 2)
                     .commit();
+        }*/
+
+        int thisYear = Calendar.getInstance().get(Calendar.YEAR);
+        String date = thisYear + "-";
+        for(int m = 1; m < 13; m++){
+            this.calendarMap.put(date + m + "-1", KishWebParser.getSchoolCalendar(Integer.toString(thisYear), Integer.toString(m)));
         }
     }
 }

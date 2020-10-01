@@ -9,11 +9,13 @@ import org.jsoup.select.Elements;
 import org.kish2020.MainLogger;
 import org.kish2020.entity.LunchMenu;
 import org.kish2020.entity.Post;
+import org.kish2020.entity.SchoolCalendar;
 import org.kish2020.entity.SimplePost;
 import org.kish2020.utils.Utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class KishWebParser {
     public static final String ROOT_URL = "http://www.hanoischool.net/";
@@ -199,6 +201,38 @@ public class KishWebParser {
             element.after("\\n");
         });
         return StringUtils.replace(content.text(), "\\n", "\n");
+    }
+
+    public static SchoolCalendar getSchoolCalendar(){
+        Calendar calendar = Calendar.getInstance();
+        return getSchoolCalendar(Integer.toString(calendar.get(Calendar.YEAR)), Integer.toString(calendar.get(Calendar.MONTH) + 1));
+    }
+
+    public static SchoolCalendar getSchoolCalendar(String year, String month){
+        String targetDate = year + "-" + month + "-1";
+        try {
+            Document doc = Jsoup.connect("http://www.hanoischool.net/?menu_no=41&" + targetDate).get();
+            SchoolCalendar calendar = new SchoolCalendar();
+            //String thisYear = doc.select(".design_font").get(0).text();
+
+            Elements dates = doc.select(".defTable2").get(0).select(".date");
+            for (Element element : dates) {
+                String date = element.text();
+                if(date.isEmpty()) continue;
+
+                Elements parentElements = element.parent().getAllElements().select("div");
+                String plans = "";
+                if(parentElements.size() > 1){
+                    plans = parentElements.get(1).text().trim();
+                }
+                calendar.add(year + "-" + month + "-" + date, plans);
+            }
+            calendar.commit();
+            return calendar;
+        } catch (IOException e) {
+            MainLogger.error("", e);
+            return null;
+        }
     }
 
 }
