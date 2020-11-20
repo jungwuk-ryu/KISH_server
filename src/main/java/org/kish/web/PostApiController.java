@@ -1,18 +1,18 @@
-package org.kish2020.web;
+package org.kish.web;
 
 import com.google.gson.Gson;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.jsoup.nodes.Document;
-import org.kish2020.Kish2020Server;
-import org.kish2020.dataBase.DataBase;
-import org.kish2020.MainLogger;
-import org.kish2020.MenuID;
-import org.kish2020.entity.Post;
-import org.kish2020.entity.PostInfo;
-import org.kish2020.entity.SimplePost;
-import org.kish2020.utils.Utils;
-import org.kish2020.utils.parser.KishWebParser;
+import org.kish.KishServer;
+import org.kish.dataBase.DataBase;
+import org.kish.MainLogger;
+import org.kish.MenuID;
+import org.kish.entity.Post;
+import org.kish.entity.PostInfo;
+import org.kish.entity.SimplePost;
+import org.kish.utils.Utils;
+import org.kish.utils.parser.KishWebParser;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,13 +25,13 @@ import java.util.*;
 @RequestMapping("/api/post")
 public class PostApiController {
     public static final Gson gson = new Gson();
-    public final Kish2020Server main;
+    public final KishServer main;
     public DataBase<PostInfo> postInfo;
     public LinkedHashMap<String, Post> loadedPosts = new LinkedHashMap<>();
     /* 검색 관련 */
     public DataBase<HashMap<String, Long>> postInKeyword;
 
-    public PostApiController(Kish2020Server main){
+    public PostApiController(KishServer main){
         this.main = main;
         this.postInfo = new DataBase<>("post/postInfoDB.json");
         this.postInKeyword = new DataBase<>("post/keywordDB.json");

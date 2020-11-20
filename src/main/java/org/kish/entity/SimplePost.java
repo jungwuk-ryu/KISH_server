@@ -1,4 +1,4 @@
-package org.kish2020.entity;
+package org.kish.entity;
 
 import org.json.simple.JSONObject;
 

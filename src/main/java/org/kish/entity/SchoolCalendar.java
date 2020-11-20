@@ -1,7 +1,7 @@
-package org.kish2020.entity;
+package org.kish.entity;
 
 import org.json.simple.JSONObject;
-import org.kish2020.MainLogger;
+import org.kish.MainLogger;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

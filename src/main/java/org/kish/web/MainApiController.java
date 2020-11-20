@@ -1,14 +1,14 @@
-package org.kish2020.web;
+package org.kish.web;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.kish2020.dataBase.ExpandedDataBase;
-import org.kish2020.Kish2020Server;
-import org.kish2020.MainLogger;
-import org.kish2020.entity.LunchMenu;
-import org.kish2020.entity.SchoolCalendar;
-import org.kish2020.utils.WebUtils;
-import org.kish2020.utils.parser.KishWebParser;
+import org.kish.KishServer;
+import org.kish.dataBase.ExpandedDataBase;
+import org.kish.MainLogger;
+import org.kish.entity.LunchMenu;
+import org.kish.entity.SchoolCalendar;
+import org.kish.utils.WebUtils;
+import org.kish.utils.parser.KishWebParser;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -27,14 +27,14 @@ public class MainApiController {
     public String testDatesJson;
     public SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-    private final Kish2020Server main;
+    private final KishServer main;
     private final ExpandedDataBase db;
     private final ExpandedDataBase lunchLikesDB;
     private final JSONObject calendarMap = new JSONObject();
 
-    public MainApiController(Kish2020Server kish2020Server){
+    public MainApiController(KishServer kishServer){
         MainLogger.info("Api Server Controller 초기화중");
-        this.main = kish2020Server;
+        this.main = kishServer;
         this.db = this.main.getMainDataBase();
         this.lunchLikesDB = new ExpandedDataBase("db/lunchLikesDB.json");
         try {

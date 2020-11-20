@@ -1,4 +1,4 @@
-package org.kish2020;
+package org.kish;
 
 public enum MenuID {
     /** 초등 공지사항 메뉴 ID*/

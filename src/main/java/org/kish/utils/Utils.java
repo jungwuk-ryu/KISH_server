@@ -1,4 +1,4 @@
-package org.kish2020.utils;
+package org.kish.utils;
 
 import io.github.bangjunyoung.KoreanChar;
 import org.apache.commons.lang3.StringUtils;
@@ -6,10 +6,10 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.kish2020.MainLogger;
-import org.kish2020.MenuID;
-import org.kish2020.entity.Post;
-import org.kish2020.entity.PostInfo;
+import org.kish.MainLogger;
+import org.kish.MenuID;
+import org.kish.entity.Post;
+import org.kish.entity.PostInfo;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;

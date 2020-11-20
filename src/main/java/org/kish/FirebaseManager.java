@@ -1,4 +1,4 @@
-package org.kish2020;
+package org.kish;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
@@ -6,8 +6,8 @@ import com.google.firebase.FirebaseOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.messaging.*;
-import org.kish2020.dataBase.DataBase;
-import org.kish2020.dataBase.ExpandedDataBase;
+import org.kish.dataBase.DataBase;
+import org.kish.dataBase.ExpandedDataBase;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,7 +24,7 @@ public class FirebaseManager {
     public boolean isReady = false;
 
     public FirebaseManager(){
-        ExpandedDataBase settings = Kish2020Server.mainSettings;
+        ExpandedDataBase settings = KishServer.mainSettings;
         this.notificationUser = new DataBase<>("db/notificationUser.json");
         for(String key : this.notificationUser.keySet()){
             this.notificationUser.put(key, new HashSet<>(notificationUser.get(key)));
