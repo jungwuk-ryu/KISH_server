@@ -1,4 +1,4 @@
-package org.kish2020.entity;
+package org.kish.entity;
 
 public class RequestResult {
     public String response, cookie;

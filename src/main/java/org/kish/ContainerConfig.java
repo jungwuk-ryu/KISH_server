@@ -3,7 +3,7 @@
 * 이 클래스는 https://snh2413.tistory.com/47 에서 가져왔습니다.
 *
 */
-package org.kish2020;
+package org.kish;
 
 import org.apache.catalina.connector.Connector;
 import org.springframework.beans.factory.annotation.Value;

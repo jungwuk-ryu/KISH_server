@@ -1,10 +1,10 @@
-package org.kish2020.utils;
+package org.kish.utils;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.kish2020.MainLogger;
-import org.kish2020.entity.RequestResult;
+import org.kish.MainLogger;
+import org.kish.entity.RequestResult;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;

@@ -1,12 +1,10 @@
 ![주석 2020-08-29 142602](https://user-images.githubusercontent.com/29895665/91631442-c0488100-ea03-11ea-8712-18e2aaa3cf74.png)
 
 
-# KISH2020 - Server
-KISH2020SERVER는 **KISH 2020**의 서버 처리를 담당하는 프로그램입니다.
-
-또한 이 리포지트리는 KISH 학생이라면 누구나 자유롭게 기여할 수 있습니다.
-
-자세한건 [여기](https://github.com/KISH-students/I-WANNA-JOIN) 를 참고해주세요.
+# KISH server
+이 리포지토리는 **KISH 어플**의 서버 처리를 담당하는 프로그램이며,  
+KISH 학생이라면 누구나 자유롭게 기여할 수 있습니다.  
+자세한 내용은 [여기](https://github.com/KISH-students/I-WANNA-JOIN) 를 참고해주세요.
 
 # 주요 API
 
@@ -37,7 +35,7 @@ API | 요청 방식 | 설명
 /api/post/searchPost | GET | 게시물을 검색합니다.
 
 # 사용하기
-KISH 2020 테스트를 위해 구동하거나 본인만의 학교 어플을 만드는 등의 자유로운 용도를 위해 사용할 수 있습니다.
+KISH server 테스트를 위해 구동하거나 본인만의 학교 어플을 만드는 등의 자유로운 용도를 위해 사용할 수 있습니다.
 
 기본 포트 : 40917
 
@@ -51,7 +49,7 @@ mvn clean package
 
 이 후, 생성된 jar 파일이 있는 폴더에서 터미널(CMD)에 아래 명령어를 입력하여 실행할 수 있습니다.
 ```
-java -jar kish2020server.jar
+java -jar kishserver.jar
 ```
 이제 http://localhost:40917 으로 접속할 수 있습니다.
 
@@ -70,7 +68,7 @@ java -jar kish2020server.jar
 - [KoreanTextMatcher](https://github.com/bangjunyoung/KoreanTextMatcher)
 
 # Java-doc
-[java doc](https://ccc1.kro.kr/java-docs/kish2020Server/)
+[java doc](https://ccc1.kro.kr/java-docs/kishServer/)
 
 # License
-KISH2020Server는 Apache-2.0 License를 따릅니다.
+KISH server는 Apache-2.0 License를 따릅니다.

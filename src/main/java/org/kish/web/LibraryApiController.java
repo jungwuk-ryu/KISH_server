@@ -1,4 +1,4 @@
-package org.kish2020.web;
+package org.kish.web;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -6,11 +6,11 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.kish2020.dataBase.DataBase;
-import org.kish2020.Kish2020Server;
-import org.kish2020.MainLogger;
-import org.kish2020.entity.RequestResult;
-import org.kish2020.utils.WebUtils;
+import org.kish.dataBase.DataBase;
+import org.kish.KishServer;
+import org.kish.MainLogger;
+import org.kish.entity.RequestResult;
+import org.kish.utils.WebUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -27,12 +27,12 @@ import java.util.HashMap;
 @Controller
 @RequestMapping("/api/library")
 public class LibraryApiController {
-    private final Kish2020Server main;
+    private final KishServer main;
     private final DataBase db;
 
     public HashMap<String, String> session = new HashMap<>();
 
-    public LibraryApiController(Kish2020Server main){
+    public LibraryApiController(KishServer main){
         this.main = main;
         this.db = main.getMainDataBase();
     }

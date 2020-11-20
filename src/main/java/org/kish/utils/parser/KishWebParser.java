@@ -1,4 +1,4 @@
-package org.kish2020.utils.parser;
+package org.kish.utils.parser;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
@@ -6,12 +6,12 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
-import org.kish2020.MainLogger;
-import org.kish2020.entity.LunchMenu;
-import org.kish2020.entity.Post;
-import org.kish2020.entity.SchoolCalendar;
-import org.kish2020.entity.SimplePost;
-import org.kish2020.utils.Utils;
+import org.kish.MainLogger;
+import org.kish.entity.LunchMenu;
+import org.kish.entity.Post;
+import org.kish.entity.SchoolCalendar;
+import org.kish.entity.SimplePost;
+import org.kish.utils.Utils;
 
 import java.io.IOException;
 import java.util.ArrayList;

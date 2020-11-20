@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <packaging>jar</packaging>
-    <name>KISH2020-Server</name>
-    <groupId>org.kish2020</groupId>
-    <artifactId>kish2020server</artifactId>
+    <name>KISH-Server</name>
+    <groupId>org.kish</groupId>
+    <artifactId>kishserver</artifactId>
     <version>1.1.4</version>
 
     <parent>

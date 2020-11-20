@@ -1,4 +1,4 @@
-package org.kish2020.entity;
+package org.kish.entity;
 
 import org.json.simple.JSONObject;
 
@@ -8,7 +8,7 @@ import java.util.HashMap;
  *  게시물의 저자, 제목과 같은 비교적 간단한 정보들을 가지는 클래스입니다.
  *  Post객체와는 다르게 HashMap을 상속받아 PostApiController의 PostInfo DataBase를 통해 저장됩니다.
  *
- * @see org.kish2020.web.PostApiController
+ * @see org.kish.web.PostApiController
  */
 @SuppressWarnings("unchecked")
 public class PostInfo extends HashMap<String, Object> {

@@ -1,4 +1,4 @@
-package org.kish2020.dataBase;
+package org.kish.dataBase;
 
 import org.json.simple.JSONObject;
 

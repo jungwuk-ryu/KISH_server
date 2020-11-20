@@ -1,7 +1,7 @@
-package org.kish2020.entity;
+package org.kish.entity;
 
 import org.json.simple.JSONObject;
-import org.kish2020.dataBase.DataBase;
+import org.kish.dataBase.DataBase;
 
 import java.util.HashSet;
 import java.util.LinkedHashMap;

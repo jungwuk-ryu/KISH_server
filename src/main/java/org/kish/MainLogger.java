@@ -1,4 +1,4 @@
-package org.kish2020;
+package org.kish;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
@@ -22,16 +22,16 @@ public class MainLogger {
     }
 
     public static void error(Object content){
-        if(Kish2020Server.firebaseManager != null){
-            Kish2020Server.firebaseManager.sendFCMToAdmin("오류 발생", content.toString(), new HashMap<>());
+        if(KishServer.firebaseManager != null){
+            KishServer.firebaseManager.sendFCMToAdmin("오류 발생", content.toString(), new HashMap<>());
         }
         LOGGER.error(content);
     }
 
     public static void error(Object content, Throwable t){
-        if(Kish2020Server.firebaseManager != null){
+        if(KishServer.firebaseManager != null){
             String[] stackTrace = ExceptionUtils.getStackTrace(t).split("\n");
-            Kish2020Server.firebaseManager.sendFCMToAdmin("오류 발생", stackTrace[0] + "\n" + stackTrace[1], new HashMap<>());
+            KishServer.firebaseManager.sendFCMToAdmin("오류 발생", stackTrace[0] + "\n" + stackTrace[1], new HashMap<>());
         }
         LOGGER.error(content, t);
     }
