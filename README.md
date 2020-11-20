@@ -1,4 +1,5 @@
 ![주석 2020-08-29 142602](https://user-images.githubusercontent.com/29895665/91631442-c0488100-ea03-11ea-8712-18e2aaa3cf74.png)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FKISH-students%2FKISH_server.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FKISH-students%2FKISH_server?ref=badge_shield)
 
 
 # KISH server
@@ -71,3 +72,6 @@ java -jar kishserver.jar
 
 # License
 KISH server는 Apache-2.0 License를 따릅니다.
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FKISH-students%2FKISH_server.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FKISH-students%2FKISH_server?ref=badge_large)
