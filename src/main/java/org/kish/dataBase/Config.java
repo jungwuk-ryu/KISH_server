@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 
 @SuppressWarnings("unchecked")
-public class DataBase<V> extends LinkedHashMap<String, V>{
+public class Config extends LinkedHashMap<String, Object>{
     public static final Gson GSON = new Gson();
     public static final Gson PRETTY_GSON = new GsonBuilder().setPrettyPrinting().create();
     public boolean doSave = true;
@@ -26,9 +26,8 @@ public class DataBase<V> extends LinkedHashMap<String, V>{
     public final String fileName;
 
     private boolean isLoaded = false;
-    private Runnable dataChangeListener;
 
-    public DataBase(String fileName) {
+    public Config(String fileName) {
         this.fileName = fileName;
         this.reload();
         Runtime rt = Runtime.getRuntime();
@@ -37,7 +36,7 @@ public class DataBase<V> extends LinkedHashMap<String, V>{
         }));
     }
 
-    public DataBase(String fileName, boolean isLoggingEnabled, boolean doSaveOnShutdown) {
+    public Config(String fileName, boolean isLoggingEnabled, boolean doSaveOnShutdown) {
         this.fileName = fileName;
         this.setIsLoggingEnabled(isLoggingEnabled);
         this.reload();
@@ -69,16 +68,51 @@ public class DataBase<V> extends LinkedHashMap<String, V>{
         this.isLoaded = true;
     }
 
-    public LinkedHashMap<String, V> jsonToMap(JSONObject jsonObject){
-        LinkedHashMap<String, V> map = new LinkedHashMap<>();
+    public LinkedHashMap<String, Object> jsonToMap(JSONObject jsonObject){
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>();
         for(String key : (Set<String>) jsonObject.keySet()){
             Object data = jsonObject.get(key);
-             map.put(key, (V) data);
+            if(data instanceof Long) this.put(key, ((Long) data).intValue());
+             map.put(key, data);
         }
         return map;
     }
 
-    public void remove(){
+    /**
+     * key에 해당하는 값을 n만큼 증가시킵니다.
+     */
+    public int increase(String k, int n){
+        Object num = this.getOrDefault(k, 0);
+        if(num instanceof Long){
+            Long longNum = (Long) num;
+            int increasedNum = (int) longNum.intValue() + n;
+            this.put(k, increasedNum);
+            return increasedNum;
+        } else {
+            int increasedNum = ((int) num) + n;
+            this.put(k, increasedNum);
+            return increasedNum;
+        }
+    }
+
+    /**
+     * key에 해당하는 값을 n만큼 감소시킵니다.
+     */
+    public int decrease(String k, int n){
+        Object num = this.getOrDefault(k, 0);
+        if(num instanceof Long){
+            Long longNum = (Long) num;
+            int decreasedNum = (int) longNum.intValue() - n;
+            this.put(k, decreasedNum);
+            return decreasedNum;
+        } else {
+            int decreasedNum = ((int) num) - n;
+            this.put(k, decreasedNum);
+            return decreasedNum;
+        }
+    }
+
+    public void deleteFile(){
         File file = new File(fileName);
         file.delete();
         if(isLoggingEnabled) MainLogger.warn("제거됨 : " + fileName);
@@ -107,72 +141,8 @@ public class DataBase<V> extends LinkedHashMap<String, V>{
         }
     }
 
-    @Override
-    public V put(String key, V value) {
-        V returnValue = super.put(key, value);
-        this.runListener();
-        return returnValue;
-    }
-
-    public boolean put(String key, V value, boolean overwrite){
-        if(this.containsKey(key)){
-            if(!overwrite) return false;
-        }
-        this.put(key, value);
-        return true;
-    }
-
-    @Override
-    public V putIfAbsent(String key, V value) {
-        V returnValue = super.putIfAbsent(key, value);
-        this.runListener();
-        return returnValue;
-    }
-
-    @Override
-    public void putAll(Map<? extends String, ? extends V> m) {
-        super.putAll(m);
-        this.runListener();
-    }
-
-    @Override
-    public V remove(Object key) {
-        V returnValue = super.remove(key);
-        this.runListener();
-        return returnValue;
-    }
-
-    @Override
-    public boolean remove(Object key, Object value) {
-        boolean returnValue = super.remove(key, value);
-        this.runListener();
-        return returnValue;
-    }
-
-    @Override
-    protected boolean removeEldestEntry(Map.Entry<String, V> eldest) {
-        boolean returnValue =  super.removeEldestEntry(eldest);
-        this.runListener();
-        return returnValue;
-    }
-
-    @Override
-    public V replace(String key, V value) {
-        V returnValue = super.replace(key, value);
-        this.runListener();
-        return returnValue;
-    }
-
-    @Override
-    public void replaceAll(BiFunction<? super String, ? super V, ? extends V> function) {
-        super.replaceAll(function);
-        this.runListener();
-    }
-
-    @Override
-    public void clear() {
-        super.clear();
-        this.runListener();
+    public long getLong(String k){
+        return (long) this.get(k);
     }
 
     public boolean isLoaded() { return isLoaded; }
@@ -193,16 +163,13 @@ public class DataBase<V> extends LinkedHashMap<String, V>{
         this.isLoggingEnabled = v;
     }
 
-    public void setDataChangeListener(Runnable r){
-        this.dataChangeListener = r;
-    }
 
     public void setSaveWithPrettyGson(boolean b){
         this.saveWithPrettyGson = b;
     }
 
-    private void runListener(){
+    /*private void runListener(){
         if(this.dataChangeListener == null) return;
         this.dataChangeListener.run();
-    }
+    }*/
 }

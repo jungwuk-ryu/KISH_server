@@ -24,7 +24,7 @@ public class FirebaseManager {
     public boolean isReady = false;
 
     public FirebaseManager(){
-        ExpandedDataBase settings = KishServer.mainSettings;
+        ExpandedDataBase settings = KishServer.CONFIG;
         this.notificationUser = new DataBase<>("db/notificationUser.json");
         for(String key : this.notificationUser.keySet()){
             this.notificationUser.put(key, new HashSet<>(notificationUser.get(key)));
