@@ -20,11 +20,11 @@ import java.util.function.BiFunction;
 public class Config extends LinkedHashMap<String, Object>{
     public static final Gson GSON = new Gson();
     public static final Gson PRETTY_GSON = new GsonBuilder().setPrettyPrinting().create();
-    public boolean doSave = true;
-    public boolean isLoggingEnabled = true;
-    public boolean saveWithPrettyGson = false;
     public final String fileName;
 
+    private final boolean doSave = false;
+    private final boolean isLoggingEnabled = true;
+    private final boolean saveWithPrettyGson = true;
     private boolean isLoaded = false;
 
     public Config(String fileName) {
@@ -36,7 +36,7 @@ public class Config extends LinkedHashMap<String, Object>{
         }));
     }
 
-    public Config(String fileName, boolean isLoggingEnabled, boolean doSaveOnShutdown) {
+    /*public Config(String fileName, boolean isLoggingEnabled, boolean doSaveOnShutdown) {
         this.fileName = fileName;
         this.setIsLoggingEnabled(isLoggingEnabled);
         this.reload();
@@ -46,11 +46,12 @@ public class Config extends LinkedHashMap<String, Object>{
                 save();
             }));
         }
-    }
+    }*/
 
     public void reload(){
         File jsonFile = new File(fileName);
-        if(this.isLoggingEnabled) MainLogger.warn("DB 불러오는 중 : " + jsonFile.getAbsolutePath());
+        if(this.isLoggingEnabled) MainLogger.warn("Config 불러오는 중 : " + jsonFile.getAbsolutePath());
+
         try {
             String json;
             if (!jsonFile.exists()) {
@@ -62,9 +63,15 @@ public class Config extends LinkedHashMap<String, Object>{
             jsonObject = (JSONObject) (new JSONParser().parse(json));
             this.putAll(jsonToMap(jsonObject));
         } catch (ParseException | IOException e) {
-            MainLogger.error("DB 준비 중 오류가 발생하였습니다.", e);
+            MainLogger.error("Config 준비 중 오류가 발생하였습니다.", e);
             return;
         }
+
+        for (ConfigItem item : ConfigItem.values()) {
+            if(!this.containsKey(item.key)) this.put(item.key, item.defaultValue);
+        }
+
+        save(true);
         this.isLoaded = true;
     }
 
@@ -78,40 +85,6 @@ public class Config extends LinkedHashMap<String, Object>{
         return map;
     }
 
-    /**
-     * key에 해당하는 값을 n만큼 증가시킵니다.
-     */
-    public int increase(String k, int n){
-        Object num = this.getOrDefault(k, 0);
-        if(num instanceof Long){
-            Long longNum = (Long) num;
-            int increasedNum = (int) longNum.intValue() + n;
-            this.put(k, increasedNum);
-            return increasedNum;
-        } else {
-            int increasedNum = ((int) num) + n;
-            this.put(k, increasedNum);
-            return increasedNum;
-        }
-    }
-
-    /**
-     * key에 해당하는 값을 n만큼 감소시킵니다.
-     */
-    public int decrease(String k, int n){
-        Object num = this.getOrDefault(k, 0);
-        if(num instanceof Long){
-            Long longNum = (Long) num;
-            int decreasedNum = (int) longNum.intValue() - n;
-            this.put(k, decreasedNum);
-            return decreasedNum;
-        } else {
-            int decreasedNum = ((int) num) - n;
-            this.put(k, decreasedNum);
-            return decreasedNum;
-        }
-    }
-
     public void deleteFile(){
         File file = new File(fileName);
         file.delete();
@@ -119,7 +92,11 @@ public class Config extends LinkedHashMap<String, Object>{
     }
 
     public void save(){
-        if(!this.doSave) return;
+        this.save(false);
+    }
+
+    public void save(boolean forceSave){
+        if(!forceSave && !this.doSave) return;
         if(!this.isLoaded){
             MainLogger.error("DB가 정상적으로 로드되지 않아 데이터 손실 방지를 위해 저장되지 않습니다.");
             return;
@@ -147,29 +124,32 @@ public class Config extends LinkedHashMap<String, Object>{
 
     public boolean isLoaded() { return isLoaded; }
 
-    public boolean getDoSave() {
-        return doSave;
-    }
-
-    public void setDoSave(boolean doSave) {
-        this.doSave = doSave;
-    }
-
-    public boolean isLoggingEnabled(){
-        return isLoggingEnabled;
-    }
-
-    public void setIsLoggingEnabled(boolean v){
-        this.isLoggingEnabled = v;
-    }
-
-
-    public void setSaveWithPrettyGson(boolean b){
-        this.saveWithPrettyGson = b;
-    }
-
     /*private void runListener(){
         if(this.dataChangeListener == null) return;
         this.dataChangeListener.run();
     }*/
+
+    public enum ConfigItem {
+        MYSQL_HOST("mysql_host", "localhost"),
+        MYSQL_PORT("mysql_port", 3306),
+        MYSQL_USER("mysql_user", "userName"),
+        MYSQL_PW("mysql_pw", "password"),
+        MYSQL_DB("mysql_db", "db name"),
+
+        FB_DB_URL("firebase_DatabaseUrl", "Firebase DB주소. ex) https://DB이름.firebaseio.com"),
+        FB_ACCOUNT_KEY("firebase_path_serviceAccountKey", "serviceAccountKey.json 파일 경로");
+
+        public String key;
+        public Object defaultValue;
+
+        ConfigItem(String key, Object defaultValue){
+            this.key = key;
+            this.defaultValue = defaultValue;
+        }
+
+        @Override
+        public String toString() {
+            return key;
+        }
+    }
 }

@@ -16,9 +16,7 @@ public class KishServer {
     public static FirebaseManager firebaseManager = null;
 
     public static void main(String[] args) {
-        // TODO : DB ID, DB PW, DB HOST, DB PORT, FB messaging_tokens, FB db url, FB service account
-        CONFIG = new Config("db/config.json");
-        CONFIG.setSaveWithPrettyGson(true);
+        CONFIG = new Config("config.json");
         firebaseManager = new FirebaseManager();
 
         DBCPInitializer dbcp = new DBCPInitializer("host", "userName", "pw", "db", 0);
