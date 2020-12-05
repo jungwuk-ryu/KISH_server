@@ -1,4 +1,4 @@
-package org.kish.dataBase;
+package org.kish;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

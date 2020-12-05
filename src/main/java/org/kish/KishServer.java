@@ -1,11 +1,12 @@
 package org.kish;
 
-import org.kish.dataBase.Config;
+import org.kish.dataBase.DBCPInitializer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.event.EventListener;
 import org.springframework.web.context.support.RequestHandledEvent;
 
+import javax.servlet.ServletException;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -19,8 +20,16 @@ public class KishServer {
         CONFIG = new Config("db/config.json");
         CONFIG.setSaveWithPrettyGson(true);
         firebaseManager = new FirebaseManager();
-        SpringApplication.run(KishServer.class, args);
 
+        DBCPInitializer dbcp = new DBCPInitializer("host", "userName", "pw", "db", 0);
+        try {
+            dbcp.init();
+        } catch (ServletException e) {
+            MainLogger.error("DBCP 초기화 실패", e);
+            Runtime.getRuntime().exit(0);
+        }
+
+        SpringApplication.run(KishServer.class, args);
         firebaseManager.sendFCMToAdmin("Server started", "서버가 시작되었습니다.\n" + new Date().toString(), new HashMap<>());
     }
 
