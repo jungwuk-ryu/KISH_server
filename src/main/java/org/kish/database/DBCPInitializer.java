@@ -1,4 +1,4 @@
-package org.kish.dataBase;
+package org.kish.database;
 
 import org.apache.commons.dbcp2.*;
 import org.apache.commons.pool2.impl.GenericObjectPool;

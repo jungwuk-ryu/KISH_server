@@ -6,7 +6,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.kish.dataBase.DataBase;
+import org.kish.database.DataBase;
 import org.kish.KishServer;
 import org.kish.MainLogger;
 import org.kish.entity.RequestResult;

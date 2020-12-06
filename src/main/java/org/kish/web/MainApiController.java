@@ -3,7 +3,7 @@ package org.kish.web;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.kish.KishServer;
-import org.kish.dataBase.ExpandedDataBase;
+import org.kish.database.ExpandedDataBase;
 import org.kish.MainLogger;
 import org.kish.entity.LunchMenu;
 import org.kish.entity.SchoolCalendar;

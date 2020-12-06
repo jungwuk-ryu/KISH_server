@@ -5,7 +5,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.jsoup.nodes.Document;
 import org.kish.KishServer;
-import org.kish.dataBase.DataBase;
+import org.kish.database.DataBase;
 import org.kish.MainLogger;
 import org.kish.MenuID;
 import org.kish.entity.Post;

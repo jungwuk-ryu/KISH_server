@@ -1,6 +1,6 @@
 package org.kish;
 
-import org.kish.dataBase.DBCPInitializer;
+import org.kish.database.DBCPInitializer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.event.EventListener;
