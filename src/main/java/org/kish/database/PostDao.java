@@ -6,6 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
+
 // TODO : search
 @Repository
 public class PostDao {
@@ -41,6 +45,34 @@ public class PostDao {
     public Post selectPost(int menu, int id){
         String query = "SELECT * FROM `kish_posts` WHERE `menu` = ? AND `id` = ?";
         return jdbcTemplate.queryForObject(query, new Object[]{menu, id}, new PostMapper());
+    }
+
+    public List<Post> searchPost(String content, int index){
+        if(content.trim().isEmpty()){
+            return new ArrayList<>();
+        }
+
+        String titleSrc, contentSrc;
+        StringTokenizer st = new StringTokenizer(content, " ");
+
+        int i = 0;
+        StringBuilder sb = new StringBuilder();
+
+        while(st.hasMoreTokens()){
+            String token = st.nextToken();
+
+            if(i != 0) sb.append(" AND ");
+            sb.append("title LIKE '%").append(token).append("%'");
+            i++;
+        }
+
+        titleSrc = sb.toString();
+        contentSrc = titleSrc.replace("title", "content");
+
+        String query = "SELECT title, content, (?) + (?) AS score " +
+                "FROM `kish_posts` WHERE (?) OR (?) " +
+                "ORDER BY score DESC, `last_updated` DESC LIMIT " + (index * 10) + ", 10";
+        return jdbcTemplate.query(query, new Object[]{titleSrc, contentSrc, titleSrc, contentSrc}, new PostMapper());
     }
 
     public int updatePost(Post post){
