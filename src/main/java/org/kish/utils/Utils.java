@@ -27,6 +27,7 @@ public class Utils {
         return choseongSb.toString();
     }
 
+    @Deprecated
     public static ArrayList<String> getContentTokens(String postContent){
         if(postContent == null || postContent.isEmpty()) return null;
         ArrayList<String> list = new ArrayList<>();
@@ -51,6 +52,7 @@ public class Utils {
         throw new IllegalArgumentException("아이디 " + name + "에 해당하는 메뉴가 없습니다.");
     }
 
+    @Deprecated
     public static LinkedHashMap<String, Integer> getContentTokenMap(String postContent){
         if(postContent == null || postContent.isEmpty()) return null;
         LinkedHashMap<String, Integer> map = new LinkedHashMap<>();
@@ -62,6 +64,12 @@ public class Utils {
         return map;
     }
 
+    public static String postUrlGenerator(int menu, int id){
+        return "http://www.hanoischool.net/?menu_no=" + menu +
+                "&board_mode=view&bno=" + id;
+    }
+
+    @Deprecated
     public static void addPostToKeyword(String postKey, String title, LinkedHashMap<String, String> attachmentUrlMap, LinkedHashMap<String, HashMap<String, Long>> targetKeywordMap, LinkedHashMap<String, Integer> tokenMap){
         if(tokenMap == null){
             MainLogger.error(postKey + "의 tokenMap이 null입니다.");
@@ -88,6 +96,7 @@ public class Utils {
     }
 
     /* 리팩토링 필요 */
+    @Deprecated
     public static void removePostFromKeyword(String postKey, String title, LinkedHashMap<String, String> attachmentUrlMap, LinkedHashMap<String, HashMap<String, Long>> targetKeywordMap, LinkedHashMap<String, Integer> tokenMap){
         tokenMap = (LinkedHashMap<String, Integer>) tokenMap.clone();
         tokenMap.putAll(Utils.getContentTokenMap(title));
@@ -107,6 +116,7 @@ public class Utils {
         MainLogger.info(postKey + "의 " + tokenMap.size() + "개의 토큰이 제거됨");
     }
 
+    @Deprecated
     public static ArrayList<String> search(LinkedHashMap<String, HashMap<String, Long>> keywordMap, HashMap<String, PostInfo> postInfoMap, String searchSentence, int index){
         //long start = System.currentTimeMillis();
         //임시
@@ -193,11 +203,13 @@ public class Utils {
     /**
      * post/posts/에 저장된 게시물인지 확인합니다.
      */
+    @Deprecated
     public static boolean isSavedPost(String postKey){
         String[] tokens = postKey.split(",");
         return isSavedPost(tokens[0], tokens[1]);
     }
 
+    @Deprecated
     public static boolean isSavedPost(String menuId, String postId){
         File file = new File("post/posts/" + menuId + "/" + postId + ".json");
         return file.exists();
@@ -206,6 +218,7 @@ public class Utils {
     /**
      * ./post/posts 에 저장된 게시물들을 postInfo로 가져옵니다.
      */
+    @Deprecated
     public static LinkedHashMap<String, PostInfo> getAllPostInfoFromPost(){
         LinkedHashMap<String, PostInfo> map = new LinkedHashMap<>();
         File[] indexes = (new File("post/posts")).listFiles();
@@ -229,11 +242,11 @@ public class Utils {
         return map;
     }
 
-    public static Document postToDocument(Post post){
+    /*public static Document postToDocument(Post post){
         Document doc = Jsoup.parse(post.getFullHtml());
         doc.setBaseUri("http://www.hanoischool.net/?menu_no=" + post.getMenuId() + "&board_mode=view&bno=" + post.getPostId());
         return doc;
-    }
+    }*/
 
     /**
      * <p>Document내 주소들을 절대 경로로 변환합니다.</p>

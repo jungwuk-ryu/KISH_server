@@ -9,7 +9,7 @@ import org.json.simple.JSONObject;
 @SuppressWarnings("unchecked")
 public class SimplePost extends JSONObject {
 
-    public SimplePost(String postUrl, String menuID, String postId, String title, String author, String postDate, String attachmentIconUrl){
+    public SimplePost(String postUrl, int menuID, int postId, String title, String author, String postDate, String attachmentIconUrl){
         this.setPostUrl(postUrl);
         this.setPostId(postId);
         this.setTitle(title);
@@ -20,11 +20,11 @@ public class SimplePost extends JSONObject {
         this.setAttachmentIconUrl(attachmentIconUrl);
     }
 
-    public String getPostId() {
-        return (String) this.get("postId");
+    public int getPostId() {
+        return (int) this.get("postId");
     }
 
-    public void setPostId(String postId) {
+    public void setPostId(int postId) {
         this.put("postId", postId);
     }
 
@@ -77,11 +77,11 @@ public class SimplePost extends JSONObject {
         this.hasAttachment = hasAttachment;
     }*/
 
-    public String getMenuId(){
-        return (String) this.get("menuID");
+    public int getMenuId(){
+        return (int) this.get("menuID");
     }
 
-    public void setMenuId(String menuId){
+    public void setMenuId(int menuId){
         this.put("menuID", menuId);
     }
 }

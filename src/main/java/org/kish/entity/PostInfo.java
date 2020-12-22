@@ -11,6 +11,7 @@ import java.util.HashMap;
  * @see org.kish.web.PostApiController
  */
 @SuppressWarnings("unchecked")
+@Deprecated
 public class PostInfo extends HashMap<String, Object> {
     public PostInfo(JSONObject jsonObject){
         super(jsonObject);

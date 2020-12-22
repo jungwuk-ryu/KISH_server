@@ -1,5 +1,6 @@
 package org.kish.database;
 
+import org.kish.MainLogger;
 import org.kish.database.mapper.PostMapper;
 import org.kish.entity.Post;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,9 +97,15 @@ public class PostDao {
         return jdbcTemplate.queryForObject(query, new Object[]{menu, id}, Integer.class) != 0;
     }
 
-    public int deletePost(Post post){
+    public int removePost(Post post){
+        return this.removePost(post.getMenu(), post.getId());
+    }
+
+    public int removePost(int menu, int id){
+        MainLogger.info("게시물 제거하는 중 : " + menu + "," + id);
+
         String query = "DELETE FROM `kish_posts` WHERE `kish_posts`.`menu` = ? AND `kish_posts`.`id` = ?";
-        return jdbcTemplate.update(query, post.getMenu(), post.getId());
+        return jdbcTemplate.update(query, menu, id);
     }
 
     private enum Tables{

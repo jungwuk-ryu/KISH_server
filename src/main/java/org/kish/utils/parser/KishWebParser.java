@@ -156,15 +156,15 @@ public class KishWebParser {
         return parsePost(menuID, postID, true);
     }
 
-    public static Post parsePost(String menuID, String postID, boolean doSaveOnShutdown){
-        Post post = new Post(menuID, postID, doSaveOnShutdown);
+    public static Post parsePost(int menu, int postID, boolean doSaveOnShutdown){
+        Post post = new Post(menu, postID, doSaveOnShutdown);
         try {
-            Document doc = Jsoup.connect("http://hanoischool.net/default.asp?menu_no=" + menuID + "&board_mode=view&bno=" + postID).get();
+            Document doc = Jsoup.connect("http://hanoischool.net/default.asp?menu_no=" + menu + "&board_mode=view&bno=" + postID).get();
             Elements elements = doc.select(".h_board").get(0).getAllElements();
             Elements thElements = elements.select("th");
             Elements titleElements = elements.select(".h_view_title");
 
-            post.setMenuId(menuID);
+            post.setMenuId(menu);
             post.setPostId(postID);
             post.getFullHtml(doc.html());
             post.setTitle(thElements.get(0).text());
@@ -184,7 +184,7 @@ public class KishWebParser {
                 });
             }
         } catch (IOException e) {
-            MainLogger.error("postKey : " + menuID + "," + postID, e);
+            MainLogger.error("postKey : " + menu + "," + postID, e);
             return null;
         }
         return post;
