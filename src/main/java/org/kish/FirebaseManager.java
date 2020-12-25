@@ -6,34 +6,27 @@ import com.google.firebase.FirebaseOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.messaging.*;
+import org.kish.database.KishDao;
+import org.kish.entity.Noti;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 public class FirebaseManager {
     public FirebaseApp firebaseApp;
-    public DataBase<HashSet<String>> notificationUser;
-
     public boolean isReady = false;
+
+    @Autowired
+    @Qualifier("KishDao")
+    private KishDao kishDao;
 
     public FirebaseManager(){
         Config config = KishServer.CONFIG;
-        this.notificationUser = new DataBase<>("db/notificationUser.json");
-        for(String key : this.notificationUser.keySet()){
-            this.notificationUser.put(key, new HashSet<>(notificationUser.get(key)));
-        }
-
-        Object admins = new ArrayList<>(); // TODO : mysql 서버 에서 가져올 것
-        if(admins instanceof ArrayList){
-            this.notificationUser.put("operators", new HashSet<>((ArrayList) admins));
-        }else{
-            this.notificationUser.put("operators", (HashSet<String>) admins);
-        }
 
         String jsonPath = (String) config.get(Config.ConfigItem.FB_ACCOUNT_KEY.key);
         File file = new File(jsonPath);
@@ -70,33 +63,36 @@ public class FirebaseManager {
         return true;
     }
 
-    public void sendFCMToAdmin(String title, String content, Map<String, String> data){
-        this.sendFCM("operators", title, content, data);
-    }
+/*    public void sendFCMToAdmin(String title, String content, Map<String, String> data){
+        this.sendFCM("admin", title, content, data);
+    }*/
 
-    public void sendFCM(String topic, String title, String content, Map<String, String> data) {
+    public void sendFCM(Noti notification) {
         if(!isReady) {
             MainLogger.warn("Firebase is not ready.");
             return;
         }
+
         Thread thread = new Thread(() -> {
             FirebaseMessaging firebaseMessaging = FirebaseMessaging.getInstance();
-            HashSet<String> userSet = this.notificationUser.get(topic);
-            ArrayList<String> users = new ArrayList<>(userSet);
+            ArrayList<String> users = (ArrayList) kishDao.getDeviceIdByTopic(notification.getTopic());
             if (users.size() < 1) return;
 
             MulticastMessage message = MulticastMessage.builder()
                     .setAndroidConfig(AndroidConfig.builder()
                             .setTtl(3600 * 1000)
-                            .setPriority(AndroidConfig.Priority.NORMAL)
+                            .setPriority(notification.getPriority())
                             .setNotification(AndroidNotification.builder()
-                                    .setColor("#344aba")
+                                    .setColor(notification.getColor())
                                     .build())
                             .build())
-                    .setNotification(new Notification(title, content))
-                    .putAllData(data)
+                    .setNotification(
+                            new Notification(notification.getTitle()
+                                    , notification.getContent()))
+                    .putAllData(notification.getData())
                     .addAllTokens(users)
                     .build();
+            ArrayList<String> needToRemove = new ArrayList<>();
 
             try {
                 BatchResponse response = firebaseMessaging.sendMulticast(message);
@@ -105,33 +101,28 @@ public class FirebaseManager {
                     for (int i = 0; i < responses.size(); i++) {
                         if (!responses.get(i).isSuccessful()) {
                             if (responses.get(i).getException().getErrorCode().equals("invalid-argument"))
-                                userSet.remove(users.get(i));
+                                needToRemove.add(users.get(i));
                         }
                     }
                 }
             } catch (FirebaseMessagingException e) {
                 MainLogger.error("", e);
+            } finally {
+                kishDao.removeUsersFromAllTopics(needToRemove);
             }
-            this.notificationUser.put(topic, userSet);
         });
         thread.start();
     }
 
     public void addNotificationUser(String topic, String userToken){
-        HashSet<String> map = this.notificationUser.getOrDefault(topic, new HashSet<>());
-        map.add(userToken);
-        this.notificationUser.put(topic, map);
+        kishDao.addUserToTopic(topic, userToken);
     }
 
     public void removeNotificationUser(String topic, String userToken){
-        HashSet<String> map = this.notificationUser.getOrDefault(topic, new HashSet<>());
-        map.remove(userToken);
-        this.notificationUser.put(topic, map);
+        kishDao.removeUserFromTopic(topic, userToken);
     }
 
-    public boolean isNotificationUser(String topic, String userToken){
-        if(!this.notificationUser.containsKey(topic)) return false;
-        HashSet<String> map = this.notificationUser.get(topic);
-        return map.contains(userToken);
+    public boolean isUserInTopic(String topic, String userToken){
+        return kishDao.isUserInTopic(topic, userToken);
     }
 }

@@ -28,6 +28,10 @@ public class Post{
         return hasAttachments;
     }
 
+    public void setHasAttachments(boolean v){
+        this.hasAttachments = v;
+    }
+
     public void setHasAttachments(int i){
         this.hasAttachments = i > 0;
     }

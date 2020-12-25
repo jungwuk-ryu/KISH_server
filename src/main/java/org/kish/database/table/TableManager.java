@@ -12,6 +12,8 @@ public class TableManager extends JdbcDaoSupport {
     public TableManager(){
         jdbcTemplate = getJdbcTemplate();
         this.addTable(new PostTable());
+        this.addTable(new AdminTable());
+        this.addTable(new NotificationTable());
     }
 
     public void checkAllTable(){

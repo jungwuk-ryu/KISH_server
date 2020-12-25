@@ -138,7 +138,7 @@ public class MainApiController {
     @RequestMapping("/checkSubscription")
     public @ResponseBody String checkSubscription(@RequestParam String topic, @RequestParam String token){
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("result", this.main.getFirebaseManager().isNotificationUser(topic, token) ? 0 : 1);
+        jsonObject.put("result", this.main.getFirebaseManager().isUserInTopic(topic, token) ? 0 : 1);
         return jsonObject.toJSONString();
     }
 

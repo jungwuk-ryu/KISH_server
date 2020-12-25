@@ -1,6 +1,7 @@
 package org.kish;
 
 import org.kish.database.PostDao;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.event.EventListener;
@@ -14,7 +15,6 @@ import java.util.HashMap;
 public class KishServer {
     public static Config CONFIG = null;
     public static FirebaseManager firebaseManager = null;
-    public static PostDao postDao = null;
 
     public static void main(String[] args) {
         CONFIG = new Config("config.json");
