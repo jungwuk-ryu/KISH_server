@@ -4,13 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Repository
 public class KishDao{
-
+    private static SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -82,5 +81,36 @@ public class KishDao{
                 "WHERE `topic` = '" + topic + "' " +
                 "AND `device_id` = '" + deviceID + "'";
         return jdbcTemplate.queryForObject(query, Integer.class) > 0;
+    }
+
+    public int addPlanToCalendar(Calendar date, String plan){
+        String strDate = sdf.format(date);
+        String query
+                = "INSERT INTO `kish_calendar`(`date`, `plan`)\n" +
+                "VALUES('?', '?');";
+
+        return jdbcTemplate.update(query, strDate, plan);
+    }
+
+    public int removePlanFromCalendar(Calendar date, String plan){
+        String strDate = sdf.format(date);
+        String query
+                = "DELETE FROM `kish_calendar` WHERE `date` = ? AND `plan` = ?";
+
+        return jdbcTemplate.update(query, strDate, plan);
+    }
+
+    // Year and month
+    public List<Map<String, Object>> getPlansByYM(Calendar date){
+        date.set(Calendar.DATE, '1');
+        String startDate = sdf.format(date);
+        date.set(Calendar.DATE, date.getActualMaximum(Calendar.DATE));
+        String endDate = sdf.format(date);
+
+        String query = "SELECT * FROM `kish_calendar` " +
+                "WHERE `date` " +
+                "BETWEEN `" + startDate + "` " +
+                "AND `" + endDate + "`";
+        return jdbcTemplate.queryForList(query);
     }
 }

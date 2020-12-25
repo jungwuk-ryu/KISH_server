@@ -9,13 +9,13 @@ import org.jsoup.select.Elements;
 import org.kish.MainLogger;
 import org.kish.entity.LunchMenu;
 import org.kish.entity.Post;
-import org.kish.entity.SchoolCalendar;
 import org.kish.entity.SimplePost;
 import org.kish.utils.Utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.LinkedHashMap;
 
 public class KishWebParser {
     public static final String ROOT_URL = "http://www.hanoischool.net/";
@@ -203,36 +203,49 @@ public class KishWebParser {
         return StringUtils.replace(content.text(), "\\n", "\n");
     }
 
-    public static SchoolCalendar getSchoolCalendar(){
+/*    public static SchoolCalendar getSchoolCalendar(){
         Calendar calendar = Calendar.getInstance();
         return getSchoolCalendar(Integer.toString(calendar.get(Calendar.YEAR)), Integer.toString(calendar.get(Calendar.MONTH) + 1));
-    }
+    }*/
 
-    public static SchoolCalendar getSchoolCalendar(String year, String month){
-        String targetDate = year + "-" + month + "-1";
+    public static LinkedHashMap<Calendar, ArrayList<String>> getPlansFromServer(Calendar targetDate){
+        String strTargetDate = targetDate.get(Calendar.YEAR) + "-" + (targetDate.get(Calendar.MONTH) + 1) + "-1";
+        LinkedHashMap<Calendar, ArrayList<String>> rs = new LinkedHashMap<>();
+
         try {
-            Document doc = Jsoup.connect("http://www.hanoischool.net/?menu_no=41&ChangeDate=" + targetDate).get();
-            SchoolCalendar calendar = new SchoolCalendar();
+            Document doc = Jsoup.connect("http://www.hanoischool.net/?menu_no=41&ChangeDate=" + strTargetDate).get();
             //String thisYear = doc.select(".design_font").get(0).text();
 
             Elements dates = doc.select(".defTable2").get(0).select(".date");
             for (Element element : dates) {
-                int date;
+                int day;
                 try {
-                    date = Integer.parseInt(element.text()) -1;
+                    day = Integer.parseInt(element.text()) -1;
                 } catch (NumberFormatException e){
                     continue;
                 }
 
                 Elements parentElements = element.parent().getAllElements().select("div");
+                ArrayList<String> plan = new ArrayList<>();
                 String plans = "";
+
                 if(parentElements.size() > 1){
                     plans = parentElements.get(1).text().trim();
                 }
-                calendar.add(year + "-" + month + "-" + date, plans);
+                for (String pn : plans.split("\n")) {
+                    String tmp = pn.trim();
+                    if(tmp.isEmpty()) continue;
+
+                    plan.add(tmp);
+                }
+
+                Calendar date = Calendar.getInstance();
+                date.set(Calendar.YEAR, targetDate.get(Calendar.YEAR));
+                date.set(Calendar.MONTH, targetDate.get(Calendar.MONTH));
+                date.set(Calendar.DATE, day);
+                rs.put(date, plan);
             }
-            calendar.commit();
-            return calendar;
+            return rs;
         } catch (IOException e) {
             MainLogger.error("", e);
             return null;

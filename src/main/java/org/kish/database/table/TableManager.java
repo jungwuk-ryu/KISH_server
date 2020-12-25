@@ -14,6 +14,7 @@ public class TableManager extends JdbcDaoSupport {
         this.addTable(new PostTable());
         this.addTable(new AdminTable());
         this.addTable(new NotificationTable());
+        this.addTable(new CalendarTable());
     }
 
     public void checkAllTable(){
