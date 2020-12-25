@@ -7,10 +7,13 @@ import org.kish.KishServer;
 import org.kish.MainLogger;
 import org.kish.MenuID;
 import org.kish.database.PostDao;
+import org.kish.entity.Noti;
 import org.kish.entity.Post;
 import org.kish.entity.SimplePost;
 import org.kish.utils.Utils;
 import org.kish.utils.parser.KishWebParser;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,14 +25,14 @@ import java.util.*;
 @Controller
 @RequestMapping("/api/post")
 public class PostApiController {
-    public static final Gson gson = new Gson();
-
-    public final KishServer main;
-    public final PostDao postDao;
+    private static final Gson gson = new Gson();
+    private final KishServer main;
+    @Autowired
+    @Qualifier("PostDao")
+    private PostDao postDao;
 
     public PostApiController(KishServer main){
         this.main = main;
-        this.postDao = KishServer.postDao;
 
         Timer scheduler = new Timer();
         scheduler.schedule(new TimerTask() {
@@ -67,8 +70,13 @@ public class PostApiController {
                     MainLogger.error("", e);
                 }
 
-                this.main.getFirebaseManager().sendFCM("newPost", post.getTitle(),
-                        "새 글이 올라왔습니다.\n메뉴 : " + menuName + "\n작성자 : " + post.getAuthor(), data);
+                Noti noti
+                        = new Noti("newPost"
+                        , post.getTitle()
+                        , "새 글이 올라왔습니다.\n메뉴 : " + menuName + "\n작성자 : " + post.getAuthor());
+                noti.setData(data);
+
+                this.main.getFirebaseManager().sendFCM(noti);
                 postCount++;
 
                 try {
@@ -92,7 +100,7 @@ public class PostApiController {
         MainLogger.info("서버에서 받아오는 중 : " + menu + "," + id);
 
         boolean isNew = !this.postDao.isExistPost(menu, id);
-        Post post = KishWebParser.parsePost(menu, id, false);
+        Post post = KishWebParser.parsePost(menu, id);
 
         if(post == null){
             if(!isNew) this.postDao.removePost(menu, id);

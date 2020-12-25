@@ -105,7 +105,8 @@ public class KishWebParser {
                 String attachmentIconUrl = elements.select("img").attr("src");
                 String postUrl = ROOT_URL + elements.select("a").attr("href");
 
-                list.add(new SimplePost(postUrl, menuId, postId, title, author, postDate, attachmentIconUrl));
+                list.add(
+                        new SimplePost(postUrl, Integer.parseInt(menuId), Integer.parseInt(postId), title, author, postDate, attachmentIconUrl));
             }));
         } catch (IOException | ArrayIndexOutOfBoundsException | NullPointerException e) {
             MainLogger.error("parseMenu 작업중 오류 발생 : " + url, e);
@@ -152,37 +153,34 @@ public class KishWebParser {
 */
     }
 
-    public static Post parsePost(String menuID, String postID){
-        return parsePost(menuID, postID, true);
-    }
-
-    public static Post parsePost(int menu, int postID, boolean doSaveOnShutdown){
-        Post post = new Post(menu, postID, doSaveOnShutdown);
+    public static Post parsePost(int menu, int postID){
+        Post post = new Post(menu, postID);
         try {
             Document doc = Jsoup.connect("http://hanoischool.net/default.asp?menu_no=" + menu + "&board_mode=view&bno=" + postID).get();
             Elements elements = doc.select(".h_board").get(0).getAllElements();
             Elements thElements = elements.select("th");
             Elements titleElements = elements.select(".h_view_title");
 
-            post.setMenuId(menu);
-            post.setPostId(postID);
-            post.getFullHtml(doc.html());
+            post.setMenu(menu);
+            post.setId(postID);
+            //(doc.html());
             post.setTitle(thElements.get(0).text());
             post.setAuthor(titleElements.get(0).text());
-            post.setPostDate(titleElements.get(1).text().split(" ")[0]);
+            post.setPost_date(titleElements.get(1).text().split(" ")[0]);
             post.setContent(KishWebParser.getPostRawContent(doc));
 
             //첨부파일
             Utils.generateUrl(doc);
             Elements attachmentElements = titleElements.get(2).select("a");
-            if(attachmentElements.size() < 1){
+            post.setHasAttachments(attachmentElements.size());
+            /*if(attachmentElements.size() < 1){
                 post.setHasAttachment(false);
             }else{
                 post.setHasAttachment(true);
                 attachmentElements.forEach(element -> {
                     post.addAttachmentUrl(element.text(), element.attr("href"));
                 });
-            }
+            }*/
         } catch (IOException e) {
             MainLogger.error("postKey : " + menu + "," + postID, e);
             return null;

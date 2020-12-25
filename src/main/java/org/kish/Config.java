@@ -12,9 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Set;
-import java.util.function.BiFunction;
 
 @SuppressWarnings("unchecked")
 public class Config extends LinkedHashMap<String, Object>{
