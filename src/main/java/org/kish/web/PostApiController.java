@@ -62,7 +62,7 @@ public class PostApiController {
                 data.put("type", "newPost");
                 data.put("menu", Integer.toString(post.getMenu()));
                 data.put("id", Integer.toString(post.getId()));
-                data.put("url", Utils.postUrlGenerator(post.getMenu(), post.getId()));
+                data.put("url", post.getUrl());
 
                 String menuName;
                 try {
@@ -159,9 +159,7 @@ public class PostApiController {
         if(post == null) post = this.getPostFromServer(menu, id);
         if(post == null) return "{ rpc: 404 }";
 
-        JsonObject rs = gson.toJsonTree(post).getAsJsonObject();
-        rs.addProperty("url", Utils.postUrlGenerator(menu, id));
-        return (gson.toJson(rs));
+        return (gson.toJson(post));
     }
 
     /**

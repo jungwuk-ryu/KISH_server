@@ -2,6 +2,7 @@ package org.kish.entity;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.kish.utils.Utils;
 
 /**
  *  게시글의 본문과 같은 내용을 포함하고 있는 클래스입니다.
@@ -12,7 +13,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Post{
-    private String title, author, content, post_date;
+    private String title, author, content, post_date, url;
     private int menu, id;
     private long last_updated;
     private boolean hasAttachments;
@@ -22,6 +23,7 @@ public class Post{
     public Post(int menu, int id){
         this.menu = menu;
         this.id = id;
+        this.setUrl();
     }
 
     public boolean hasAttachments() {
@@ -30,6 +32,20 @@ public class Post{
 
     public void setHasAttachments(boolean v){
         this.hasAttachments = v;
+    }
+
+    public void setMenu(int menu) {
+        this.menu = menu;
+        this.setUrl();
+    }
+
+    public void setId(int id) {
+        this.id = id;
+        this.setUrl();
+    }
+
+    public void setUrl(){
+        this.url = Utils.postUrlGenerator(this.getMenu(), this.getId());
     }
 
     public void setHasAttachments(int i){
