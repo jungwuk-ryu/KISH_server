@@ -65,6 +65,7 @@ java -jar kishserver.jar
 - firebase-admin
 - auto-value
 - commons-lang3
+- mysql-connector-java
 - [KoreanTextMatcher](https://github.com/bangjunyoung/KoreanTextMatcher)
 
 # Java-doc

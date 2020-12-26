@@ -3,15 +3,14 @@ package org.kish.web;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.kish.KishServer;
-import org.kish.dataBase.ExpandedDataBase;
 import org.kish.MainLogger;
+import org.kish.database.KishDAO;
 import org.kish.entity.LunchMenu;
-import org.kish.entity.SchoolCalendar;
 import org.kish.utils.WebUtils;
 import org.kish.utils.parser.KishWebParser;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -23,36 +22,26 @@ import java.util.*;
 @Controller
 @RequestMapping("/api")
 public class MainApiController {
-    public JSONArray testDates = new JSONArray();
     public String testDatesJson;
     public SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
     private final KishServer main;
-    private final ExpandedDataBase db;
-    private final ExpandedDataBase lunchLikesDB;
-    private final JSONObject calendarMap = new JSONObject();
+    @Autowired
+    private KishDAO kishDao;
 
     public MainApiController(KishServer kishServer){
         MainLogger.info("Api Server Controller 초기화중");
         this.main = kishServer;
-        this.db = this.main.getMainDataBase();
-        this.lunchLikesDB = new ExpandedDataBase("db/lunchLikesDB.json");
-        try {
-            testDates.add(sdf.parse("2020-09-07").getTime() / 1000);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        this.testDatesJson = testDates.toJSONString();
 
         MainLogger.info("학사일정 준비중");
-        this.makeCalendar();
+        //this.makeCalendar();
         Timer scheduler = new Timer();
         scheduler.schedule(new TimerTask() {
             @Override
             public void run() {
                 makeCalendar();
             }
-        }, 1000 * 60 * 50, 1000 * 60 * 50);
+        }, 1000 * 60, 1000 * 60 * 50);
     }
 
     /**
@@ -83,26 +72,26 @@ public class MainApiController {
         return result.toJSONString();
     }
 
-    @RequestMapping("/getCount")
+/*    @RequestMapping("/getCount")
     public @ResponseBody String getCount(){
         int count = this.db.increase("count", 1);
         MainLogger.info("now count : " + count);
         return "{\"num\":" + count + "}";
-    }
+    }*/
 
     @RequestMapping("/getLunch")
     public @ResponseBody String getLunch(@RequestParam(required = false, defaultValue = "") String date){
         ArrayList<LunchMenu> list = KishWebParser.parseLunch(date);
         JSONArray jsonArray = new JSONArray();
         for(LunchMenu menu : list){
-            HashSet<String> likes = (HashSet<String>) this.lunchLikesDB.getOrDefault(menu.getDate(), new HashSet<String>());
-            menu.put("likes", likes.size());
+            //HashSet<String> likes = (HashSet<String>) this.lunchLikesDB.getOrDefault(menu.getDate(), new HashSet<String>());
+            //menu.put("likes", likes.size());
             jsonArray.add(menu);
         }
         return jsonArray.toJSONString();
     }
 
-    @RequestMapping(value = "/toggleLunchLikes", method = RequestMethod.POST)
+/*    @RequestMapping(value = "/toggleLunchLikes", method = RequestMethod.POST)
     public @ResponseBody String toggleLunchLikes(@RequestParam String uid, @RequestParam String lunchDate, @RequestParam String method){
         JSONObject resultJson = new JSONObject();
         if(this.main.getFirebaseManager().isExistUser(uid)) {
@@ -121,7 +110,7 @@ public class MainApiController {
             resultJson.put("msg", "로그인 상태를 확인할 수 없습니다.");
         }
         return resultJson.toJSONString();
-    }
+    }*/
 
     @RequestMapping("/subscribeNotification")
     public @ResponseBody String subscribeNoti(@RequestParam String topic, @RequestParam String token){
@@ -138,7 +127,7 @@ public class MainApiController {
     @RequestMapping("/checkSubscription")
     public @ResponseBody String checkSubscription(@RequestParam String topic, @RequestParam String token){
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("result", this.main.getFirebaseManager().isNotificationUser(topic, token) ? 0 : 1);
+        jsonObject.put("result", this.main.getFirebaseManager().isUserInTopic(topic, token) ? 0 : 1);
         return jsonObject.toJSONString();
     }
 
@@ -151,75 +140,69 @@ public class MainApiController {
     /**
      * <p>학사일정을 반환하는 API입니다.</p>
      */
-    @RequestMapping("/getCalendar")
+/*    @RequestMapping("/getCalendar")
     public @ResponseBody String getCalendar(){
         return new JSONObject(this.calendarMap).toJSONString();
         //return this.calendar.getJson();
-    }
+    }*/
 
     @RequestMapping("/getCalendarFromDate")
-    public @ResponseBody String getCalendarFromDate(@RequestParam String year, @RequestParam String month){
-        String key = year + "-" + month + "-1";
-        if(this.calendarMap.containsKey(key)){
-           return ((SchoolCalendar) this.calendarMap.get(key)).getJson();
-        }
-        return KishWebParser.getSchoolCalendar(year, month).getJson();
+    public @ResponseBody String getCalendarFromDate(@RequestParam int year, @RequestParam int month){
+        Calendar date = Calendar.getInstance();
+        date.set(Calendar.YEAR, year);
+        date.set(Calendar.MONTH, month - 1);
+
+        List<Map<String, Object>> rs = kishDao.getPlansByYM(date);
+        JSONArray rsArray = new JSONArray();
+        rsArray.addAll(rs);
+
+        return rsArray.toJSONString();
         //return new JSONObject(KishWebParser.getSchoolCalendar()).toJSONString();
         //return this.calendar.getJson();
     }
 
     private void makeCalendar(){
-        /*if(calendar.isEmpty()) {
-            calendar.add("2020-08-31", "1학기 종료")
-                    .add("2020-09-01", "2학기 시작")
-                    .add("2020-09-02", "외국어의 날")
-                    .add("2020-09-04", "인문학에세이쓰기공모전")
-                    .add("2020-09-11", "2학기 간부수련회")
-                    .add("2020-09-12", "과학캠프")
-                    .add("2020-09-14", "2학기 방과후 수업 시작")
-                    .add("2020-09-21", "스포츠리그(스포츠교류)", 1)
-                    .add("2020-10-01", "추석")
-                    .add("2020-10-02","추석연휴")
-                    .add("2020-10-06", "10-11학년 학부모 대상\n교육과정 및 진학설명회")
-                    .add("2020-10-09", "한글날 행사")
-                    .add("2020-10-20", "1차 지필평가", 3)
-                    .add("2020-10-26", "스포츠클럽주간", 5)
-                    .add("2020-10-30", "과학탐구포트폴리오")
-                    .add("2020-10-30", "프리젠테이션발표대회")
-                    .add("2020-11-04", "10학년 수학여행", 3)
-                    .add("2020-11-05", "8학년 수학여행", 2)
-                    .add("2020-11-09", "화재예방 및 재난대피 훈련주간", 5)
-                    .add("2020-11-6", "현장체험학습")
-                    .add("2020-11-18", "2차 학생 건강검진")
-                    .add("2020-11-20", "KISH 문화제")
-                    .add("2020-11-21", "KISH 음악회")
-                    .add("2020-11-26", "총학생회 유세")
-                    .add("2020-11-27", "총학생회 선거")
-                    .add("2020-11-30", "교육과정 만족도조사")
-                    .add("2020-12-01", "예비중∙고학생 OT")
-                    .add("2020-12-04", "독서퀴즈대회")
-                    .add("2020-12-15", "2차 지필평가", 4)
-                    .add("2020-12-19", "전편입생 지필면접")
-                    .add("2020-12-21", "스포츠클럽주간", 8)
-                    .add("2020-12-24", "인문학에세이쓰기공모전")
-                    .add("2020-12-25", "크리스마스")
-                    .add("2020-12-31", "졸업진급사정회(4교시)")
-                    .add("2021-01-01", "신정" )
-                    .add("2021-01-07", "(오전) 종업식(2교시)")
-                    .add("2021-01-07", "(오후) 졸업식")
-                    .add("2021-01-08", "중등교사출근일")
-                    .add("2021-01-08", "겨울방학(예정)", 24 + 28)
-                    .add("2021-01-11", "방학 중 방과후 수업", 12)
-                    .add("2021-02-06", "설날연휴(예정)",9)
-                    .add("2021-02-22", "전교직원 출근일", 4)
-                    .add("2021-02-23", "전교직원 워크숍", 2)
-                    .commit();
-        }*/
-
-        int thisYear = Calendar.getInstance().get(Calendar.YEAR);
-        String date = thisYear + "-";
+        int added = 0;
+        int removed = 0;
+        Calendar date = Calendar.getInstance();
         for(int m = 1; m < 13; m++){
-            this.calendarMap.put(date + m + "-1", KishWebParser.getSchoolCalendar(Integer.toString(thisYear), Integer.toString(m)));
+            date.set(Calendar.MONTH, (m - 1));
+            List<Map<String, Object>> registered = kishDao.getPlansByYM(date);
+            HashSet<String> set = new HashSet<>();
+
+            for (Map<String, Object> planMap : registered) {
+                set.add(sdf.format(planMap.get("date")) + "=" + planMap.get("plan"));
+            }
+
+            LinkedHashMap<Calendar, ArrayList<String>> map = KishWebParser.getPlansFromServer(date);
+            for (Calendar planDate : map.keySet()) {
+                ArrayList<String> plans = map.get(planDate);
+
+                for (String plan : plans) {
+                    String key = sdf.format(planDate.getTime()) + "=" + plan;
+                    if(!set.remove(key)){
+                        kishDao.addPlanToCalendar(planDate, plan);
+                        added ++;
+                    }
+                }
+            }
+            Calendar calendar = Calendar.getInstance();
+            for (String key : set) {
+                String[] tmp = key.split("=");
+
+                try {
+                    calendar.setTime(sdf.parse(tmp[0]));
+                } catch (ParseException e) {
+                    MainLogger.error("", e);
+                }
+
+                kishDao.removePlanFromCalendar(calendar, tmp[1]);
+                removed ++;
+            }
+        }
+
+        if(added > 0 || removed > 0) {
+            MainLogger.info(added + "개의 추가된 학사일정과 " + removed + "개의 제거된 학사일정이 있습니다.");
         }
     }
 }

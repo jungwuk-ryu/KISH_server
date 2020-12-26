@@ -1,39 +1,56 @@
 package org.kish;
 
-import org.kish.dataBase.ExpandedDataBase;
+import org.kish.database.table.TableManager;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.EventListener;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.context.support.RequestHandledEvent;
 
-import java.util.Date;
-import java.util.HashMap;
+import java.util.Arrays;
+import java.util.Properties;
 
-@SpringBootApplication
+
+@SpringBootApplication(scanBasePackages = {"org.kish", "org.kish.web", "org.kish.database"})
 public class KishServer {
-    public static ExpandedDataBase mainDataBase = null;
-    public static ExpandedDataBase mainSettings = null;
+    public static Config CONFIG = null;
+    public static ConfigurableApplicationContext CAC = null;
+
+    public static TableManager tableManager = null;
     public static FirebaseManager firebaseManager = null;
 
+    public static JdbcTemplate jdbcTemplate = null;
+
     public static void main(String[] args) {
-        mainDataBase = new ExpandedDataBase("db/kish_main_db.json");
-        mainSettings = new ExpandedDataBase("db/kish2020.json");
-        mainSettings.setSaveWithPrettyGson(true);
+        CONFIG = new Config("kish_config.json");
+
+        if(CONFIG.get("mysql_db").equals("db name")){
+            System.out.println("mysql_db is not configured");
+            System.exit(0);
+        }
+
+        SpringApplication application = new SpringApplication(KishServer.class);
+        Properties props = new Properties();
+
+        String host = "jdbc:mysql://%host%:%port%/%db%?useUnicode=true&characterEncoding=utf8&useSSL=false";
+        host = host.replace("%host%", (String) CONFIG.get("mysql_host"));
+        host = host.replace("%port%", Long.toString(CONFIG.getLong("mysql_port")));
+        host = host.replace("%db%", (String) CONFIG.get("mysql_db"));
+
+        props.put("spring.datasource.url", host);
+        props.put("spring.datasource.username", CONFIG.get("mysql_user"));
+        props.put("spring.datasource.password", CONFIG.get("mysql_pw"));
+        application.setDefaultProperties(props);
+        CAC = application.run(args);
+
+        tableManager.checkAllTable();
         firebaseManager = new FirebaseManager();
-        SpringApplication.run(KishServer.class, args);
-
-        firebaseManager.sendFCMToAdmin("Server started", "서버가 시작되었습니다.\n" + new Date().toString(), new HashMap<>());
+        MainLogger.info("실행 준비됨");
     }
 
-    /**
-     * @return 기본 데이터베이스
-     */
-    public ExpandedDataBase getMainDataBase(){
-        return mainDataBase;
-    }
-
-    public ExpandedDataBase getMainSettings(){
-        return mainSettings;
+    public Config getConfig(){
+        return CONFIG;
     }
 
     public FirebaseManager getFirebaseManager(){

@@ -9,13 +9,13 @@ import org.jsoup.select.Elements;
 import org.kish.MainLogger;
 import org.kish.entity.LunchMenu;
 import org.kish.entity.Post;
-import org.kish.entity.SchoolCalendar;
 import org.kish.entity.SimplePost;
 import org.kish.utils.Utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.LinkedHashMap;
 
 public class KishWebParser {
     public static final String ROOT_URL = "http://www.hanoischool.net/";
@@ -105,7 +105,8 @@ public class KishWebParser {
                 String attachmentIconUrl = elements.select("img").attr("src");
                 String postUrl = ROOT_URL + elements.select("a").attr("href");
 
-                list.add(new SimplePost(postUrl, menuId, postId, title, author, postDate, attachmentIconUrl));
+                list.add(
+                        new SimplePost(postUrl, Integer.parseInt(menuId), Integer.parseInt(postId), title, author, postDate, attachmentIconUrl));
             }));
         } catch (IOException | ArrayIndexOutOfBoundsException | NullPointerException e) {
             MainLogger.error("parseMenu 작업중 오류 발생 : " + url, e);
@@ -152,39 +153,36 @@ public class KishWebParser {
 */
     }
 
-    public static Post parsePost(String menuID, String postID){
-        return parsePost(menuID, postID, true);
-    }
-
-    public static Post parsePost(String menuID, String postID, boolean doSaveOnShutdown){
-        Post post = new Post(menuID, postID, doSaveOnShutdown);
+    public static Post parsePost(int menu, int postID){
+        Post post = new Post(menu, postID);
         try {
-            Document doc = Jsoup.connect("http://hanoischool.net/default.asp?menu_no=" + menuID + "&board_mode=view&bno=" + postID).get();
+            Document doc = Jsoup.connect("http://hanoischool.net/default.asp?menu_no=" + menu + "&board_mode=view&bno=" + postID).get();
             Elements elements = doc.select(".h_board").get(0).getAllElements();
             Elements thElements = elements.select("th");
             Elements titleElements = elements.select(".h_view_title");
 
-            post.setMenuId(menuID);
-            post.setPostId(postID);
-            post.getFullHtml(doc.html());
+            post.setMenu(menu);
+            post.setId(postID);
+            //(doc.html());
             post.setTitle(thElements.get(0).text());
             post.setAuthor(titleElements.get(0).text());
-            post.setPostDate(titleElements.get(1).text().split(" ")[0]);
+            post.setPost_date(titleElements.get(1).text().split(" ")[0]);
             post.setContent(KishWebParser.getPostRawContent(doc));
 
             //첨부파일
             Utils.generateUrl(doc);
             Elements attachmentElements = titleElements.get(2).select("a");
-            if(attachmentElements.size() < 1){
+            post.setHasAttachments(attachmentElements.size());
+            /*if(attachmentElements.size() < 1){
                 post.setHasAttachment(false);
             }else{
                 post.setHasAttachment(true);
                 attachmentElements.forEach(element -> {
                     post.addAttachmentUrl(element.text(), element.attr("href"));
                 });
-            }
+            }*/
         } catch (IOException e) {
-            MainLogger.error("postKey : " + menuID + "," + postID, e);
+            MainLogger.error("postKey : " + menu + "," + postID, e);
             return null;
         }
         return post;
@@ -203,36 +201,45 @@ public class KishWebParser {
         return StringUtils.replace(content.text(), "\\n", "\n");
     }
 
-    public static SchoolCalendar getSchoolCalendar(){
+/*    public static SchoolCalendar getSchoolCalendar(){
         Calendar calendar = Calendar.getInstance();
         return getSchoolCalendar(Integer.toString(calendar.get(Calendar.YEAR)), Integer.toString(calendar.get(Calendar.MONTH) + 1));
-    }
+    }*/
 
-    public static SchoolCalendar getSchoolCalendar(String year, String month){
-        String targetDate = year + "-" + month + "-1";
+    public static LinkedHashMap<Calendar, ArrayList<String>> getPlansFromServer(Calendar targetDate){
+        String strTargetDate = targetDate.get(Calendar.YEAR) + "-" + (targetDate.get(Calendar.MONTH) + 1) + "-1";
+        LinkedHashMap<Calendar, ArrayList<String>> rs = new LinkedHashMap<>();
+
         try {
-            Document doc = Jsoup.connect("http://www.hanoischool.net/?menu_no=41&ChangeDate=" + targetDate).get();
-            SchoolCalendar calendar = new SchoolCalendar();
+            Document doc = Jsoup.connect("http://www.hanoischool.net/?menu_no=41&ChangeDate=" + strTargetDate).get();
             //String thisYear = doc.select(".design_font").get(0).text();
 
             Elements dates = doc.select(".defTable2").get(0).select(".date");
             for (Element element : dates) {
-                int date;
+                int day;
                 try {
-                    date = Integer.parseInt(element.text()) -1;
+                    day = Integer.parseInt(element.text());
                 } catch (NumberFormatException e){
                     continue;
                 }
 
                 Elements parentElements = element.parent().getAllElements().select("div");
-                String plans = "";
-                if(parentElements.size() > 1){
-                    plans = parentElements.get(1).text().trim();
+                ArrayList<String> plans = new ArrayList<>();
+
+                for(int i = 1; i < parentElements.size(); i ++){
+                    String plan = parentElements.get(i).text().trim();
+                    if(plan.isEmpty()) continue;
+
+                    plans.add(plan);
                 }
-                calendar.add(year + "-" + month + "-" + date, plans);
+
+                Calendar date = Calendar.getInstance();
+                date.set(Calendar.YEAR, targetDate.get(Calendar.YEAR));
+                date.set(Calendar.MONTH, targetDate.get(Calendar.MONTH));
+                date.set(Calendar.DATE, day);
+                rs.put(date, plans);
             }
-            calendar.commit();
-            return calendar;
+            return rs;
         } catch (IOException e) {
             MainLogger.error("", e);
             return null;

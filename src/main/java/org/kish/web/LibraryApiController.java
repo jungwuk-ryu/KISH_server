@@ -6,7 +6,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.kish.dataBase.DataBase;
 import org.kish.KishServer;
 import org.kish.MainLogger;
 import org.kish.entity.RequestResult;
@@ -28,13 +27,11 @@ import java.util.HashMap;
 @RequestMapping("/api/library")
 public class LibraryApiController {
     private final KishServer main;
-    private final DataBase db;
 
     public HashMap<String, String> session = new HashMap<>();
 
     public LibraryApiController(KishServer main){
         this.main = main;
-        this.db = main.getMainDataBase();
     }
 
     /**
