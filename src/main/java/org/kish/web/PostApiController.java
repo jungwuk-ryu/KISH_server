@@ -1,19 +1,19 @@
 package org.kish.web;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.kish.KishServer;
 import org.kish.MainLogger;
 import org.kish.MenuID;
-import org.kish.database.PostDao;
+import org.kish.database.PostDAO;
 import org.kish.entity.Noti;
 import org.kish.entity.Post;
 import org.kish.entity.SimplePost;
 import org.kish.utils.Utils;
 import org.kish.utils.parser.KishWebParser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,7 +28,7 @@ public class PostApiController {
     private static final Gson gson = new Gson();
     private final KishServer main;
     @Autowired
-    private PostDao postDao;
+    private PostDAO postDao;
 
     public PostApiController(KishServer main){
         this.main = main;
@@ -125,11 +125,11 @@ public class PostApiController {
     }
 
     @RequestMapping("/getPostsFromMenu")
-    public @ResponseBody String getPostsFromMenuApi(@RequestParam String menuId, @RequestParam(required = false, defaultValue = "1") String page){
-        MainLogger.info("메뉴 게시글 불러오는 중 : " + menuId);
+    public @ResponseBody String getPostsFromMenuApi(@RequestParam String menu, @RequestParam(required = false, defaultValue = "1") String page){
+        MainLogger.info("메뉴 게시글 불러오는 중 : " + menu);
         JSONArray jsonArray = new JSONArray();
 
-        ArrayList<SimplePost> result = KishWebParser.parseMenu(menuId, page);
+        ArrayList<SimplePost> result = KishWebParser.parseMenu(menu, page);
         jsonArray.addAll(result);
 
         return jsonArray.toJSONString();
@@ -150,22 +150,14 @@ public class PostApiController {
     }
 
     @RequestMapping(value = "/getPost")
-    public @ResponseBody String getPostApi(@RequestParam int menuID, @RequestParam int postID){
-        Post post = this.postDao.selectPost(menuID, postID);
-        if(post == null) post = this.getPostFromServer(menuID, postID);
+    public @ResponseBody String getPostApi(@RequestParam int menu, @RequestParam int id){
+        Post post = this.postDao.selectPost(menu, id);
+        if(post == null) post = this.getPostFromServer(menu, id);
         if(post == null) return "{ rpc: 404 }";
 
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("title", post.getTitle());
-        jsonObject.put("author", post.getAuthor());
-        jsonObject.put("post_date", post.getPost_date());
-        jsonObject.put("content", post.getContent());
-        jsonObject.put("menu", post.getMenu());
-        jsonObject.put("id", post.getId());
-        jsonObject.put("rpc", 200);
-        jsonObject.put("url", Utils.postUrlGenerator(menuID, postID));
-
-        return (jsonObject.toJSONString());
+        JsonObject rs = gson.toJsonTree(post).getAsJsonObject();
+        rs.addProperty("url", Utils.postUrlGenerator(menu, id));
+        return (gson.toJson(rs));
     }
 
     /**

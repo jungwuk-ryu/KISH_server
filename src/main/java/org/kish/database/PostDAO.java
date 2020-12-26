@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 @Repository
-public class PostDao {
+public class PostDAO {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;

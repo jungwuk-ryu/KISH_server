@@ -11,11 +11,11 @@ import java.util.*;
 
 
 @Repository
-public class KishDao{
+public class KishDAO {
     private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     public JdbcTemplate jdbcTemplate;
 
-    public KishDao(DataSource dataSource){
+    public KishDAO(DataSource dataSource){
         this.jdbcTemplate = new JdbcTemplate(dataSource);
         KishServer.jdbcTemplate = this.jdbcTemplate;
     }

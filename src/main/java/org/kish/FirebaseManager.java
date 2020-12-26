@@ -6,7 +6,7 @@ import com.google.firebase.FirebaseOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.messaging.*;
-import org.kish.database.KishDao;
+import org.kish.database.KishDAO;
 import org.kish.entity.Noti;
 
 import java.io.File;
@@ -19,7 +19,7 @@ public class FirebaseManager {
     public FirebaseApp firebaseApp;
     public boolean isReady = false;
 
-    private KishDao kishDao;
+    private KishDAO kishDao;
 
     public FirebaseManager(){
         Config config = KishServer.CONFIG;
@@ -46,7 +46,7 @@ public class FirebaseManager {
         } catch (IOException e) {
             MainLogger.error("FirebaseManager 초기화 중 오류 발생", e);
         }
-        this.kishDao = KishServer.CAC.getBean(KishDao.class);
+        this.kishDao = KishServer.CAC.getBean(KishDAO.class);
         this.isReady = true;
     }
 

@@ -4,7 +4,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.kish.KishServer;
 import org.kish.MainLogger;
-import org.kish.database.KishDao;
+import org.kish.database.KishDAO;
 import org.kish.entity.LunchMenu;
 import org.kish.utils.WebUtils;
 import org.kish.utils.parser.KishWebParser;
@@ -27,7 +27,7 @@ public class MainApiController {
 
     private final KishServer main;
     @Autowired
-    private KishDao kishDao;
+    private KishDAO kishDao;
 
     public MainApiController(KishServer kishServer){
         MainLogger.info("Api Server Controller 초기화중");
