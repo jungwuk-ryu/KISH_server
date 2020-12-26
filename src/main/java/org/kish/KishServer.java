@@ -14,14 +14,16 @@ import java.util.Properties;
 
 @SpringBootApplication(scanBasePackages = {"org.kish", "org.kish.web", "org.kish.database"})
 public class KishServer {
+    public static Config CONFIG = null;
+    public static ConfigurableApplicationContext CAC = null;
+
     public static TableManager tableManager = null;
     public static FirebaseManager firebaseManager = null;
-    public static Config CONFIG = null;
+
     public static JdbcTemplate jdbcTemplate = null;
 
     public static void main(String[] args) {
         CONFIG = new Config("kish_config.json");
-        firebaseManager = new FirebaseManager();
 
         if(CONFIG.get("mysql_db").equals("db name")){
             System.out.println("mysql_db is not configured");
@@ -40,9 +42,10 @@ public class KishServer {
         props.put("spring.datasource.username", CONFIG.get("mysql_user"));
         props.put("spring.datasource.password", CONFIG.get("mysql_pw"));
         application.setDefaultProperties(props);
-        ConfigurableApplicationContext cac = application.run(args);
+        CAC = application.run(args);
 
         tableManager.checkAllTable();
+        firebaseManager = new FirebaseManager();
         MainLogger.info("실행 준비됨");
     }
 

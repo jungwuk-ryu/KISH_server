@@ -8,8 +8,6 @@ import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.messaging.*;
 import org.kish.database.KishDao;
 import org.kish.entity.Noti;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,8 +19,6 @@ public class FirebaseManager {
     public FirebaseApp firebaseApp;
     public boolean isReady = false;
 
-    @Autowired
-    @Qualifier("KishDao")
     private KishDao kishDao;
 
     public FirebaseManager(){
@@ -50,6 +46,7 @@ public class FirebaseManager {
         } catch (IOException e) {
             MainLogger.error("FirebaseManager 초기화 중 오류 발생", e);
         }
+        this.kishDao = KishServer.CAC.getBean(KishDao.class);
         this.isReady = true;
     }
 
