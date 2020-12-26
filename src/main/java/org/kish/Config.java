@@ -20,7 +20,6 @@ public class Config extends LinkedHashMap<String, Object>{
     public static final Gson PRETTY_GSON = new GsonBuilder().setPrettyPrinting().create();
     public final String fileName;
 
-    private final boolean doSave = false;
     private final boolean isLoggingEnabled = true;
     private final boolean saveWithPrettyGson = true;
     private boolean isLoaded = false;
@@ -28,10 +27,6 @@ public class Config extends LinkedHashMap<String, Object>{
     public Config(String fileName) {
         this.fileName = fileName;
         this.reload();
-        Runtime rt = Runtime.getRuntime();
-        rt.addShutdownHook(new Thread(() -> {
-            save();
-        }));
     }
 
     /*public Config(String fileName, boolean isLoggingEnabled, boolean doSaveOnShutdown) {
@@ -69,8 +64,8 @@ public class Config extends LinkedHashMap<String, Object>{
             if(!this.containsKey(item.key)) this.put(item.key, item.defaultValue);
         }
 
-        save(true);
         this.isLoaded = true;
+        save();
     }
 
     public LinkedHashMap<String, Object> jsonToMap(JSONObject jsonObject){
@@ -90,11 +85,6 @@ public class Config extends LinkedHashMap<String, Object>{
     }
 
     public void save(){
-        this.save(false);
-    }
-
-    public void save(boolean forceSave){
-        if(!forceSave && !this.doSave) return;
         if(!this.isLoaded){
             MainLogger.error("DB가 정상적으로 로드되지 않아 데이터 손실 방지를 위해 저장되지 않습니다.");
             return;

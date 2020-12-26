@@ -1,26 +1,33 @@
 package org.kish.database;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.kish.KishServer;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import javax.sql.DataSource;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+
 @Repository
 public class KishDao{
-    private static SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    public JdbcTemplate jdbcTemplate;
+
+    public KishDao(DataSource dataSource){
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
+        KishServer.jdbcTemplate = this.jdbcTemplate;
+    }
 
     public int addAdmin(String deviceID){
         String query
-                = "INSERT INTO `kish_admin` (`device_id`) VALUES ('?');";
+                = "INSERT INTO `kish_admin` (`device_id`) VALUES (?);";
         return jdbcTemplate.update(query, deviceID);
     }
 
     public int removeAdmin(String deviceID){
-        String query = "DELETE FROM `kish_admin` WHERE `device_id` = '?'";
+        String query = "DELETE FROM `kish_admin` WHERE `device_id` = ?";
         return jdbcTemplate.update(query, deviceID);
     }
 
@@ -47,20 +54,20 @@ public class KishDao{
         String query
                 = "INSERT INTO `kish_notification` (`topic`, `device_id`) " +
                 "VALUES " +
-                "  ('?', '?');";
+                "  (?, ?);";
 
         return jdbcTemplate.update(query, topic, deviceID);
     }
 
     public int removeUserFromTopic(String topic, String deviceID){
         String query = "DELETE FROM `kish_notification` " +
-                "WHERE `device id` = '?' AND `topic` = ?";
+                "WHERE `device id` = ? AND `topic` = ?";
         return jdbcTemplate.update(query, deviceID, topic);
     }
 
     public int removeUserFromAllTopics(String deviceID){
         String query = "DELETE FROM `kish_notification` " +
-                "WHERE `device_id` = '?'";
+                "WHERE `device_id` = ?";
         return jdbcTemplate.update(query, deviceID);
     }
 
@@ -84,16 +91,16 @@ public class KishDao{
     }
 
     public int addPlanToCalendar(Calendar date, String plan){
-        String strDate = sdf.format(date);
+        String strDate = sdf.format(date.getTime());
         String query
                 = "INSERT INTO `kish_calendar`(`date`, `plan`)\n" +
-                "VALUES('?', '?');";
+                "VALUES(?, ?);";
 
         return jdbcTemplate.update(query, strDate, plan);
     }
 
     public int removePlanFromCalendar(Calendar date, String plan){
-        String strDate = sdf.format(date);
+        String strDate = sdf.format(date.getTime());
         String query
                 = "DELETE FROM `kish_calendar` WHERE `date` = ? AND `plan` = ?";
 
@@ -102,15 +109,15 @@ public class KishDao{
 
     // Year and month
     public List<Map<String, Object>> getPlansByYM(Calendar date){
-        date.set(Calendar.DATE, '1');
-        String startDate = sdf.format(date);
-        date.set(Calendar.DATE, date.getActualMaximum(Calendar.DATE));
-        String endDate = sdf.format(date);
+        date.set(Calendar.DAY_OF_MONTH, 1);
+        String startDate = sdf.format(date.getTime());
+        date.set(Calendar.DAY_OF_MONTH, date.getActualMaximum(Calendar.DAY_OF_MONTH));
+        String endDate = sdf.format(date.getTime());
 
         String query = "SELECT * FROM `kish_calendar` " +
                 "WHERE `date` " +
-                "BETWEEN `" + startDate + "` " +
-                "AND `" + endDate + "`";
+                "BETWEEN '" + startDate + "' " +
+                "AND '" + endDate + "'";
         return jdbcTemplate.queryForList(query);
     }
 }

@@ -1,16 +1,22 @@
 package org.kish.database.table;
 
+import org.kish.KishServer;
+import org.kish.MainLogger;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.stereotype.Component;
 
+import javax.sql.DataSource;
 import java.util.LinkedHashMap;
 
-public class TableManager extends JdbcDaoSupport {
+@Component
+public class TableManager{
     private LinkedHashMap<String, Table> tables = new LinkedHashMap<>();
     private JdbcTemplate jdbcTemplate;
 
-    public TableManager(){
-        jdbcTemplate = getJdbcTemplate();
+    public TableManager(DataSource dataSource){
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
+        KishServer.tableManager = this;
+
         this.addTable(new PostTable());
         this.addTable(new AdminTable());
         this.addTable(new NotificationTable());
@@ -24,8 +30,11 @@ public class TableManager extends JdbcDaoSupport {
     }
 
     public void checkTable(Table table){
-        String tableExitQuery = "SHOW TABLES LIKE '" + table.toString() + "'";
+        MainLogger.info("DB 테이블 확인 중 : " + table.getName());
+        String tableExitQuery = "SHOW TABLES LIKE '" + table.getName() + "'";
+
         if(jdbcTemplate.queryForList(tableExitQuery).size() < 1){
+            MainLogger.info("새 table 생성 중 : " + table.getName());
             jdbcTemplate.execute(table.getCreateQuery());
         }
     }

@@ -9,12 +9,12 @@ import org.kish.entity.LunchMenu;
 import org.kish.utils.WebUtils;
 import org.kish.utils.parser.KishWebParser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -27,7 +27,6 @@ public class MainApiController {
 
     private final KishServer main;
     @Autowired
-    @Qualifier("KishDao")
     private KishDao kishDao;
 
     public MainApiController(KishServer kishServer){
@@ -35,14 +34,14 @@ public class MainApiController {
         this.main = kishServer;
 
         MainLogger.info("학사일정 준비중");
-        this.makeCalendar();
+        //this.makeCalendar();
         Timer scheduler = new Timer();
         scheduler.schedule(new TimerTask() {
             @Override
             public void run() {
                 makeCalendar();
             }
-        }, 1000 * 60 * 50, 1000 * 60 * 50);
+        }, 1000 * 60, 1000 * 60 * 50);
     }
 
     /**
@@ -163,15 +162,47 @@ public class MainApiController {
     }
 
     private void makeCalendar(){
+        int added = 0;
+        int removed = 0;
         Calendar date = Calendar.getInstance();
         for(int m = 1; m < 13; m++){
             date.set(Calendar.MONTH, (m - 1));
-            KishWebParser.getPlansFromServer(date).forEach((planDate, plans) -> {
-                for (String plan : plans) {
-                    kishDao.addPlanToCalendar(planDate, plan);
-                }
-            });
+            List<Map<String, Object>> registered = kishDao.getPlansByYM(date);
+            HashSet<String> set = new HashSet<>();
 
+            for (Map<String, Object> planMap : registered) {
+                set.add(sdf.format(planMap.get("date")) + "=" + planMap.get("plan"));
+            }
+
+            LinkedHashMap<Calendar, ArrayList<String>> map = KishWebParser.getPlansFromServer(date);
+            for (Calendar planDate : map.keySet()) {
+                ArrayList<String> plans = map.get(planDate);
+
+                for (String plan : plans) {
+                    String key = sdf.format(planDate.getTime()) + "=" + plan;
+                    if(!set.remove(key)){
+                        kishDao.addPlanToCalendar(planDate, plan);
+                        added ++;
+                    }
+                }
+            }
+            Calendar calendar = Calendar.getInstance();
+            for (String key : set) {
+                String[] tmp = key.split("=");
+
+                try {
+                    calendar.setTime(sdf.parse(tmp[0]));
+                } catch (ParseException e) {
+                    MainLogger.error("", e);
+                }
+
+                kishDao.removePlanFromCalendar(calendar, tmp[1]);
+                removed ++;
+            }
+        }
+
+        if(added > 0 || removed > 0) {
+            MainLogger.info(added + "개의 추가된 학사일정과 " + removed + "개의 제거된 학사일정이 있습니다.");
         }
     }
 }

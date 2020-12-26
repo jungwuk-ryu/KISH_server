@@ -218,30 +218,26 @@ public class KishWebParser {
             for (Element element : dates) {
                 int day;
                 try {
-                    day = Integer.parseInt(element.text()) -1;
+                    day = Integer.parseInt(element.text());
                 } catch (NumberFormatException e){
                     continue;
                 }
 
                 Elements parentElements = element.parent().getAllElements().select("div");
-                ArrayList<String> plan = new ArrayList<>();
-                String plans = "";
+                ArrayList<String> plans = new ArrayList<>();
 
-                if(parentElements.size() > 1){
-                    plans = parentElements.get(1).text().trim();
-                }
-                for (String pn : plans.split("\n")) {
-                    String tmp = pn.trim();
-                    if(tmp.isEmpty()) continue;
+                for(int i = 1; i < parentElements.size(); i ++){
+                    String plan = parentElements.get(i).text().trim();
+                    if(plan.isEmpty()) continue;
 
-                    plan.add(tmp);
+                    plans.add(plan);
                 }
 
                 Calendar date = Calendar.getInstance();
                 date.set(Calendar.YEAR, targetDate.get(Calendar.YEAR));
                 date.set(Calendar.MONTH, targetDate.get(Calendar.MONTH));
                 date.set(Calendar.DATE, day);
-                rs.put(date, plan);
+                rs.put(date, plans);
             }
             return rs;
         } catch (IOException e) {

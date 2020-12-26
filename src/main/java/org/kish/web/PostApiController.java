@@ -28,7 +28,6 @@ public class PostApiController {
     private static final Gson gson = new Gson();
     private final KishServer main;
     @Autowired
-    @Qualifier("PostDao")
     private PostDao postDao;
 
     public PostApiController(KishServer main){
