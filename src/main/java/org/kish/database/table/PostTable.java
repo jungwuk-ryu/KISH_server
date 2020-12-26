@@ -10,7 +10,7 @@ public class PostTable extends Table {
                         "`title` VARCHAR(64) NOT NULL ," +
                         "`author` VARCHAR(64) NOT NULL ," +
                         "`content` MEDIUMTEXT NOT NULL ," +
-                        "`post_date` VARCHAR(25) NOT NULL ," +
+                        "`post_date` DATE NOT NULL ," +
                         "`last_updated` TIMESTAMP NOT NULL ," +
                         "`has_attachments` BOOLEAN NOT NULL ," +
                         "PRIMARY KEY( `menu`, `id`)) " +

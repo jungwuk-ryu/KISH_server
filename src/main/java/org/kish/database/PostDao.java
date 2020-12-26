@@ -59,10 +59,13 @@ public class PostDao {
         titleSrc = sb.toString();
         contentSrc = titleSrc.replace("title", "content");
 
-        String query = "SELECT title, content, (?) + (?) AS score " +
-                "FROM `kish_posts` WHERE (?) OR (?) " +
-                "ORDER BY score DESC, `last_updated` DESC LIMIT " + (index * 10) + ", 10";
-        return jdbcTemplate.query(query, new Object[]{titleSrc, contentSrc, titleSrc, contentSrc}, new PostMapper());
+        String query = new StringBuilder()
+                .append("SELECT  *, (").append(titleSrc).append(") + (").append(contentSrc).append(") AS score ")
+                .append("FROM `kish_posts` WHERE (").append(titleSrc).append(") OR (").append(contentSrc).append(") ")
+                .append("ORDER BY score DESC, `post_date` DESC LIMIT ")
+                .append(index * 10).append(", 10").toString();
+
+        return jdbcTemplate.query(query, new Object[]{}, new PostMapper());
     }
 
     public int updatePost(Post post){

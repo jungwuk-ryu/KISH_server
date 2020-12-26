@@ -16,7 +16,7 @@ public class PostMapper implements RowMapper<Post> {
         post.setAuthor(rs.getString("author"));
         post.setContent(rs.getString("content"));
         post.setPost_date(rs.getString("post_date"));
-        post.setHasAttachments(rs.getBoolean("hasAttachments"));
+        post.setHasAttachments(rs.getBoolean("has_attachments"));
         post.setLast_updated(rs.getTimestamp("last_updated").getTime());
 
         return post;
