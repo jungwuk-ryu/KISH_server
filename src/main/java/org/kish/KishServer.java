@@ -1,6 +1,7 @@
 package org.kish;
 
 import org.kish.database.table.TableManager;
+import org.kish.web.PostApiController;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -47,6 +48,12 @@ public class KishServer {
         tableManager.checkAllTable();
         firebaseManager = new FirebaseManager();
         MainLogger.info("실행 준비됨");
+
+        PostApiController pac = CAC.getBean(PostApiController.class);
+        if(KishServer.CONFIG.get(Config.ConfigOption.GET_ALL_POSTS_ON_BOOT.key).equals("on")){
+            pac.checkingNewPostLock = true;
+            pac.parseAllPosts();
+        }
     }
 
     public Config getConfig(){

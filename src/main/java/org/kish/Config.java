@@ -6,7 +6,6 @@ import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.kish.MainLogger;
 
 import java.io.File;
 import java.io.IOException;
@@ -60,7 +59,7 @@ public class Config extends LinkedHashMap<String, Object>{
             return;
         }
 
-        for (ConfigItem item : ConfigItem.values()) {
+        for (ConfigOption item : ConfigOption.values()) {
             if(!this.containsKey(item.key)) this.put(item.key, item.defaultValue);
         }
 
@@ -117,7 +116,7 @@ public class Config extends LinkedHashMap<String, Object>{
         this.dataChangeListener.run();
     }*/
 
-    public enum ConfigItem {
+    public enum ConfigOption {
         MYSQL_HOST("mysql_host", "localhost"),
         MYSQL_PORT("mysql_port", 3306),
         MYSQL_USER("mysql_user", "userName"),
@@ -125,12 +124,15 @@ public class Config extends LinkedHashMap<String, Object>{
         MYSQL_DB("mysql_db", "db name"),
 
         FB_DB_URL("firebase_DatabaseUrl", "Firebase DB주소. ex) https://DB이름.firebaseio.com"),
-        FB_ACCOUNT_KEY("firebase_path_serviceAccountKey", "serviceAccountKey.json 파일 경로");
+        FB_ACCOUNT_KEY("firebase_path_serviceAccountKey", "serviceAccountKey.json 파일 경로"),
+
+        GET_ALL_POSTS_ON_BOOT("get_all_posts_on_boot",
+                "on으로 설정할경우 서버 시작시 홈페이지의 모든 게시물을 조회하고 가져옵니다. (최초실행용)");
 
         public String key;
         public Object defaultValue;
 
-        ConfigItem(String key, Object defaultValue){
+        ConfigOption(String key, Object defaultValue){
             this.key = key;
             this.defaultValue = defaultValue;
         }

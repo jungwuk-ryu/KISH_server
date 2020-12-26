@@ -10,7 +10,7 @@ import java.util.LinkedHashMap;
 
 @Component
 public class TableManager{
-    private LinkedHashMap<String, Table> tables = new LinkedHashMap<>();
+    private LinkedHashMap<String, org.kish.database.table.Table> tables = new LinkedHashMap<>();
     private JdbcTemplate jdbcTemplate;
 
     public TableManager(DataSource dataSource){

@@ -24,7 +24,7 @@ public class FirebaseManager {
     public FirebaseManager(){
         Config config = KishServer.CONFIG;
 
-        String jsonPath = (String) config.get(Config.ConfigItem.FB_ACCOUNT_KEY.key);
+        String jsonPath = (String) config.get(Config.ConfigOption.FB_ACCOUNT_KEY.key);
         File file = new File(jsonPath);
         if(!file.exists()){
             MainLogger.error("Firebase의 serviceAccountKey.json 파일을 찾지 못했습니다.");
@@ -40,7 +40,7 @@ public class FirebaseManager {
             FirebaseOptions options;
             options = new FirebaseOptions.Builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                    .setDatabaseUrl((String) config.get(Config.ConfigItem.FB_DB_URL.key))
+                    .setDatabaseUrl((String) config.get(Config.ConfigOption.FB_DB_URL.key))
                     .build();
             this.firebaseApp = FirebaseApp.initializeApp(options);
         } catch (IOException e) {

@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.kish.Config;
 import org.kish.KishServer;
 import org.kish.MainLogger;
 import org.kish.MenuID;
@@ -25,6 +26,8 @@ import java.util.*;
 @Controller
 @RequestMapping("/api/post")
 public class PostApiController {
+    public boolean checkingNewPostLock = false;
+
     private static final Gson gson = new Gson();
     private final KishServer main;
     @Autowired
@@ -43,6 +46,7 @@ public class PostApiController {
     }
 
     public void checkNewPost(){
+        if(checkingNewPostLock) return;
         int postCount = 0;
 
         for(MenuID menuId : MenuID.values()) {
@@ -96,7 +100,7 @@ public class PostApiController {
     }
 
     public Post getPostFromServer(int menu, int id){
-        MainLogger.info("서버에서 받아오는 중 : " + menu + "," + id);
+        MainLogger.info("서버에서 가져오는 중 : " + menu + "," + id);
 
         boolean isNew = !this.postDao.isExistPost(menu, id);
         Post post = KishWebParser.parsePost(menu, id);
@@ -165,7 +169,7 @@ public class PostApiController {
      * <p>(최초 실행시 필요할 수 있음)</p>
      */
     public void parseAllPosts(){
-        MainLogger.warn("이 작업 후 프로그램 재시작을 추천드립니다.");
+        MainLogger.warn("모든 게시물 조회를 시작합니다. 상당한 시간이 소요될 수 있습니다.");
         Thread thread = new Thread( () -> {
             int cnt = 0;
             int postCount = 0;
@@ -198,6 +202,7 @@ public class PostApiController {
                 }
             }
             MainLogger.info("총 " + postCount + "개의 게시물이 저장되었습니다.");
+            checkingNewPostLock = false;
         });
         thread.start();
     }
