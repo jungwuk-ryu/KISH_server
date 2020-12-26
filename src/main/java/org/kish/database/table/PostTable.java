@@ -7,13 +7,13 @@ public class PostTable extends Table {
                         "( " +
                         "`menu` SMALLINT NOT NULL ," +
                         "`id` MEDIUMINT NOT NULL ," +
-                        "`title` VARCHAR(64) NOT NULL ," +
-                        "`author` VARCHAR(64) NOT NULL ," +
+                        "`title` VARCHAR(512) NOT NULL ," +
+                        "`author` VARCHAR(128) NOT NULL ," +
                         "`content` MEDIUMTEXT NOT NULL ," +
                         "`post_date` DATE NOT NULL ," +
                         "`last_updated` TIMESTAMP NOT NULL ," +
                         "`has_attachments` BOOLEAN NOT NULL ," +
                         "PRIMARY KEY( `menu`, `id`)) " +
-                        "ENGINE = InnoDB;");
+                        "ENGINE = InnoDB CHARSET=utf8mb4 COLLATE utf8mb4_general_ci;");
     }
 }
