@@ -51,6 +51,9 @@ public class KishDAO {
     }
 
     public int addUserToTopic(String topic, String deviceID){
+        if(!KishServer.firebaseManager.isExistUser(deviceID)) return -1;
+        if(isUserInTopic(topic, deviceID)) return -2;
+
         String query
                 = "INSERT INTO `kish_notification` (`topic`, `device_id`) " +
                 "VALUES " +
@@ -61,7 +64,7 @@ public class KishDAO {
 
     public int removeUserFromTopic(String topic, String deviceID){
         String query = "DELETE FROM `kish_notification` " +
-                "WHERE `device id` = ? AND `topic` = ?";
+                "WHERE `device_id` = ? AND `topic` = ?";
         return jdbcTemplate.update(query, deviceID, topic);
     }
 
@@ -84,7 +87,7 @@ public class KishDAO {
     }
 
     public boolean isUserInTopic(String topic, String deviceID){
-        String query = "SELECT COUNT FROM `kish_notification` " +
+        String query = "SELECT COUNT(*) FROM `kish_notification` " +
                 "WHERE `topic` = '" + topic + "' " +
                 "AND `device_id` = '" + deviceID + "'";
         return jdbcTemplate.queryForObject(query, Integer.class) > 0;

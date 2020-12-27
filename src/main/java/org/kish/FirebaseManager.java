@@ -111,12 +111,12 @@ public class FirebaseManager {
         thread.start();
     }
 
-    public void addNotificationUser(String topic, String userToken){
-        kishDao.addUserToTopic(topic, userToken);
+    public int addNotificationUser(String topic, String userToken){
+        return kishDao.addUserToTopic(topic, userToken);
     }
 
-    public void removeNotificationUser(String topic, String userToken){
-        kishDao.removeUserFromTopic(topic, userToken);
+    public int removeNotificationUser(String topic, String userToken){
+        return kishDao.removeUserFromTopic(topic, userToken);
     }
 
     public boolean isUserInTopic(String topic, String userToken){

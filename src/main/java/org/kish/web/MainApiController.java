@@ -114,20 +114,20 @@ public class MainApiController {
 
     @RequestMapping("/subscribeNotification")
     public @ResponseBody String subscribeNoti(@RequestParam String topic, @RequestParam String token){
-        this.main.getFirebaseManager().addNotificationUser(topic, token);
-        return "";
+        int rs = this.main.getFirebaseManager().addNotificationUser(topic, token);
+        return "{rs: " + rs + "}";
     }
 
     @RequestMapping("/unsubscribeNotification")
     public @ResponseBody String unsubscribeNoti(@RequestParam String topic, @RequestParam String token){
-        this.main.getFirebaseManager().removeNotificationUser(topic, token);
-        return "";
+        int rs = this.main.getFirebaseManager().removeNotificationUser(topic, token);
+        return "{rs: " + rs + "}";
     }
 
     @RequestMapping("/checkSubscription")
     public @ResponseBody String checkSubscription(@RequestParam String topic, @RequestParam String token){
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("result", this.main.getFirebaseManager().isUserInTopic(topic, token) ? 0 : 1);
+        jsonObject.put("rs", this.main.getFirebaseManager().isUserInTopic(topic, token) ? 1 : 0);
         return jsonObject.toJSONString();
     }
 
