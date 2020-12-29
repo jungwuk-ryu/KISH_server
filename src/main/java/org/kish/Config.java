@@ -127,7 +127,9 @@ public class Config extends LinkedHashMap<String, Object>{
         FB_ACCOUNT_KEY("firebase_path_serviceAccountKey", "serviceAccountKey.json 파일 경로"),
 
         GET_ALL_POSTS_ON_BOOT("get_all_posts_on_boot",
-                "on으로 설정할경우 서버 시작시 홈페이지의 모든 게시물을 조회하고 가져옵니다. (최초실행용)");
+                "on으로 설정할경우 서버 시작시 홈페이지의 모든 게시물을 조회하고 가져옵니다. (최초실행용)"),
+        SPRING_SERVER_PORT("spring_server_port", 9533),
+        SPRING_AJP_PORT("tomcat_apj_port", 8009);
 
         public String key;
         public Object defaultValue;

@@ -9,7 +9,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.context.support.RequestHandledEvent;
 
-import java.util.Arrays;
 import java.util.Properties;
 
 
@@ -42,6 +41,9 @@ public class KishServer {
         props.put("spring.datasource.url", host);
         props.put("spring.datasource.username", CONFIG.get("mysql_user"));
         props.put("spring.datasource.password", CONFIG.get("mysql_pw"));
+
+        props.put("server.port", CONFIG.get(Config.ConfigOption.SPRING_SERVER_PORT.key));
+        props.put("ajp.port", CONFIG.get(Config.ConfigOption.SPRING_AJP_PORT.key));
         application.setDefaultProperties(props);
         CAC = application.run(args);
 
