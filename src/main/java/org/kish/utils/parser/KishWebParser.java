@@ -51,7 +51,7 @@ public class KishWebParser {
                 list.add(new LunchMenu(date, menu, salt, imageUrl));
             }));
         } catch (IOException e) {
-            MainLogger.error("", e);
+            MainLogger.error(e);
         }
 
         return list;
@@ -241,7 +241,7 @@ public class KishWebParser {
             }
             return rs;
         } catch (IOException e) {
-            MainLogger.error("", e);
+            MainLogger.error(e);
             return null;
         }
     }

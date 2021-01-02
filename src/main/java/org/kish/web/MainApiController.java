@@ -193,7 +193,7 @@ public class MainApiController {
                 try {
                     calendar.setTime(sdf.parse(tmp[0]));
                 } catch (ParseException e) {
-                    MainLogger.error("", e);
+                    MainLogger.error(e);
                 }
 
                 kishDao.removePlanFromCalendar(calendar, tmp[1]);

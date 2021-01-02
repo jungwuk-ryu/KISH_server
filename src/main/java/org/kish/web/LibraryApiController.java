@@ -213,7 +213,7 @@ public class LibraryApiController {
                             "&PAGE_NO=" + index + "&PAGE_SIZE=12&BLOCK_SIZE=10&BK_BIB_SEQ=&BK_ITEM_SEQ=&ORDER_COLUMN=BK_BIBAUTHOR&ORDER_METHOD=DESC&CHKTYPEALL=ALL&CHKTYPE0=&CHKTYPE2=&CHKTYPE3=&CHKLENDINCLUDE=1&CHKRESERVEINCLUDE=1&SC_LIST_TYPE=list" +
                             "&SC_KEYWORD_FIRST=" + keyword + "&SC_KEY_SECOND=ALL&SC_KEYWORD_SECOND=").get();
         } catch (IOException e) {
-            MainLogger.error("", e);
+            MainLogger.error(e);
             return "{\"message\":\"서버 처리 중 오류가 발생하였습니다\",\"result\":500}";
         }
 

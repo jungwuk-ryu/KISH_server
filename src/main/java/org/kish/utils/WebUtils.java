@@ -38,7 +38,7 @@ public class WebUtils {
             if(jsonResult == null) return null;
             resultJson = (JSONObject) parser.parse(jsonResult);
         } catch (ParseException e) {
-            MainLogger.error("", e);
+            MainLogger.error(e);
         }
         return resultJson;
     }
@@ -119,7 +119,7 @@ public class WebUtils {
         try {
             resultJson = (JSONObject) parser.parse(getRequest(fullUrl, cookie).getResponse());
         } catch (ParseException e) {
-            MainLogger.error("", e);
+            MainLogger.error(e);
         }
         return resultJson;
     }

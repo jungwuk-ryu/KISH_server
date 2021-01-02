@@ -1,7 +1,14 @@
 package org.kish;
 
-import org.kish.database.table.TableManager;
+import org.jodconverter.core.office.OfficeException;
+import org.kish.config.Config;
+import org.kish.config.ConfigOption;
+import org.kish.manager.JodManager;
+import org.kish.manager.TableManager;
+import org.kish.manager.FirebaseManager;
+import org.kish.web.KishMagazineApiController;
 import org.kish.web.PostApiController;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -9,6 +16,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.context.support.RequestHandledEvent;
 
+import java.io.File;
 import java.util.Properties;
 
 
@@ -19,17 +27,22 @@ public class KishServer {
 
     public static TableManager tableManager = null;
     public static FirebaseManager firebaseManager = null;
+    public static JodManager jodManager = null;
 
     public static JdbcTemplate jdbcTemplate = null;
 
+    public static File RESOURCE_PATH = null;
+
     public static void main(String[] args) {
+        /* Kish server configuration */
         CONFIG = new Config("kish_config.json");
 
-        if(CONFIG.get("mysql_db").equals("db name")){
-            System.out.println("mysql_db is not configured");
-            System.exit(0);
+        if(ConfigOption.MYSQL_DB.isChanged(CONFIG)){
+            shutdown(true, "mysql_db is not configured");
         }
+        RESOURCE_PATH = new File((String) CONFIG.get(ConfigOption.RESOURCE_PATH));
 
+        /* spring boot 실행*/
         SpringApplication application = new SpringApplication(KishServer.class);
         Properties props = new Properties();
 
@@ -42,20 +55,43 @@ public class KishServer {
         props.put("spring.datasource.username", CONFIG.get("mysql_user"));
         props.put("spring.datasource.password", CONFIG.get("mysql_pw"));
 
-        props.put("server.port", CONFIG.get(Config.ConfigOption.SPRING_SERVER_PORT.key));
-        props.put("ajp.port", CONFIG.get(Config.ConfigOption.SPRING_AJP_PORT.key));
+        props.put("server.port", CONFIG.get(ConfigOption.SPRING_SERVER_PORT));
+        props.put("ajp.port", CONFIG.get(ConfigOption.SPRING_AJP_PORT));
         application.setDefaultProperties(props);
         CAC = application.run(args);
 
+        /* 매니저 초기화 */
         tableManager.checkAllTable();
         firebaseManager = new FirebaseManager();
-        MainLogger.info("실행 준비됨");
+        try {
+            jodManager = new JodManager();
+        } catch (OfficeException e) {
+            shutdown(false, e);
+        }
 
+        /* config에서 parse all posts 확인 */
         PostApiController pac = CAC.getBean(PostApiController.class);
-        if(KishServer.CONFIG.get(Config.ConfigOption.GET_ALL_POSTS_ON_BOOT.key).equals("on")){
+        if(CONFIG.get(ConfigOption.GET_ALL_POSTS_ON_BOOT).equals("on")){
             pac.checkingNewPostLock = true;
             pac.parseAllPosts();
         }
+
+        CAC.getBean(KishMagazineApiController.class).updateArticles();
+
+        MainLogger.info("kish server가 준비되었음.");
+    }
+
+    public static void shutdown(boolean force, Object reason){
+        if(reason instanceof Exception) MainLogger.LOGGER.fatal(reason);
+        else MainLogger.warn(reason);
+
+        MainLogger.warn("Kish server is shutting down now ...");
+
+        if(!force){
+            // something to do ...
+        }
+
+        System.exit(0);
     }
 
     public Config getConfig(){

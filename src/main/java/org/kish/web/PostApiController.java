@@ -1,10 +1,8 @@
 package org.kish.web;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.kish.Config;
 import org.kish.KishServer;
 import org.kish.MainLogger;
 import org.kish.MenuID;
@@ -70,7 +68,7 @@ public class PostApiController {
                     menuName = menu.name;
                 } catch(IllegalArgumentException e){
                     menuName = "알 수 없음";
-                    MainLogger.error("", e);
+                    MainLogger.error(e);
                 }
 
                 Noti noti
@@ -85,14 +83,14 @@ public class PostApiController {
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
-                    MainLogger.error("", e);
+                    MainLogger.error(e);
                 }
             }
 
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
-                MainLogger.error("", e);
+                MainLogger.error(e);
             }
         }
 
@@ -193,7 +191,7 @@ public class PostApiController {
                         try {
                             Thread.sleep(500);
                         } catch (InterruptedException e) {
-                            MainLogger.error("", e);
+                            MainLogger.error(e);
                         }
                     }
                     i++;

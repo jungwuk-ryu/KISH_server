@@ -1,4 +1,4 @@
-package org.kish;
+package org.kish.manager;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
@@ -6,6 +6,10 @@ import com.google.firebase.FirebaseOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.messaging.*;
+import org.kish.config.Config;
+import org.kish.config.ConfigOption;
+import org.kish.KishServer;
+import org.kish.MainLogger;
 import org.kish.database.KishDAO;
 import org.kish.entity.Noti;
 
@@ -24,7 +28,7 @@ public class FirebaseManager {
     public FirebaseManager(){
         Config config = KishServer.CONFIG;
 
-        String jsonPath = (String) config.get(Config.ConfigOption.FB_ACCOUNT_KEY.key);
+        String jsonPath = (String) config.get(ConfigOption.FB_ACCOUNT_KEY);
         File file = new File(jsonPath);
         if(!file.exists()){
             MainLogger.error("Firebase의 serviceAccountKey.json 파일을 찾지 못했습니다.");
@@ -40,7 +44,7 @@ public class FirebaseManager {
             FirebaseOptions options;
             options = new FirebaseOptions.Builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                    .setDatabaseUrl((String) config.get(Config.ConfigOption.FB_DB_URL.key))
+                    .setDatabaseUrl((String) config.get(ConfigOption.FB_DB_URL))
                     .build();
             this.firebaseApp = FirebaseApp.initializeApp(options);
         } catch (IOException e) {
@@ -103,7 +107,7 @@ public class FirebaseManager {
                     }
                 }
             } catch (FirebaseMessagingException e) {
-                MainLogger.error("", e);
+                MainLogger.error(e);
             } finally {
                 kishDao.removeUsersFromAllTopics(needToRemove);
             }

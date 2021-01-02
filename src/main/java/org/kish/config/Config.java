@@ -1,4 +1,4 @@
-package org.kish;
+package org.kish.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -6,6 +6,7 @@ import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.kish.MainLogger;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,18 +29,6 @@ public class Config extends LinkedHashMap<String, Object>{
         this.reload();
     }
 
-    /*public Config(String fileName, boolean isLoggingEnabled, boolean doSaveOnShutdown) {
-        this.fileName = fileName;
-        this.setIsLoggingEnabled(isLoggingEnabled);
-        this.reload();
-        Runtime rt = Runtime.getRuntime();
-        if(doSaveOnShutdown) {
-            rt.addShutdownHook(new Thread(() -> {
-                save();
-            }));
-        }
-    }*/
-
     public void reload(){
         File jsonFile = new File(fileName);
         if(this.isLoggingEnabled) MainLogger.warn("Config 불러오는 중 : " + jsonFile.getAbsolutePath());
@@ -60,7 +49,7 @@ public class Config extends LinkedHashMap<String, Object>{
         }
 
         for (ConfigOption item : ConfigOption.values()) {
-            if(!this.containsKey(item.key)) this.put(item.key, item.defaultValue);
+            if(!this.containsKey(item.getKey())) this.put(item.getKey(), item.getDefValue());
         }
 
         this.isLoaded = true;
@@ -79,8 +68,8 @@ public class Config extends LinkedHashMap<String, Object>{
 
     public void deleteFile(){
         File file = new File(fileName);
-        file.delete();
-        if(isLoggingEnabled) MainLogger.warn("제거됨 : " + fileName);
+        if(!file.delete()) MainLogger.warn("Could not delete : " + file.getAbsolutePath());
+        else if (isLoggingEnabled) MainLogger.warn("제거됨 : " + fileName);
     }
 
     public void save(){
@@ -105,6 +94,10 @@ public class Config extends LinkedHashMap<String, Object>{
         }
     }
 
+    public Object get(ConfigOption option) {
+        return super.get(option.getKey());
+    }
+
     public long getLong(String k){
         return (long) this.get(k);
     }
@@ -115,33 +108,4 @@ public class Config extends LinkedHashMap<String, Object>{
         if(this.dataChangeListener == null) return;
         this.dataChangeListener.run();
     }*/
-
-    public enum ConfigOption {
-        MYSQL_HOST("mysql_host", "localhost"),
-        MYSQL_PORT("mysql_port", 3306),
-        MYSQL_USER("mysql_user", "userName"),
-        MYSQL_PW("mysql_pw", "password"),
-        MYSQL_DB("mysql_db", "db name"),
-
-        FB_DB_URL("firebase_DatabaseUrl", "Firebase DB주소. ex) https://DB이름.firebaseio.com"),
-        FB_ACCOUNT_KEY("firebase_path_serviceAccountKey", "serviceAccountKey.json 파일 경로"),
-
-        GET_ALL_POSTS_ON_BOOT("get_all_posts_on_boot",
-                "on으로 설정할경우 서버 시작시 홈페이지의 모든 게시물을 조회하고 가져옵니다. (최초실행용)"),
-        SPRING_SERVER_PORT("spring_server_port", 9533),
-        SPRING_AJP_PORT("tomcat_apj_port", 8009);
-
-        public String key;
-        public Object defaultValue;
-
-        ConfigOption(String key, Object defaultValue){
-            this.key = key;
-            this.defaultValue = defaultValue;
-        }
-
-        @Override
-        public String toString() {
-            return key;
-        }
-    }
 }

@@ -11,9 +11,13 @@ import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactor
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.io.File;
 
 @Configuration
-public class ContainerConfig {
+public class ContainerConfig implements WebMvcConfigurer {
     @Value("${ajp.port}")
     int ajpPort;
 
@@ -31,5 +35,12 @@ public class ContainerConfig {
         ajpConnector.setAllowTrace(false);
         ajpConnector.setScheme("https");
         return ajpConnector;
+    }
+
+    @Override
+    public void addResourceHandlers(final ResourceHandlerRegistry registry) {
+        registry
+                .addResourceHandler("/resource/**")
+                .addResourceLocations("file:" + KishServer.RESOURCE_PATH.getAbsolutePath() + File.separator);
     }
 }

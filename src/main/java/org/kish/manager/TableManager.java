@@ -1,7 +1,8 @@
-package org.kish.database.table;
+package org.kish.manager;
 
 import org.kish.KishServer;
 import org.kish.MainLogger;
+import org.kish.database.table.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 

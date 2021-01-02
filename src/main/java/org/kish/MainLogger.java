@@ -23,6 +23,10 @@ public class MainLogger {
         LOGGER.error(content);
     }
 
+    public static void error(Throwable t){
+        LOGGER.error(t);
+    }
+
     public static void error(Object content, Throwable t){
         LOGGER.error(content, t);
     }
