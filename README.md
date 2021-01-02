@@ -3,7 +3,7 @@
 
 
 # KISH server
-이 리포지토리는 **KISH 어플**의 서버 처리를 담당하는 프로그램이며,  
+Kish server는 **KISH 어플**의 서버 처리를 담당하는 프로그램이며 Spring boot 프레임워크를 기반으로 하며,  
 KISH 학생이라면 누구나 자유롭게 기여할 수 있습니다.  
 자세한 내용은 [여기](https://github.com/KISH-students/I-WANNA-JOIN) 를 참고해주세요.
 
@@ -34,13 +34,14 @@ API | 요청 방식 | 설명
 /api/post/getPostsFromMenu | GET | 특정 메뉴의 글들을 불러옵니다.
 /api/post/getPost | GET | 게시물을 불러옵니다.
 /api/post/searchPost | GET | 게시물을 검색합니다.
+/api/kish-magazine/getArticleList | GET | kish magazine 기사 목록을 가져옵니다.
 
 # 사용하기
 KISH server 테스트를 위해 구동하거나 본인만의 학교 어플을 만드는 등의 자유로운 용도를 위해 사용할 수 있습니다.
 
-기본 포트 : 40917
-
-톰캣 연동을 위한 ajp 포트 : 8009
+기본 포트 : 9533  
+톰캣 연동을 위한 ajp 포트 : 8009  
+위 설정은 최초 구동시 생성되는 kish_config.json 파일에서 변경할 수 있습니다.
 
 ## 사용하기 - 단순 테스트용도
 프로젝트 세팅 후, 아래 명령어로 프로젝트를 jar로 패키징 합니다.
@@ -52,27 +53,21 @@ mvn clean package
 ```
 java -jar kishserver.jar
 ```
-이제 http://localhost:40917 으로 접속할 수 있습니다.
 
+kish_config.json을 수정해서 mysql 정보를 입력해주세요.
+
+이제 http://localhost:9533 으로 접속할 수 있습니다.
+
+#### TIP
 **https 접속이 필요한 경우 springBoot, 톰캣8, 아파치2를 연동하는 방법을 찾아보세요 (KISH2020Server의 ajp포트는 8009입니다)**
-
-# 사용된 라이브러리
-- Spring Boot
-- json-simple
-- Gson
-- commons-io
-- jsoup 
-- firebase-admin
-- auto-value
-- commons-lang3
-- mysql-connector-java
-- [KoreanTextMatcher](https://github.com/bangjunyoung/KoreanTextMatcher)
+- get_all_posts_on_boot 옵션의 값을 on으로 설정하여 KISH 홈페이지의 모든 게시물들을 불러올 수 있습니다.
+- KISH magazine의 기사는 kish magazine 폴더에 저장하면 자동으로 pdf파일로 변환됩니다.
 
 # Java-doc
 [java doc](https://ccc1.kro.kr/java-docs/kishServer/)
 
 # License
-KISH server는 Apache-2.0 License를 따릅니다.
+KISH server는 GPL-3.0 License를 따릅니다.
 
 
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FKISH-students%2FKISH_server.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FKISH-students%2FKISH_server?ref=badge_large)
