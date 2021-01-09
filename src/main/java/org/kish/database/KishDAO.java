@@ -1,8 +1,9 @@
 package org.kish.database;
 
 import org.kish.KishServer;
+import org.kish.database.mapper.ExamMapper;
+import org.kish.entity.Exam;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
@@ -122,5 +123,10 @@ public class KishDAO {
                 "BETWEEN '" + startDate + "' " +
                 "AND '" + endDate + "'";
         return jdbcTemplate.queryForList(query);
+    }
+
+    public List<Exam> getExamDates(){
+        String query = "SELECT * FROM `kish_exam`";
+        return jdbcTemplate.query(query, new ExamMapper());
     }
 }

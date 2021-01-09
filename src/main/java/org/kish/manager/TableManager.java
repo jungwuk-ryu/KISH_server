@@ -22,6 +22,7 @@ public class TableManager{
         this.addTable(new AdminTable());
         this.addTable(new NotificationTable());
         this.addTable(new CalendarTable());
+        this.addTable(new ExamTable());
     }
 
     public void checkAllTable(){

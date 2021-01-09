@@ -18,16 +18,16 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static org.kish.KishServer.GSON;
+
 @SuppressWarnings("unchecked")
 @Controller
 @RequestMapping("/api")
 public class MainApiController {
-    public String testDatesJson;
     public SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
     private final KishServer main;
-    @Autowired
-    private KishDAO kishDao;
+    private @Autowired KishDAO kishDao;
 
     public MainApiController(KishServer kishServer){
         MainLogger.info("Api Server Controller 초기화중");
@@ -133,8 +133,7 @@ public class MainApiController {
 
     @RequestMapping("/getExamDates")
     public @ResponseBody String getExamDates(){
-        MainLogger.info("getExamDates 호출");
-        return this.testDatesJson;
+        return GSON.toJson(kishDao.getExamDates());
     }
 
     /**

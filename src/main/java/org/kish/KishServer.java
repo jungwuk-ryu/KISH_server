@@ -1,5 +1,7 @@
 package org.kish;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.jodconverter.core.office.OfficeException;
 import org.kish.config.Config;
 import org.kish.config.ConfigOption;
@@ -8,7 +10,6 @@ import org.kish.manager.TableManager;
 import org.kish.manager.FirebaseManager;
 import org.kish.web.KishMagazineApiController;
 import org.kish.web.PostApiController;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -22,6 +23,9 @@ import java.util.Properties;
 
 @SpringBootApplication(scanBasePackages = {"org.kish", "org.kish.web", "org.kish.database"})
 public class KishServer {
+    public static final Gson GSON = new Gson();
+    public static final Gson PRETTY_GSON = new GsonBuilder().setPrettyPrinting().create();
+
     public static Config CONFIG = null;
     public static ConfigurableApplicationContext CAC = null;
 
@@ -30,7 +34,6 @@ public class KishServer {
     public static JodManager jodManager = null;
 
     public static JdbcTemplate jdbcTemplate = null;
-
     public static File RESOURCE_PATH = null;
 
     public static void main(String[] args) {

@@ -14,10 +14,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
+import static org.kish.KishServer.GSON;
+import static org.kish.KishServer.PRETTY_GSON;
+
 @SuppressWarnings("unchecked")
 public class Config extends LinkedHashMap<String, Object>{
-    public static final Gson GSON = new Gson();
-    public static final Gson PRETTY_GSON = new GsonBuilder().setPrettyPrinting().create();
     public final String fileName;
 
     private final boolean isLoggingEnabled = true;
