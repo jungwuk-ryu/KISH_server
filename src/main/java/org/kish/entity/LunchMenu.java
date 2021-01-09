@@ -2,13 +2,19 @@ package org.kish.entity;
 
 import org.json.simple.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 /**
  *  급식 정보를 담고있는 클래스입니다.
  *  급식 정보는 http://www.hanoischool.net/?menu_no=47 에서 볼 수 있습니다.
  */
 @SuppressWarnings("unchecked")
 public class LunchMenu extends JSONObject {
+    private static SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd");
+
     public LunchMenu(String date, String menu, String detail, String imageUrl){
+        this.setDate(date);
         this.setMenu(menu);
         this.setDetail(detail);
         this.setImageUrl(imageUrl);
@@ -27,7 +33,13 @@ public class LunchMenu extends JSONObject {
      * @param date
      */
     public void setDate(String date){
-        this.put("date", date);
+        try {
+            date = SDF.format(SDF.parse(date));
+        } catch (ParseException ignore) {
+
+        } finally {
+            this.put("date", date);
+        }
     }
 
     /**
