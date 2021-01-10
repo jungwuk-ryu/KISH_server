@@ -42,6 +42,14 @@ public class MainApiController {
                 makeCalendar();
             }
         }, 1000 * 60, 1000 * 60 * 50);
+
+        Timer scheduler2 = new Timer();
+        scheduler2.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                updateLunchMenu();
+            }
+        }, 1000, 1000 * 60 * 10);
     }
 
     /**
@@ -80,15 +88,23 @@ public class MainApiController {
     }*/
 
     @RequestMapping("/getLunch")
-    public @ResponseBody String getLunch(@RequestParam(required = false, defaultValue = "") String date){
-        ArrayList<LunchMenu> list = KishWebParser.parseLunch(date);
-        JSONArray jsonArray = new JSONArray();
-        for(LunchMenu menu : list){
-            //HashSet<String> likes = (HashSet<String>) this.lunchLikesDB.getOrDefault(menu.getDate(), new HashSet<String>());
-            //menu.put("likes", likes.size());
-            jsonArray.add(menu);
+    public @ResponseBody String getLunch(@RequestParam(required = false, defaultValue = "0") int year,
+                                         @RequestParam(required = false, defaultValue = "0") int month){
+        if(year > Calendar.getInstance().get(Calendar.YEAR) + 2) return "[]";
+        if(year < 1) year = Calendar.getInstance().get(Calendar.YEAR);
+        if(month < 1) month = Calendar.getInstance().get(Calendar.MONTH) + 1;
+
+        String strDate = year + "-" + month + "-01";
+        Calendar lunchDate = Calendar.getInstance();
+        lunchDate.set(Calendar.YEAR, year);
+        lunchDate.set(Calendar.MONTH, month - 1);
+
+        ArrayList<LunchMenu> menus = (ArrayList<LunchMenu>) kishDao.queryLunchMenu(lunchDate);
+        if(menus.size() == 0) {
+            menus = KishWebParser.parseLunch(strDate);
+            kishDao.updateLunchMenus(true, menus);
         }
-        return jsonArray.toJSONString();
+        return GSON.toJson(menus);
     }
 
 /*    @RequestMapping(value = "/toggleLunchLikes", method = RequestMethod.POST)
@@ -158,6 +174,12 @@ public class MainApiController {
         return rsArray.toJSONString();
         //return new JSONObject(KishWebParser.getSchoolCalendar()).toJSONString();
         //return this.calendar.getJson();
+    }
+
+    private void updateLunchMenu(){
+        MainLogger.warn("급식 업데이트중 ...");
+        ArrayList<LunchMenu> menus = KishWebParser.parseLunch();
+        kishDao.updateLunchMenus(false, menus);
     }
 
     private void makeCalendar(){

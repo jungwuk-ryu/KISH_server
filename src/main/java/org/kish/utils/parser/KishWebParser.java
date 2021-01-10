@@ -36,19 +36,24 @@ public class KishWebParser {
             String yyyymm = tempArray[0].trim() + "-" + tempArray[1].split("월")[0].trim() + "-";
 
             items.forEach((element -> {
-                String date = yyyymm + (element.select(".h_view_name").text()).split("일")[0].trim();
-                Elements bodyElements = element.select(".mm_to");
-                String menu = "정보 없음";
-                String salt = "정보 없음";
-                String imageUrl = "";
-                if(bodyElements.size() > 0) {
-                    Elements info = bodyElements.select("p");
-                    Elements elementImg = bodyElements.select("img");
-                    menu = info.get(0).text();
-                    if (info.size() > 1) salt = info.get(1).text();
-                    if (elementImg.size() > 0) imageUrl = elementImg.get(0).attr("src");
+                String day = (element.select(".h_view_name").text()).split("일")[0].trim();
+
+                if(!day.isEmpty()){
+                    String date = yyyymm + day;
+
+                    Elements bodyElements = element.select(".mm_to");
+                    String menu = "정보 없음";
+                    String salt = "정보 없음";
+                    String imageUrl = "";
+                    if (bodyElements.size() > 0) {
+                        Elements info = bodyElements.select("p");
+                        Elements elementImg = bodyElements.select("img");
+                        menu = info.get(0).text();
+                        if (info.size() > 1) salt = info.get(1).text();
+                        if (elementImg.size() > 0) imageUrl = elementImg.get(0).attr("src");
+                    }
+                    list.add(new LunchMenu(date, menu, salt, imageUrl));
                 }
-                list.add(new LunchMenu(date, menu, salt, imageUrl));
             }));
         } catch (IOException e) {
             MainLogger.error(e);

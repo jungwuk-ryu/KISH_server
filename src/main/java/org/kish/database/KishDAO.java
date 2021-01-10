@@ -2,7 +2,9 @@ package org.kish.database;
 
 import org.kish.KishServer;
 import org.kish.database.mapper.ExamMapper;
+import org.kish.database.mapper.LunchMenuMapper;
 import org.kish.entity.Exam;
+import org.kish.entity.LunchMenu;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -128,5 +130,39 @@ public class KishDAO {
     public List<Exam> getExamDates(){
         String query = "SELECT * FROM `kish_exam`";
         return jdbcTemplate.query(query, new ExamMapper());
+    }
+
+    public List<LunchMenu> queryLunchMenu(Calendar date){
+        date.set(Calendar.DAY_OF_MONTH, 1);
+        String startDate = sdf.format(date.getTime());
+        date.set(Calendar.DAY_OF_MONTH, date.getActualMaximum(Calendar.DAY_OF_MONTH));
+        String endDate = sdf.format(date.getTime());
+
+        String query = "SELECT * FROM `kish_lunch` " +
+                "WHERE `lunch_date` " +
+                "BETWEEN '" + startDate + "' " +
+                "AND '" + endDate + "'";
+        return jdbcTemplate.query(query, new LunchMenuMapper());
+    }
+    
+    public void updateLunchMenus(boolean async, ArrayList<LunchMenu> list){
+        if(async) {
+            updateLunchMenus(false, list);
+            return;
+        }
+
+        String query = "INSERT INTO `kish_lunch` (lunch_date, menu, detail, image_url) " +
+                "VALUES (?, ?, ?, ?) " +
+                "ON DUPLICATE KEY UPDATE menu=?, detail=?, image_url=?; ";
+        ArrayList<Object[]> params = new ArrayList<>();
+
+        for (LunchMenu lunchMenu : list) {
+            Object[] args = new Object[]{
+                    lunchMenu.getDate(),lunchMenu.getMenu(),lunchMenu.getDetail(),lunchMenu.getImageUrl(),
+                    lunchMenu.getMenu(), lunchMenu.getDetail(), lunchMenu.getImageUrl()};
+            params.add(args);
+        }
+
+        jdbcTemplate.batchUpdate(query, params);
     }
 }

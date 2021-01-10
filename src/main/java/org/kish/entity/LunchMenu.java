@@ -4,6 +4,7 @@ import org.json.simple.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  *  급식 정보를 담고있는 클래스입니다.
@@ -34,9 +35,11 @@ public class LunchMenu extends JSONObject {
      */
     public void setDate(String date){
         try {
-            date = SDF.format(SDF.parse(date));
+            Date tmpDate = SDF.parse(date);
+            date = SDF.format(tmpDate);
+            this.put("timestamp", tmpDate.getTime() / 1000);
         } catch (ParseException ignore) {
-
+            this.put("timestamp", 0);
         } finally {
             this.put("date", date);
         }
