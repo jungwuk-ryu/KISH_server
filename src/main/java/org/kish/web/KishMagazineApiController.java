@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.*;
 
 @Controller
@@ -47,7 +45,8 @@ public class KishMagazineApiController {
             String pdfFullPath = docxFile.getAbsolutePath();
             pdfFullPath = pdfFullPath
                     .replace(originalArticlesPath.getAbsolutePath(), resourcePath.getAbsolutePath())
-                    .replace(".docx", ".pdf");
+                    .replace(".docx", ".pdf")
+                    .replace("&", ", ");
 
             File pdfPath = new File(pdfFullPath);
             if(pdfPath.exists()) continue;
@@ -70,11 +69,12 @@ public class KishMagazineApiController {
     @ResponseBody
     public String getArticleList(@RequestParam(required = false, defaultValue = "") String path){
         ArrayList<File> subfile = new ArrayList<>();
-        LinkedHashMap<String, Object> rs = new LinkedHashMap<>();
+        ArrayList<Object> rs = new ArrayList<>();
         File file = new File(resourcePath.getAbsolutePath() + File.separator +  path);
-        if(file.isFile()){
+        MainLogger.info(resourcePath.getAbsolutePath() + File.separator +  path);
+        if(!file.exists() || file.isFile()){
             MainLogger.error(path);
-            return "";
+            return "[]";
         }
 
         String[] tmp = file.list();
@@ -84,8 +84,8 @@ public class KishMagazineApiController {
         }
 
         for (File subFile : file.listFiles()) {
-            if(subFile.isDirectory()) rs.put(subFile.getName(), new Category(subFile));
-            else rs.put(subFile.getName(), new Article(subFile));
+            if(subFile.isDirectory()) rs.add( new Category(subFile));
+            else rs.add(new Article(subFile));
         }
 
         return gson.toJson(rs);
@@ -95,17 +95,16 @@ public class KishMagazineApiController {
     @Getter
     @Setter
     class Category {
-        private final String type = "DIR";
-        private String url;
+        private final String type = "dir";
+        private String name;
+        private String path;
         private ArrayList<String> subfileName = new ArrayList<>();
 
         public Category(File file){
-            try {
-                this.url = file.getAbsolutePath().substring(resourcePath.getAbsolutePath().length());
-                this.url = URLEncoder.encode(this.url,"UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                MainLogger.error(e);
-            }
+            this.name = file.getName();
+            this.path = file.getAbsolutePath().substring(resourcePath.getAbsolutePath().length());
+            //this.url = URLEncoder.encode(this.url,"UTF-8");
+            //this.url =  file.getAbsolutePath().substring(resourcePath.getAbsolutePath().length());
 
             for (File subfile : file.listFiles()) {
                 if(subfile.isFile()){
@@ -120,20 +119,17 @@ public class KishMagazineApiController {
     @Getter
     class Article{
         private final String type = "file";
+        private String name;
         private String url;
 
         public Article(File file){
-            try {
-                this.url = file.getAbsolutePath().substring(resourcePath.getAbsolutePath().length());
-                this.url = URLEncoder
+            this.name = FilenameUtils.getBaseName(file.getName());
+            this.url = "/resource/" + DIR_NAME + file.getAbsolutePath().substring(resourcePath.getAbsolutePath().length());
+                /*this.url = URLEncoder
                         .encode(this.url,"UTF-8")
                         .replace("+", "%20")
                         .replace("%2F", "/");
-                this.url = "/resource/" + DIR_NAME + this.url;
-            } catch (UnsupportedEncodingException e) {
-                MainLogger.error(e);
-            }
-            MainLogger.warn(url);
+                this.url = "/resource/" + DIR_NAME + this.url;*/
         }
     }
 }
