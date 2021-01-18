@@ -1,6 +1,8 @@
 package org.kish.manager;
 
+import org.apache.commons.io.FilenameUtils;
 import org.jodconverter.core.document.DefaultDocumentFormatRegistry;
+import org.jodconverter.core.document.DocumentFormat;
 import org.jodconverter.core.office.OfficeException;
 import org.jodconverter.local.JodConverter;
 import org.jodconverter.local.office.LocalOfficeManager;
@@ -16,11 +18,18 @@ public class JodManager {
         officeManager.start();
     }
 
-    public void docxToPDF(File docxFile, File output){
+    public void fileToPDF(File srcFile, File output){
+        String srcName = srcFile.getName();
+        DocumentFormat type = DefaultDocumentFormatRegistry.getFormatByExtension(FilenameUtils.getExtension(srcName));
+
+        if(type == null){
+            MainLogger.error(srcFile.getAbsolutePath() + "는 지원하지 않는 파일입니다.");
+            return;
+        }
+
         try {
             JodConverter
-                    .convert(docxFile)
-                    .as(DefaultDocumentFormatRegistry.DOCX)
+                    .convert(srcFile)
                     .to(output)
                     .as(DefaultDocumentFormatRegistry.PDF)
                     .execute();

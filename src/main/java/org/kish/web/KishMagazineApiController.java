@@ -3,15 +3,18 @@ package org.kish.web;
 import com.google.gson.Gson;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.kish.KishServer;
 import org.kish.MainLogger;
+import org.kish.utils.Utils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 @Controller
@@ -40,29 +43,38 @@ public class KishMagazineApiController {
         File originalArticlesPath = new File("kish magazine");
         if(!originalArticlesPath.exists()) originalArticlesPath.mkdirs();
 
-        ArrayList<File> docs = getAllDocs(originalArticlesPath, new ArrayList<>());
-        for (File docxFile : docs) {
-            String pdfFullPath = docxFile.getAbsolutePath();
+        ArrayList<File> docs = Utils.getAllFiles(originalArticlesPath, new ArrayList<>());
+        for (File article : docs) {
+            String pdfFullPath = article.getAbsolutePath();
+            String articleExtension = FilenameUtils.getExtension(article.getName());
+
             pdfFullPath = pdfFullPath
                     .replace(originalArticlesPath.getAbsolutePath(), resourcePath.getAbsolutePath())
-                    .replace(".docx", ".pdf")
+                    .replace("." + articleExtension, ".pdf")
                     .replace("&", ", ");
 
-            File pdfPath = new File(pdfFullPath);
-            if(pdfPath.exists()) continue;
+            File pdfFile = new File(pdfFullPath);
+            if(pdfFile.exists()) continue;
 
-            MainLogger.info("매거진 기사 업데이트 중 : " + docxFile.getName());
-            KishServer.jodManager.docxToPDF(docxFile, pdfPath);
+            switch (articleExtension) {
+                case "docx":
+                case "png":
+                case "jpg":
+                    MainLogger.info("매거진 기사 추가 중 : " + article.getName());
+                    KishServer.jodManager.fileToPDF(article, pdfFile);
+                    break;
+
+                case "pdf":
+                    try {
+                        MainLogger.info("매거진 기사 추가 중 : " + article.getName());
+                        FileUtils.copyFile(article, pdfFile);
+                    } catch (IOException e) {
+                        MainLogger.error(e);
+                    }
+                    break;
+
+            }
         }
-    }
-
-    public ArrayList<File> getAllDocs(File path, ArrayList<File> list){
-        for (File subfile : path.listFiles()) {
-            if(subfile.isDirectory()) getAllDocs(subfile, list);
-            else if(FilenameUtils.getExtension(subfile.getName()).equals("docx")) list.add(subfile);
-        }
-
-        return list;
     }
 
     @RequestMapping(value = "getArticleList")

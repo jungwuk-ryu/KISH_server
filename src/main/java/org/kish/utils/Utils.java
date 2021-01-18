@@ -1,12 +1,14 @@
 package org.kish.utils;
 
 import io.github.bangjunyoung.KoreanChar;
+import org.apache.commons.io.FilenameUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.kish.MainLogger;
 import org.kish.MenuID;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
@@ -94,5 +96,17 @@ public class Utils {
             MainLogger.error("generateUrl에서 발생한 오류", e);
         }
         return doc;
+    }
+
+    public static ArrayList<File> getAllFiles(File path, ArrayList<File> list){
+        File[] files = path.listFiles();
+        if(files == null) return list;
+
+        for (File subfile : files) {
+            if(subfile.isDirectory()) getAllFiles(subfile, list);
+            else list.add(subfile);
+        }
+
+        return list;
     }
 }
