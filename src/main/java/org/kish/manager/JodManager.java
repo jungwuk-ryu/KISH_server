@@ -6,7 +6,9 @@ import org.jodconverter.core.document.DocumentFormat;
 import org.jodconverter.core.office.OfficeException;
 import org.jodconverter.local.JodConverter;
 import org.jodconverter.local.office.LocalOfficeManager;
+import org.kish.KishServer;
 import org.kish.MainLogger;
+import org.kish.config.ConfigOption;
 
 import java.io.File;
 
@@ -14,7 +16,9 @@ public class JodManager {
     private LocalOfficeManager officeManager;
 
     public JodManager() throws OfficeException {
-        this.officeManager = LocalOfficeManager.install();
+        int port = ((Long) KishServer.CONFIG.get(ConfigOption.JOD_PORT)).intValue();
+        this.officeManager = LocalOfficeManager.builder()
+                .portNumbers(port).build();
         officeManager.start();
     }
 
