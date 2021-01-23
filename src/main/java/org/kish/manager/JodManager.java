@@ -18,7 +18,7 @@ public class JodManager {
     public JodManager() throws OfficeException {
         int port = ((Long) KishServer.CONFIG.get(ConfigOption.JOD_PORT)).intValue();
         this.officeManager = LocalOfficeManager.builder()
-                .portNumbers(port).build();
+                .portNumbers(port).install().build();
         officeManager.start();
     }
 
