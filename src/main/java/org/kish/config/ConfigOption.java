@@ -17,7 +17,7 @@ public enum ConfigOption {
             "on으로 설정할경우 서버 시작시 홈페이지의 모든 게시물을 조회하고 가져옵니다. (최초실행용)"),
     SPRING_SERVER_PORT("spring_server_port", 9533),
     SPRING_AJP_PORT("tomcat_apj_port", 8009),
-    JOD_PORT("jod_converter_port", 2002),
+    JOD_PORT("jod_converter_port", 2002L),
 
     RESOURCE_PATH("resource_path", "./resource/");
 
