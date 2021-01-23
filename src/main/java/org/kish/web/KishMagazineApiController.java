@@ -8,7 +8,12 @@ import org.apache.commons.io.FilenameUtils;
 import org.kish.KishServer;
 import org.kish.MainLogger;
 import org.kish.utils.Utils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -21,12 +26,14 @@ import java.util.*;
 @RequestMapping("/api/kish-magazine")
 public class KishMagazineApiController {
     public static String DIR_NAME = "magazine";
-
     private static final Gson gson = new Gson();
-    private final File resourcePath;
+    private final File resourceFolder;
+    @Autowired
+    private CacheManager cacheManager;
+
 
     public KishMagazineApiController(){
-        this.resourcePath = new File(KishServer.RESOURCE_PATH.getAbsolutePath() + File.separator + DIR_NAME);
+        this.resourceFolder = new File(KishServer.RESOURCE_PATH.getAbsolutePath() + File.separator + DIR_NAME);
 
         Timer scheduler = new Timer();
         scheduler.schedule(new TimerTask() {
@@ -34,11 +41,13 @@ public class KishMagazineApiController {
             public void run() {
                 updateArticles();
             }
-        }, 1000 * 60 * 60, 1000 * 60 * 60);     // 60분 마다 반복
+        }, 1000 * 60 * 30, 1000 * 60 * 30);     // 30분 마다 반복
     }
 
     public void updateArticles(){
-        MainLogger.warn("매거진 기사 업데이트 중");
+        Cache cache = cacheManager.getCache("articleList");
+        if(cache != null)
+            cache.clear();
 
         File originalArticlesPath = new File("kish magazine");
         if(!originalArticlesPath.exists()) originalArticlesPath.mkdirs();
@@ -49,7 +58,7 @@ public class KishMagazineApiController {
             String articleExtension = FilenameUtils.getExtension(article.getName());
 
             pdfFullPath = pdfFullPath
-                    .replace(originalArticlesPath.getAbsolutePath(), resourcePath.getAbsolutePath())
+                    .replace(originalArticlesPath.getAbsolutePath(), resourceFolder.getAbsolutePath())
                     .replace("." + articleExtension, ".pdf")
                     .replace("&", ", ");
 
@@ -77,13 +86,14 @@ public class KishMagazineApiController {
         }
     }
 
-    @RequestMapping(value = "getArticleList")
+    @Cacheable(value = "articleList", key = "#path")
+    @GetMapping(value = "getArticleList")
     @ResponseBody
     public String getArticleList(@RequestParam(required = false, defaultValue = "") String path){
         ArrayList<File> subfile = new ArrayList<>();
         ArrayList<Object> rs = new ArrayList<>();
-        File file = new File(resourcePath.getAbsolutePath() + File.separator +  path);
-        MainLogger.info(resourcePath.getAbsolutePath() + File.separator +  path);
+        File file = new File(resourceFolder.getAbsolutePath() + File.separator +  path);
+        MainLogger.info(resourceFolder.getAbsolutePath() + File.separator +  path);
         if(!file.exists() || file.isFile()){
             MainLogger.error(path);
             return "[]";
@@ -92,7 +102,7 @@ public class KishMagazineApiController {
         String[] tmp = file.list();
         Arrays.sort(tmp);
         for (String subfileName : tmp) {
-            subfile.add(new File(resourcePath.getAbsolutePath() + File.separator + subfileName));
+            subfile.add(new File(resourceFolder.getAbsolutePath() + File.separator + subfileName));
         }
 
         for (File subFile : file.listFiles()) {
@@ -114,7 +124,7 @@ public class KishMagazineApiController {
 
         public Category(File file){
             this.name = file.getName();
-            this.path = file.getAbsolutePath().substring(resourcePath.getAbsolutePath().length());
+            this.path = file.getAbsolutePath().substring(resourceFolder.getAbsolutePath().length());
             //this.url = URLEncoder.encode(this.url,"UTF-8");
             //this.url =  file.getAbsolutePath().substring(resourcePath.getAbsolutePath().length());
 
@@ -136,7 +146,7 @@ public class KishMagazineApiController {
 
         public Article(File file){
             this.name = FilenameUtils.getBaseName(file.getName());
-            this.url = "/resource/" + DIR_NAME + file.getAbsolutePath().substring(resourcePath.getAbsolutePath().length());
+            this.url = "/resource/" + DIR_NAME + file.getAbsolutePath().substring(resourceFolder.getAbsolutePath().length());
                 /*this.url = URLEncoder
                         .encode(this.url,"UTF-8")
                         .replace("+", "%20")

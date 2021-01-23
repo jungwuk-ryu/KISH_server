@@ -12,6 +12,7 @@ import org.kish.web.KishMagazineApiController;
 import org.kish.web.PostApiController;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.EventListener;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -20,7 +21,7 @@ import org.springframework.web.context.support.RequestHandledEvent;
 import java.io.File;
 import java.util.Properties;
 
-
+@EnableCaching
 @SpringBootApplication(scanBasePackages = {"org.kish", "org.kish.web", "org.kish.database"})
 public class KishServer {
     public static final Gson GSON = new Gson();
