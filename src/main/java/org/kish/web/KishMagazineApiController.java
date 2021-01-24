@@ -123,7 +123,7 @@ public class KishMagazineApiController {
         private ArrayList<String> subfileName = new ArrayList<>();
 
         public Category(File file){
-            this.name = file.getName();
+            this.name = file.getName().replace("^", "\n");
             this.path = file.getAbsolutePath().substring(resourceFolder.getAbsolutePath().length());
             //this.url = URLEncoder.encode(this.url,"UTF-8");
             //this.url =  file.getAbsolutePath().substring(resourcePath.getAbsolutePath().length());
@@ -145,7 +145,7 @@ public class KishMagazineApiController {
         private String url;
 
         public Article(File file){
-            this.name = FilenameUtils.getBaseName(file.getName());
+            this.name = FilenameUtils.getBaseName(file.getName()).replace("^", "\n");
             this.url = "/resource/" + DIR_NAME + file.getAbsolutePath().substring(resourceFolder.getAbsolutePath().length());
                 /*this.url = URLEncoder
                         .encode(this.url,"UTF-8")
