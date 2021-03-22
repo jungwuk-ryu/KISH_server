@@ -124,6 +124,7 @@ public class KishMagazineApiController {
 
         public Category(File file){
             this.name = file.getName().replace("^", "\n");
+
             this.path = file.getAbsolutePath().substring(resourceFolder.getAbsolutePath().length());
             //this.url = URLEncoder.encode(this.url,"UTF-8");
             //this.url =  file.getAbsolutePath().substring(resourcePath.getAbsolutePath().length());
@@ -143,9 +144,15 @@ public class KishMagazineApiController {
         private final String type = "file";
         private String name;
         private String url;
+        private String author = " ";
 
         public Article(File file){
-            this.name = FilenameUtils.getBaseName(file.getName()).replace("^", "\n");
+            String[] tmp = FilenameUtils.getBaseName(file.getName()).replace("^", "\n").split(":");
+            this.name = tmp[0];
+            if (tmp.length > 1) {
+                this.author = tmp[1];
+            }
+
             this.url = "/resource/" + DIR_NAME + file.getAbsolutePath().substring(resourceFolder.getAbsolutePath().length());
                 /*this.url = URLEncoder
                         .encode(this.url,"UTF-8")
