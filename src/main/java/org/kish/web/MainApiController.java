@@ -80,6 +80,18 @@ public class MainApiController {
         return result.toJSONString();
     }
 
+    @RequestMapping("/getMainPage")
+    public @ResponseBody String getMainPage(){
+        Calendar calendar = Calendar.getInstance();
+
+        LinkedHashMap<String, Object> rs = new LinkedHashMap<>();
+        rs.put("lunch", getLunch(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH)));
+        rs.put("examDates", getExamDates());
+        rs.put("plan", getCalendarFromDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH)));
+
+        return GSON.toJson(rs);
+    }
+
 /*    @RequestMapping("/getCount")
     public @ResponseBody String getCount(){
         int count = this.db.increase("count", 1);

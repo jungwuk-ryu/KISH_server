@@ -126,6 +126,11 @@ public class PostApiController {
         return jsonObject.toJSONString();
     }
 
+    @RequestMapping("/getOrderedMenuIdList")
+    public @ResponseBody String getOrderedMenuIdListApi() {
+        return gson.toJson(postDao.getLastUpdatedMenu());
+    }
+
     @RequestMapping("/getPostsFromMenu")
     public @ResponseBody String getPostsFromMenuApi(@RequestParam String menu, @RequestParam(required = false, defaultValue = "1") String page){
         MainLogger.info("메뉴 게시글 불러오는 중 : " + menu);

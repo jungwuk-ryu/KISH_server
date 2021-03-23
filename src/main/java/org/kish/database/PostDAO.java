@@ -1,14 +1,17 @@
 package org.kish.database;
 
 import org.kish.MainLogger;
+import org.kish.database.mapper.KishOrderedMenuIdMapper;
 import org.kish.database.mapper.PostMapper;
 import org.kish.entity.Post;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 @Repository
@@ -19,6 +22,7 @@ public class PostDAO {
 
     public int insertPost(Post post){
         String query = "INSERT INTO kish_posts(menu, id, title, author, content, post_date, has_attachments) VALUES(?,?,?,?,?,?,?);";
+        updateMenuLasteupdate(post.getMenu());
         return jdbcTemplate.update(query, post.getMenu(),
                 post.getId(),
                 post.getTitle(),
@@ -26,6 +30,26 @@ public class PostDAO {
                 post.getContent(),
                 post.getPost_date(),
                 post.hasAttachments());
+    }
+
+    public void updateMenuLasteupdate(int id){
+        String sql = "INSERT INTO `kish_menu_info` (`id`, `lastupdate`) VALUES (?, ?) ON DUPLICATE KEY UPDATE id=?, lastupdate=?";
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String menuId = Integer.toString(id);
+        String lastupdate = sdf.format(System.currentTimeMillis());
+
+        jdbcTemplate.update(sql, menuId, lastupdate, menuId, lastupdate);
+    }
+
+    public List<Integer> getLastUpdatedMenu() {
+        String sql = "SELECT * FROM `kish_menu_info` ORDER BY lastupdate DESC";
+        ArrayList<Integer> idList = new ArrayList<>();
+
+        for (String id : jdbcTemplate.query(sql, new KishOrderedMenuIdMapper())) {
+            idList.add(Integer.parseInt(id));
+        }
+        return idList;
     }
 
     public Post selectPost(Post post){

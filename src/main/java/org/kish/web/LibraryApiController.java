@@ -11,10 +11,7 @@ import org.kish.MainLogger;
 import org.kish.entity.RequestResult;
 import org.kish.utils.WebUtils;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -42,8 +39,9 @@ public class LibraryApiController {
      * @param ck 재입력 비밀번호
      * */
 
-    @RequestMapping(value = "/checkID", method = RequestMethod.POST)
-    public @ResponseBody String checkID(@RequestParam String seq, @RequestParam String id, @RequestParam String pwd, @RequestParam(required = false, defaultValue = "") String ck){
+    @PostMapping(value = "/checkID")
+    public @ResponseBody String checkID(@RequestParam String seq, @RequestParam String id, @RequestParam String pwd,
+                                        @RequestParam(required = false, defaultValue = "") String ck){
         String parameters;
         /*ID_EXIST_CHECK 값이 무엇을 의미하는지는 모르겠습니다만, 회원가입 중복확인시 0을 사용합니다 --> 1도 사용되네요..?*/
         parameters = "ID_EXIST_CHECK=" + 0;
@@ -61,8 +59,10 @@ public class LibraryApiController {
     }
 
     //http://lib.hanoischool.net:81/front/member/register
-    @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public @ResponseBody String register(@RequestParam String uuid, @RequestParam String seq, @RequestParam String id, @RequestParam String pwd, @RequestParam String ck){
+    @PostMapping(value = "/register")
+    public @ResponseBody String register(@RequestParam String uuid, @RequestParam String seq,
+                                         @RequestParam String id, @RequestParam String pwd,
+                                         @RequestParam String ck){
         String parameters;
         parameters = "ID_EXIST_CHECK=" + 1;
         parameters += "&MEMBER_REG_SEQ=" + seq;
@@ -74,7 +74,7 @@ public class LibraryApiController {
         return response.toJSONString();
     }
 
-    @RequestMapping(value = "/login", method = RequestMethod.GET)
+    @PostMapping(value = "/login")
     public @ResponseBody String login(@RequestParam String uuid, @RequestParam String id, @RequestParam String pwd){
         String parameters;
         parameters = "REQ_URL=";

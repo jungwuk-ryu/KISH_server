@@ -24,6 +24,7 @@ public class TableManager{
         this.addTable(new CalendarTable());
         this.addTable(new ExamTable());
         this.addTable(new LunchTable());
+        this.addTable(new KishMenuInfoTable());
     }
 
     public void checkAllTable(){
