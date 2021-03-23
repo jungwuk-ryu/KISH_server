@@ -52,7 +52,11 @@ public class KishWebParser {
                         if (info.size() > 1) salt = info.get(1).text();
                         if (elementImg.size() > 0) imageUrl = elementImg.get(0).attr("src");
                     }
-                    list.add(new LunchMenu(date, menu, salt, imageUrl));
+                    try {
+                        list.add(new LunchMenu(date, menu, salt, imageUrl));
+                    } catch (NumberFormatException e) {
+                        MainLogger.error("메뉴 추가 중 오류 발생 : \n" + e.getMessage());
+                    }
                 }
             }));
         } catch (IOException e) {
