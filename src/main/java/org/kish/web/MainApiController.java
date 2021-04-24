@@ -81,18 +81,6 @@ public class MainApiController {
         return result.toJSONString();
     }
 
-    @RequestMapping("/getMainPage")
-    public @ResponseBody String getMainPage(){
-        Calendar calendar = Calendar.getInstance();
-
-        LinkedHashMap<String, Object> rs = new LinkedHashMap<>();
-        rs.put("lunch", getLunch(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH)));
-        rs.put("examDates", getExamDates());
-        rs.put("plan", getCalendarFromDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH)));
-
-        return GSON.toJson(rs);
-    }
-
 /*    @RequestMapping("/getCount")
     public @ResponseBody String getCount(){
         int count = this.db.increase("count", 1);
@@ -102,20 +90,43 @@ public class MainApiController {
 
     @RequestMapping("/getLunch")
     public @ResponseBody String getLunch(@RequestParam(required = false, defaultValue = "0") int year,
-                                         @RequestParam(required = false, defaultValue = "0") int month){
-        if(year > Calendar.getInstance().get(Calendar.YEAR) + 2) return "[]";
-        if(year < 1) year = Calendar.getInstance().get(Calendar.YEAR);
-        if(month < 1) month = Calendar.getInstance().get(Calendar.MONTH) + 1;
+                                         @RequestParam(required = false, defaultValue = "0") int month,
+                                         @RequestParam(required = false, defaultValue = "null") String date){
+        String strDate;
 
-        String strDate = year + "-" + month + "-01";
+        if (date.equals("null")) {
+            if (year > Calendar.getInstance().get(Calendar.YEAR) + 2) return "[]";
+            if (year < 1) year = Calendar.getInstance().get(Calendar.YEAR);
+            if (month < 1) month = Calendar.getInstance().get(Calendar.MONTH) + 1;
+        } else {
+            String[] splitDate = date.split("-");
+            if (splitDate.length != 3) {
+                MainLogger.warn("잘못된 date값을 받았습니다 : " + date);
+                return "[]";
+            }
+
+            year = Integer.parseInt(splitDate[0]);
+            month = Integer.parseInt(splitDate[1]);
+        }
+        strDate = year + "-" + month + "-01";
+
         Calendar lunchDate = Calendar.getInstance();
         lunchDate.set(Calendar.YEAR, year);
         lunchDate.set(Calendar.MONTH, month - 1);
 
         ArrayList<LunchMenu> menus = (ArrayList<LunchMenu>) kishDao.queryLunchMenu(lunchDate);
-        if(menus.size() == 0) {
+        if (menus.size() == 0) {
             menus = KishWebParser.parseLunch(strDate);
             kishDao.updateLunchMenus(true, menus);
+        }
+
+        if (!date.equals("null")) {
+            ArrayList<LunchMenu> newMenuList = new ArrayList<>();
+            for (LunchMenu menu : menus) {
+                if (menu.getDate().equals(date)) newMenuList.add(menu);
+            }
+
+            menus = newMenuList;
         }
         return GSON.toJson(menus);
     }
