@@ -5,6 +5,7 @@ import org.json.simple.JSONObject;
 import org.kish.KishServer;
 import org.kish.MainLogger;
 import org.kish.database.KishDAO;
+import org.kish.entity.Exam;
 import org.kish.entity.LunchMenu;
 import org.kish.utils.WebUtils;
 import org.kish.utils.parser.KishWebParser;
@@ -161,7 +162,34 @@ public class MainApiController {
 
     @RequestMapping("/getExamDates")
     public @ResponseBody String getExamDates(){
-        return GSON.toJson(kishDao.getExamDates());
+        Calendar calOfToday = Calendar.getInstance();
+        calOfToday.set(Calendar.HOUR_OF_DAY, 0);
+        calOfToday.set(Calendar.MINUTE, 0);
+        calOfToday.set(Calendar.SECOND, 0);
+        calOfToday.set(Calendar.MILLISECOND, 0);
+
+        int dayOfYear = calOfToday.get(Calendar.DAY_OF_YEAR);
+        long minDiff = Long.MAX_VALUE;
+        Exam resultExam = null;
+
+        for (Exam exam : kishDao.getExamDates()) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(exam.getTimestamp() * 1000);
+
+            if(cal.before(calOfToday)) continue;
+
+            long diff = Math.abs(cal.get(Calendar.DAY_OF_YEAR) - dayOfYear);
+            if (diff < minDiff) {
+                minDiff = diff;
+                resultExam = exam;
+            }
+        }
+
+        ArrayList<Exam> result = new ArrayList<>();     // Legacy support
+        if (resultExam != null) {
+            result.add(resultExam);
+        }
+        return GSON.toJson(result);
     }
 
     /**
