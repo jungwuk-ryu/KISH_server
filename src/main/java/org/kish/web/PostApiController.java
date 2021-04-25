@@ -53,8 +53,8 @@ public class PostApiController {
 
             if (list.size() < 1) break;
             for (SimplePost sp : list) {
-                if(this.postDao.isExistPost(sp.getMenuId(), sp.getPostId())) break;
-                Post post = getPostFromServer(sp.getMenuId(), sp.getPostId());
+                if(this.postDao.isExistPost(sp.getMenu(), sp.getId())) break;
+                Post post = getPostFromServer(sp.getMenu(), sp.getId());
                 HashMap<String, String> data = new HashMap<>();
 
                 data.put("type", "newPost");
@@ -191,12 +191,12 @@ public class PostApiController {
                     ArrayList<SimplePost> list = KishWebParser.parseMenu(id, Integer.toString(i));
                     if(list.size() < 1) break;
                     for (SimplePost sp : list){
-                        if(this.postDao.isExistPost(sp.getMenuId(), sp.getPostId())){
-                            MainLogger.warn(sp.getMenuId() + "," + sp.getPostId() + "가 이미 저장되어있습니다. skip...");
+                        if(this.postDao.isExistPost(sp.getMenu(), sp.getId())){
+                            MainLogger.warn(sp.getMenu() + "," + sp.getId() + "가 이미 저장되어있습니다. skip...");
                             continue;
                         }
 
-                        this.getPostFromServer(sp.getMenuId(), sp.getPostId());
+                        this.getPostFromServer(sp.getMenu(), sp.getId());
                         postCount++;
 
                         try {
