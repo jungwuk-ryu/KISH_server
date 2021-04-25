@@ -150,13 +150,18 @@ public class PostApiController {
         return gson.toJson(postDao.getLastUpdatedMenu());
     }
 
-    @RequestMapping("/getPostsFromMenu")
-    public @ResponseBody String getPostsFromMenuApi(@RequestParam String menu, @RequestParam(required = false, defaultValue = "1") String page){
-        MainLogger.info("메뉴 게시글 불러오는 중 : " + menu);
-        JSONArray jsonArray = new JSONArray();
+    @RequestMapping("/getMenuTitle")
+    public @ResponseBody String getMenuTitleApi(@RequestParam int menuId) {
+        String id = Integer.toString(menuId);
 
-        ArrayList<SimplePost> result = KishWebParser.parseMenu(menu, page);
-        jsonArray.addAll(result);
+        for (MenuID value : MenuID.values()) {
+            if (value.id.equals(id)) {
+                return value.name;
+            }
+        }
+
+        return "";
+    }
 
     @RequestMapping("/getPostsByMenu")
     public @ResponseBody String getPostsByMenuApi(@RequestParam int menu, @RequestParam(required = false, defaultValue = "1") int page){
