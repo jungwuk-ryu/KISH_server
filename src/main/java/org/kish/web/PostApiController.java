@@ -1,7 +1,6 @@
 package org.kish.web;
 
 import com.google.gson.Gson;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -9,6 +8,7 @@ import org.kish.KishServer;
 import org.kish.MainLogger;
 import org.kish.MenuID;
 import org.kish.database.PostDAO;
+import org.kish.entity.Menu;
 import org.kish.entity.Noti;
 import org.kish.entity.Post;
 import org.kish.entity.SimplePost;
@@ -127,6 +127,22 @@ public class PostApiController {
             jsonObject.put(menu.name(), menu.id);
         }
         return jsonObject.toJSONString();
+    }
+
+    @RequestMapping("/getLastUpdatedMenuList")
+    public @ResponseBody String getLastUpdatedMenuListApi() {
+        ArrayList<Menu> result = new ArrayList<>();
+        for (Integer lastUpdatedMenuId : postDao.getLastUpdatedMenu()) {
+            String id = Integer.toString(lastUpdatedMenuId);
+            for (MenuID value : MenuID.values()) {
+                if (value.id.equals(id)) {
+                    result.add(new Menu(lastUpdatedMenuId, value.name));
+                    break;
+                }
+            }
+        }
+
+        return gson.toJson(result);
     }
 
     @RequestMapping("/getOrderedMenuIdList")
