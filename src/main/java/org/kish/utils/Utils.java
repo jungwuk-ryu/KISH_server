@@ -1,13 +1,18 @@
 package org.kish.utils;
 
 import io.github.bangjunyoung.KoreanChar;
+import org.apache.commons.io.FilenameUtils;
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.kish.KishServer;
 import org.kish.MainLogger;
 import org.kish.MenuID;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
@@ -107,5 +112,31 @@ public class Utils {
         }
 
         return list;
+    }
+
+    public static void downloadImgs(Document doc) {
+        for (Element element : doc.select("img")) {
+            try {
+                File file = new java.io.File("resource/downloaded/" + element.attr("src").split(".net/")[1]);
+                if (file.exists()) continue;
+                File dir = new File(FilenameUtils.getFullPath(file.getAbsolutePath()));
+                dir.mkdirs();
+
+                Connection.Response resultImageResponse = Jsoup.connect(element.attr("src")).ignoreContentType(true).execute();
+                FileOutputStream out = new FileOutputStream(file);
+                out.write(resultImageResponse.bodyAsBytes());
+                out.close();
+
+                MainLogger.warn("파일 다운로드 중 : " + file.getPath());
+            } catch (Exception e) {
+                MainLogger.warn(e);
+            }
+        }
+    }
+
+    public static void replaceImgPaths(Document doc, String replacement) {
+        for (Element element : doc.select("img")) {
+            element.attr("src", element.attr("src").replace(KishServer.KISH_WEB_ROOT + "/", replacement));
+        }
     }
 }

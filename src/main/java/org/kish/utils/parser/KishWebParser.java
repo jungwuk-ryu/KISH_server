@@ -4,7 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 import org.kish.MainLogger;
 import org.kish.entity.LunchMenu;
@@ -126,8 +125,8 @@ public class KishWebParser {
     public static String generatePostToNormal(Document doc){
         doc = doc.clone();
         Utils.generateUrl(doc);
-        Elements rs = doc.select("#bbs_view_contents");
-        for (Element element : rs.select("p, span")) {
+        Elements content = doc.select("#bbs_view_contents");
+        for (Element element : content.select("p, span")) {
             String style = element.attr("style");
             if (style != null) {
                 StringBuilder sb = new StringBuilder();
@@ -139,7 +138,9 @@ public class KishWebParser {
                 element.attr("style", sb.toString());
             }
         }
-        return rs.html();
+        Elements result = doc.select(".align_center");
+        result.addAll(content);
+        return result.html();
     }
 
     public static Post parsePost(int menu, int postID){

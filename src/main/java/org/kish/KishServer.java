@@ -24,6 +24,7 @@ import java.util.Properties;
 @EnableCaching
 @SpringBootApplication(scanBasePackages = {"org.kish", "org.kish.web", "org.kish.database"})
 public class KishServer {
+    public static final String KISH_WEB_ROOT = "http://hanoischool.net";
     public static final Gson GSON = new Gson();
     public static final Gson PRETTY_GSON = new GsonBuilder().setPrettyPrinting().create();
 

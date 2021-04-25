@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.kish.KishServer;
 import org.kish.MainLogger;
 import org.kish.MenuID;
@@ -147,12 +148,17 @@ public class PostApiController {
     @RequestMapping("/getPostContentHtml")
     public @ResponseBody String getPostContentHtmlApi(@RequestParam int menu, @RequestParam int id) {
         try {
+            String contentHtml = KishWebParser.generatePostToNormal(Jsoup.connect("http://hanoischool.net/default.asp?board_mode=view&menu_no=" + menu + "&bno=" + id).get());
+            Document doc = Jsoup.parse(contentHtml);
+            Utils.downloadImgs(doc);
+            Utils.replaceImgPaths(doc, "../../../resource/downloaded/");
+            contentHtml = doc.html();
+
             return "<head>" +
                     "<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\">" +
                     "<link href=\"https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap\" rel=\"stylesheet\">" +
                     "<style> body { font-family: 'Nanum Gothic', sans-serif;} </style>" +
-                    "</head><body>" +
-                    KishWebParser.generatePostToNormal(Jsoup.connect("http://hanoischool.net/default.asp?board_mode=view&menu_no=101&bno=6&issearch=&keyword=&keyfield=&page=1").get()) + "</body>";
+                    "</head><body>" + contentHtml + "</body>";
         } catch (IOException e) {
             MainLogger.error(e);
             return "죄송합니다. 서버 처리 중 오류가 발생하였습니다.";
