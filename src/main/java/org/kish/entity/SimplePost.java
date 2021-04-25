@@ -20,6 +20,10 @@ public class SimplePost extends JSONObject {
         this.setAttachmentIconUrl(attachmentIconUrl);
     }
 
+    public SimplePost(Post post) {
+        this(post.getUrl(), post.getMenu(), post.getId(), post.getTitle(), post.getAuthor(), post.getPost_date(), "");
+    }
+
     public int getPostId() {
         return (int) this.get("postId");
     }

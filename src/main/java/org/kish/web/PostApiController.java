@@ -152,8 +152,14 @@ public class PostApiController {
             result.add(postInfo);
         });
         return gson.toJson(result);*/
-        List<Post> rs = this.postDao.searchPost(keyword, index);
-        return gson.toJson(rs);
+        List<Post> foundPosts = this.postDao.searchPost(keyword, index);
+        ArrayList<SimplePost> searchResult = new ArrayList<>();
+
+        for (Post post : foundPosts) {
+            SimplePost simplePost = new SimplePost(post);
+            searchResult.add(simplePost);
+        }
+        return gson.toJson(searchResult);
     }
 
     @RequestMapping(value = "/getPost")
