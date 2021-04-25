@@ -158,7 +158,15 @@ public class PostApiController {
         ArrayList<SimplePost> result = KishWebParser.parseMenu(menu, page);
         jsonArray.addAll(result);
 
-        return jsonArray.toJSONString();
+    @RequestMapping("/getPostsByMenu")
+    public @ResponseBody String getPostsByMenuApi(@RequestParam int menu, @RequestParam(required = false, defaultValue = "1") int page){
+        ArrayList<SimplePost> result = new ArrayList<>();
+
+        for (Post post : postDao.getPostsByMenu(menu, page)) {
+            result.add(new SimplePost(post));
+        }
+
+        return gson.toJson(result);
     }
 
     @RequestMapping("/getPostContentHtml")

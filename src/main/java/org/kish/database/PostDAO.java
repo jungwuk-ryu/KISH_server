@@ -52,6 +52,11 @@ public class PostDAO {
         return idList;
     }
 
+    public List<Post> getPostsByMenu(int menu, int page) {
+        String sql = "SELECT * FROM `kish_posts` WHERE menu=? ORDER BY `post_date` DESC LIMIT ?, 10";
+        return jdbcTemplate.query(sql, new Object[]{ menu, page * 10}, new PostMapper());
+    }
+
     public Post selectPost(Post post){
         return this.selectPost(post.getMenu(), post.getId());
     }

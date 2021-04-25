@@ -22,11 +22,11 @@ public class SimplePost {
 
     public SimplePost(String postUrl, int menu, int id, String title, String author, String postDate, String attachmentIconUrl){
         this.setUrl(postUrl);
-        this.setId(id);
+        this.setMenu(menu);
         this.setTitle(title);
         this.setAuthor(author);
         this.setPostDate(postDate);
-        this.setId(menu);
+        this.setId(id);
 
         this.setAttachmentIconUrl(attachmentIconUrl);
     }
