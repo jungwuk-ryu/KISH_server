@@ -1,7 +1,6 @@
 package org.kish.utils;
 
 import io.github.bangjunyoung.KoreanChar;
-import org.apache.commons.io.FilenameUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;

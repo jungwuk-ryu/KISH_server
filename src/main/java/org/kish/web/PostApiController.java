@@ -3,6 +3,7 @@ package org.kish.web;
 import com.google.gson.Gson;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.jsoup.Jsoup;
 import org.kish.KishServer;
 import org.kish.MainLogger;
 import org.kish.MenuID;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.io.IOException;
 import java.util.*;
 
 @SuppressWarnings("unchecked")
@@ -140,6 +142,21 @@ public class PostApiController {
         jsonArray.addAll(result);
 
         return jsonArray.toJSONString();
+    }
+
+    @RequestMapping("/getPostContentHtml")
+    public @ResponseBody String getPostContentHtmlApi(@RequestParam int menu, @RequestParam int id) {
+        try {
+            return "<head>" +
+                    "<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\">" +
+                    "<link href=\"https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap\" rel=\"stylesheet\">" +
+                    "<style> body { font-family: 'Nanum Gothic', sans-serif;} </style>" +
+                    "</head><body>" +
+                    KishWebParser.generatePostToNormal(Jsoup.connect("http://hanoischool.net/default.asp?board_mode=view&menu_no=101&bno=6&issearch=&keyword=&keyfield=&page=1").get()) + "</body>";
+        } catch (IOException e) {
+            MainLogger.error(e);
+            return "죄송합니다. 서버 처리 중 오류가 발생하였습니다.";
+        }
     }
 
     @RequestMapping("/searchPost")

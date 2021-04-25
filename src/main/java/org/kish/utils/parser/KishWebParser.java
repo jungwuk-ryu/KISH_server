@@ -126,40 +126,20 @@ public class KishWebParser {
     public static String generatePostToNormal(Document doc){
         doc = doc.clone();
         Utils.generateUrl(doc);
-        Elements elements = doc.select("link");
-        for (Element element : elements) {
-            if("http://www.hanoischool.net/html/css/style.css?ver=1.0.0.0.0".equals(element.attr("href")))
-                element.remove();
+        Elements rs = doc.select("#bbs_view_contents");
+        for (Element element : rs.select("p, span")) {
+            String style = element.attr("style");
+            if (style != null) {
+                StringBuilder sb = new StringBuilder();
+                for (String s : style.split(";")) {
+                    if (!s.split(":")[0].contains("font-family")) {
+                        sb.append(s).append(";");
+                    }
+                }
+                element.attr("style", sb.toString());
+            }
         }
-        doc.head().append("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">");
-        doc.select("#nav").forEach((Node::remove));
-        doc.select("#skipnavigation").forEach(Node::remove);
-        doc.select("#header").forEach((Node::remove));
-        doc.select("#sub_visual").forEach((Node::remove));
-        doc.select("#footer").forEach(Node::remove);
-        doc.select("#sub_left").forEach(Node::remove);
-        doc.select(".h_board table").forEach(Node::remove);
-        doc.select(".h_btn_area2").forEach(Node::remove);
-        doc.select(".table_b5").forEach(Node::remove);
-        doc.select(".fr").forEach(Node::remove);
-        doc.select(".sub_title").forEach(Node::remove);
-        doc.select(".h_board").get(1).remove();
-        doc.select("caption").forEach(Node::remove);
-        Elements trElements = doc.select(".h_board").get(0).select("tr");
-        for(int i = 0; i < 4; i++) {
-            trElements.get(i).remove();
-        }
-        return doc.toString();
-            /*return "<html lang=\"ko\">\n" +
-                    "\t<head>\n" +
-                    "\n" +
-                    "\t\t<meta charset=\"euc-kr\">\n" +
-                    "\t\t<meta name=\"robots\" content=\"all\" />\n" +
-                    "\t\t<meta name=\"robots\" content=\"index, follow\" />\n" +
-                    "\t\t<meta name=\"content-language\" content=\"kr\" />\n" +
-                    "\t\t<meta name=\"build\" content=\"\" />\n" +
-                    "</head><body>" + doc.select("style") + doc.select("script") + doc.select(".h_body").get(0).html() + "</body></html>";
-*/
+        return rs.html();
     }
 
     public static Post parsePost(int menu, int postID){
