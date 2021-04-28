@@ -184,7 +184,7 @@ public class PostApiController {
     }
 
     @RequestMapping("/getPostsByMenu")
-    public @ResponseBody String getPostsByMenuApi(@RequestParam int menu, @RequestParam(required = false, defaultValue = "1") int page){
+    public @ResponseBody String getPostsByMenuApi(@RequestParam int menu, @RequestParam(required = false, defaultValue = "0") int page){
         if (menu == 11501150) return this.getLatestPostsApi(page);
         return gson.toJson(Utils.convertPostList2SimplePostList(postDao.getPostsByMenu(menu, page)));
     }
