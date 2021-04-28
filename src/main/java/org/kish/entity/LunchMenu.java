@@ -46,19 +46,35 @@ public class LunchMenu extends JSONObject {
     }
 
     /**
-     * @return 급식 메뉴
+     * @return 중식 메뉴
      */
     public String getMenu() {
         return (String) this.get("menu");
     }
 
     /**
-     *  급식 메뉴를 설정합니다.
+     *  중식 메뉴를 설정합니다.
      *
      * @param menu
      */
     public void setMenu(String menu) {
         this.put("menu", menu);
+    }
+
+    /**
+     * @return 석식 메뉴
+     */
+    public String getDinnerMenu() {
+        return (String) this.get("dinnerMenu");
+    }
+
+    /**
+     *  석식 메뉴를 설정합니다.
+     *
+     * @param dinnerMenu
+     */
+    public void setDinnerMenu(String dinnerMenu) {
+        this.put("dinnerMenu", dinnerMenu);
     }
 
     /**

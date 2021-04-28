@@ -6,6 +6,7 @@ public class LunchTable extends Table {
                 "CREATE TABLE `kish_lunch`(" +
                         "    `lunch_date` DATE NOT NULL," +
                         "    `menu` TEXT NOT NULL," +
+                        "    `dinner_menu` TEXT NOT NULL," +
                         "    `detail` VARCHAR(128) NOT NULL," +
                         "    `image_url` TEXT NOT NULL," +
                         "    PRIMARY KEY(`lunch_date`)" +

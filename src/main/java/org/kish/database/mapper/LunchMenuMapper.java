@@ -18,6 +18,7 @@ public class LunchMenuMapper implements RowMapper<LunchMenu> {
                 rs.getString("detail"),
                 rs.getString("image_url"));
 
+        menu.setDinnerMenu(rs.getString("dinner_menu"));
         return menu;
     }
 }

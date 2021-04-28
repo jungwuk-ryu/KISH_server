@@ -151,8 +151,8 @@ public class KishDAO {
             return;
         }
 
-        String query = "INSERT INTO `kish_lunch` (lunch_date, menu, detail, image_url) " +
-                "VALUES (?, ?, ?, ?) " +
+        String query = "INSERT INTO `kish_lunch` (lunch_date, menu, dinner_menu, detail, image_url) " +
+                "VALUES (?, ?, \"정보 없음\", ?, ?) " +
                 "ON DUPLICATE KEY UPDATE menu=if(CHAR_LENGTH(`menu`) < 6, ?, `menu`), detail=?, image_url=?; ";
         ArrayList<Object[]> params = new ArrayList<>();
 
