@@ -185,13 +185,13 @@ public class PostApiController {
 
     @RequestMapping("/getPostsByMenu")
     public @ResponseBody String getPostsByMenuApi(@RequestParam int menu, @RequestParam(required = false, defaultValue = "1") int page){
-        ArrayList<SimplePost> result = new ArrayList<>();
+        if (menu == 11501150) return this.getLatestPostsApi(page);
+        return gson.toJson(Utils.convertPostList2SimplePostList(postDao.getPostsByMenu(menu, page)));
+    }
 
-        for (Post post : postDao.getPostsByMenu(menu, page)) {
-            result.add(new SimplePost(post));
-        }
-
-        return gson.toJson(result);
+    @RequestMapping("/getLatestPosts")
+    public @ResponseBody String getLatestPostsApi(@RequestParam(required = false, defaultValue = "0") int page) {
+        return gson.toJson(Utils.convertPostList2SimplePostList(postDao.getLatestPosts(page)));
     }
 
     @RequestMapping("/getPostContentHtml")

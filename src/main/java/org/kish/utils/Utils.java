@@ -152,4 +152,11 @@ public class Utils {
         return "";
     }
 
+    public static List<SimplePost> convertPostList2SimplePostList(List<Post> list) {
+        ArrayList<SimplePost> result = new ArrayList<>();
+        for (Post post : list) {
+            result.add(new SimplePost(post));
+        }
+        return result;
+    }
 }
