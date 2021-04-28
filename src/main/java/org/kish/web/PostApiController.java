@@ -153,14 +153,34 @@ public class PostApiController {
     @RequestMapping("/getMenuTitle")
     public @ResponseBody String getMenuTitleApi(@RequestParam int menuId) {
         String id = Integer.toString(menuId);
+        return Utils.getMenuTitle(id);
+    }
 
-        for (MenuID value : MenuID.values()) {
-            if (value.id.equals(id)) {
-                return value.name;
+    @RequestMapping("/getPostListHomeSummary")
+    public @ResponseBody String getPostListHomeSummary() {
+        ArrayList<Object> result = new ArrayList<>();
+
+        LinkedHashMap<String, Object> latestPostListMap = new LinkedHashMap<>();
+        latestPostListMap.put("title", "최신 글");
+        latestPostListMap.put("menu", "11501150");      // 11501150은 최신 글 메뉴를 명시하는
+        latestPostListMap.put("posts", postDao.getLatestPosts(0));
+        result.add(latestPostListMap);
+
+        for (Integer lastUpdatedMenu : postDao.getLastUpdatedMenu()) {
+            LinkedHashMap<String, Object> map = new LinkedHashMap<>();
+            ArrayList<SimplePost> postList = new ArrayList<>();
+
+            for (Post post : postDao.getPostsByMenu(lastUpdatedMenu, 0)) {
+                postList.add(new SimplePost(post));
             }
+            map.put("title", Utils.getMenuTitle(lastUpdatedMenu.toString()));
+            map.put("menu", lastUpdatedMenu);
+            map.put("posts", postList);
+
+            result.add(map);
         }
 
-        return "";
+        return gson.toJson(result);
     }
 
     @RequestMapping("/getPostsByMenu")

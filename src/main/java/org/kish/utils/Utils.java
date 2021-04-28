@@ -10,6 +10,8 @@ import org.jsoup.select.Elements;
 import org.kish.KishServer;
 import org.kish.MainLogger;
 import org.kish.MenuID;
+import org.kish.entity.Post;
+import org.kish.entity.SimplePost;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -139,4 +141,15 @@ public class Utils {
             element.attr("src", element.attr("src").replace(KishServer.KISH_WEB_ROOT + "/", replacement));
         }
     }
+
+    public static String getMenuTitle(String id) {
+        for (MenuID value : MenuID.values()) {
+            if (value.id.equals(id)) {
+                return value.name;
+            }
+        }
+
+        return "";
+    }
+
 }
