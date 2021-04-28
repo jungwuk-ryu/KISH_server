@@ -163,14 +163,11 @@ public class KishWebParser {
             Utils.generateUrl(doc);
             Elements attachmentElements = titleElements.get(2).select("a");
             post.setHasAttachments(attachmentElements.size());
-            /*if(attachmentElements.size() < 1){
-                post.setHasAttachment(false);
-            }else{
-                post.setHasAttachment(true);
+            if(attachmentElements.size() > 0){
                 attachmentElements.forEach(element -> {
-                    post.addAttachmentUrl(element.text(), element.attr("href"));
+                    post.addAttachment(element.text(), element.attr("href"));
                 });
-            }*/
+            }
         } catch (IOException e) {
             MainLogger.error("postKey : " + menu + "," + postID, e);
             return null;

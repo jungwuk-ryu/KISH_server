@@ -194,6 +194,11 @@ public class PostApiController {
         }
     }
 
+    @RequestMapping("/getPostAttachments")
+    public @ResponseBody String getPostAttachments(@RequestParam int menu, @RequestParam int id) {
+        return gson.toJson(KishWebParser.parsePost(menu, id).getAttachments());
+    }
+
     @RequestMapping("/searchPost")
     public @ResponseBody String searchPostApi(@RequestParam String keyword, @RequestParam int index){
         MainLogger.info("검색요청 : " + keyword);
