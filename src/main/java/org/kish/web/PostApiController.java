@@ -201,6 +201,7 @@ public class PostApiController {
             Document doc = Jsoup.parse(contentHtml);
             Utils.downloadImgs(doc);
             Utils.replaceImgPaths(doc, "../../../resource/downloaded/");
+            Utils.enhanceImgTags(doc);
             contentHtml = doc.html();
 
             return "<head>" +

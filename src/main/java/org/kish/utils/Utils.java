@@ -136,6 +136,12 @@ public class Utils {
         }
     }
 
+    public static void enhanceImgTags(Document doc) {
+        for (Element element : doc.select("img")) {
+            element.attr("style", element.attr("style") + "max-width:100%; height:auto;");
+        }
+    }
+
     public static void replaceImgPaths(Document doc, String replacement) {
         for (Element element : doc.select("img")) {
             element.attr("src", element.attr("src").replace(KishServer.KISH_WEB_ROOT + "/", replacement));
