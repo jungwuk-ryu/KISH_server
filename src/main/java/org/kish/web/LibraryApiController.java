@@ -51,9 +51,9 @@ public class LibraryApiController {
         parameters += "&MEMBER_PWD_CK=" + ck;
 
         /*
-        * message : 결과 메세지
-        * result가 0이면 사용 가능 아이디
-        */
+         * message : 결과 메세지
+         * result가 0이면 사용 가능 아이디
+         */
         JSONObject response = WebUtils.postRequestWithJsonResult("http://lib.hanoischool.net:81/front/member/checkID", WebUtils.ContentType.FORM, parameters);
         return response.toJSONString();
     }
@@ -70,7 +70,7 @@ public class LibraryApiController {
         parameters += "&MEMBER_REG_PWD=" + pwd;
         parameters += "&MEMBER_PWD_CK=" + ck;
 
-        JSONObject response = WebUtils.postRequestWithJsonResult("http://lib.hanoischool.net:81/front/member/register", WebUtils.ContentType.FORM, parameters, this.getCookie(uuid));
+        JSONObject response = WebUtils.postRequestWithJsonResult("http://lib.hanoischool.net:81/front/member/register", WebUtils.ContentType.FORM, parameters, this.getCookie(uuid, true));
         return response.toJSONString();
     }
 
@@ -81,7 +81,7 @@ public class LibraryApiController {
         parameters += "&MEMBER_ID=" + id;
         parameters += "&MEMBER_PWD=" + pwd;
 
-        RequestResult response = WebUtils.postRequest("http://lib.hanoischool.net:81/front/login", WebUtils.ContentType.FORM, parameters, this.getCookie(uuid));
+        RequestResult response = WebUtils.postRequest("http://lib.hanoischool.net:81/front/login", WebUtils.ContentType.FORM, parameters, this.getCookie(uuid, true));
         return response.getResponse();
     }
 
@@ -90,13 +90,16 @@ public class LibraryApiController {
         JSONObject json = new JSONObject();
         if(!this.session.containsKey(uuid)){
             json.put("result", "1");
+            json.put("message", "잘못된 요청입니다.");
             return json.toJSONString();
         }
+
         String response = WebUtils.getRequest("http://lib.hanoischool.net:81/front/mypage/mypage", this.getCookie(uuid)).getResponse();
         Document doc = Jsoup.parse(response);
         Elements myPageBox = doc.select(".list-style01");
         if(myPageBox.size() < 2){
-            json.put("result", "1");
+            json.put("result", "2");
+            json.put("message", "요청이 만료되었습니다.");
             return json.toJSONString();
         }
         Elements myInfoElements = myPageBox.get(0).select("span");
@@ -249,8 +252,12 @@ public class LibraryApiController {
     }
 
     public String getCookie(String uuid){
+        return getCookie(uuid, false);
+    }
+
+    public String getCookie(String uuid, boolean force){
         String cookie;
-        if(!this.session.containsKey(uuid)) {
+        if(force || !this.session.containsKey(uuid)) {
             this.session.put(uuid, WebUtils.getNewCookie("http://lib.hanoischool.net:81/"));
         }
         cookie = this.session.get(uuid);
