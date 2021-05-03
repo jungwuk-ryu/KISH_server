@@ -82,6 +82,7 @@ public class KishServer {
         }
 
         CAC.getBean(KishMagazineApiController.class).updateArticles();
+        CAC.getBean(KishMagazineApiController.class).cacheHome(true);
 
         MainLogger.info("kish server가 준비되었음.");
     }

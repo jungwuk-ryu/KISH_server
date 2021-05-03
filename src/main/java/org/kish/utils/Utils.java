@@ -1,7 +1,14 @@
 package org.kish.utils;
 
 import io.github.bangjunyoung.KoreanChar;
+import lombok.SneakyThrows;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.pdfbox.cos.COSName;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDResources;
+import org.apache.pdfbox.pdmodel.graphics.PDXObject;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -13,6 +20,7 @@ import org.kish.MenuID;
 import org.kish.entity.Post;
 import org.kish.entity.SimplePost;
 
+import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.UnsupportedEncodingException;
@@ -104,18 +112,6 @@ public class Utils {
         return doc;
     }
 
-    public static ArrayList<File> getAllFiles(File path, ArrayList<File> list){
-        File[] files = path.listFiles();
-        if(files == null) return list;
-
-        for (File subfile : files) {
-            if(subfile.isDirectory()) getAllFiles(subfile, list);
-            else list.add(subfile);
-        }
-
-        return list;
-    }
-
     public static void downloadImgs(Document doc) {
         for (Element element : doc.select("img")) {
             try {
@@ -164,5 +160,35 @@ public class Utils {
             result.add(new SimplePost(post));
         }
         return result;
+    }
+    
+    public static List<File> getAllSubFiles(File parentDir) {
+        ArrayList<File> list = new ArrayList<>();
+
+        if(parentDir.isDirectory()) {
+            for (File file : parentDir.listFiles()) {
+                if (file.isDirectory()) list.addAll(getAllSubFiles(file));
+                else list.add(file);
+            }
+        }
+
+        return list;
+    }
+
+    @SneakyThrows
+    public static void extractFirstImgFromPdf(PDDocument document, File imgPath) {
+        int limit = 0;
+
+        for (PDPage page : document.getDocumentCatalog().getPages()) {
+            if (limit > 0) return;
+            PDResources pdResources = page.getResources();
+            for (COSName xObjectName : pdResources.getXObjectNames()) {
+                PDXObject xObject = pdResources.getXObject(xObjectName);
+                if (xObject instanceof PDImageXObject) {
+                    ImageIO.write(((PDImageXObject) xObject).getImage(), "png", imgPath);
+                    limit ++;
+                }
+            }
+        }
     }
 }
