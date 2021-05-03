@@ -1,5 +1,6 @@
 package org.kish.web;
 
+import com.google.gson.JsonObject;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.jsoup.Jsoup;
@@ -82,6 +83,9 @@ public class LibraryApiController {
         parameters += "&MEMBER_PWD=" + pwd;
 
         RequestResult response = WebUtils.postRequest("http://lib.hanoischool.net:81/front/login", WebUtils.ContentType.FORM, parameters, this.getCookie(uuid, true));
+        if (response == null) {
+            return serviceTerminated("3");
+        }
         return response.getResponse();
     }
 
@@ -95,6 +99,10 @@ public class LibraryApiController {
         }
 
         String response = WebUtils.getRequest("http://lib.hanoischool.net:81/front/mypage/mypage", this.getCookie(uuid)).getResponse();
+        if (response == null) {
+            return serviceTerminated("3");
+        }
+
         Document doc = Jsoup.parse(response);
         Elements myPageBox = doc.select(".list-style01");
         if(myPageBox.size() < 2){
@@ -124,6 +132,10 @@ public class LibraryApiController {
         }
         JSONArray jsonArray = new JSONArray();
         String response = WebUtils.getRequest("http://lib.hanoischool.net:81/front/mypage/bookLend?SC_BOOKSTATUS_CK=on&SC_BOOKSTATUS_FLAG=0", this.getCookie(uuid)).getResponse();
+        if (response == null) {
+            return serviceTerminated("3");
+        }
+
         Document doc = Jsoup.parse(response);
         Elements books = doc.select("tbody").get(1).select("tr");
         for(Element book : books){
@@ -204,6 +216,9 @@ public class LibraryApiController {
         String parameters = "USER_PW="+ pwd + "&USER_PW2=" + ck;
         // 아래 결과는 무조건 result값이 0임...
         String result = WebUtils.postRequest("http://lib.hanoischool.net:81/front/member/updatePwd", WebUtils.ContentType.FORM, parameters, this.getCookie(uuid)).getResponse();
+        if (result == null) {
+            return serviceTerminated("3");
+        }
         return "{\"message\":\"성공적으로 비밀번호가 변경되었습니다.\",\"result\":0}";
     }
 
@@ -217,7 +232,7 @@ public class LibraryApiController {
                             "&SC_KEYWORD_FIRST=" + keyword + "&SC_KEY_SECOND=ALL&SC_KEYWORD_SECOND=").get();
         } catch (IOException e) {
             MainLogger.error(e);
-            return "{\"message\":\"서버 처리 중 오류가 발생하였습니다\",\"result\":500}";
+            return serviceTerminated("3");
         }
 
         Elements books = doc.select("tbody").get(0).select("tr");
@@ -264,4 +279,13 @@ public class LibraryApiController {
         return cookie;
     }
 
+    public String serviceTerminated(String resultCode) {
+        JSONObject json = new JSONObject();
+            /*
+            도서관 홈페이지는 때때로 오프라인 상태인 경우가 존재합니다.
+             */
+        json.put("result", resultCode);
+        json.put("message", "죄송합니다! \n지금은 도서관 운영시간이 아닙니다.\n나중에 다시 시도해주세요.");
+        return json.toJSONString();
+    }
 }
