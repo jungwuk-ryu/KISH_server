@@ -64,7 +64,6 @@ public class KishMagazineApiController {
         clearCache("articleList");
         clearCache("library_parent_list");
         clearCache("library_category_dir");
-        this.cachedHome.clear();
 
         File originalArticlesPath = new File("kish magazine");
         if(!originalArticlesPath.exists()) originalArticlesPath.mkdirs();
@@ -112,6 +111,7 @@ public class KishMagazineApiController {
         }
 
         if (isChanged) {
+            this.cachedHome.clear();
             cacheHome(true);
         }
     }
