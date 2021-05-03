@@ -145,6 +145,7 @@ public class KishMagazineApiController {
                 }
             }
 
+            Collections.shuffle(result);
             return gson.toJson(result);
         }
 
