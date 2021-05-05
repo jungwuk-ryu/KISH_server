@@ -325,7 +325,7 @@ public class KishMagazineApiController {
             super(file);
             summary = content;
             summary = summary.trim().replace("\n\n", "").replace("   ", "");
-            summary = summary.substring(0, 150) + " ...";
+            summary = summary.substring(0, 350) + " ...";
             this.setSummary(summary);
         }
     }
@@ -342,7 +342,7 @@ public class KishMagazineApiController {
 
             summary = content;
             summary = summary.trim().replace("\n\n", "").replace("   ", "");
-            summary = summary.substring(0, 70) + " ...";
+            summary = summary.substring(0, 200) + " ...";
             this.setSummary(summary);
 
             String path = file.getAbsolutePath().substring(libraryResourceDir.getAbsolutePath().length());
