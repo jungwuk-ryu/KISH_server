@@ -123,13 +123,13 @@ public class KishMagazineApiController {
             return;
         }
 
-        MainLogger.warn("도서관 home 캐싱 작업 시작 ...");
+        MainLogger.warn("KISH MAGAZINE home 캐싱 작업 시작 ...");
         for (Object parent : gson.fromJson(getParentListApi(), ArrayList.class)) {
             for (Object category : gson.fromJson(getCategoryListApi((String) parent), ArrayList.class)) {
                 homeApi((String) parent, (String) category);
             }
         }
-        MainLogger.warn("도서관 home 캐싱 완료.");
+        MainLogger.warn("KISH MAGAZINE home 캐싱 완료.");
     }
 
     @GetMapping(value = "home")
