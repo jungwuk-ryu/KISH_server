@@ -109,9 +109,4 @@ public class KishServer {
     public FirebaseManager getFirebaseManager(){
         return firebaseManager;
     }
-
-    @EventListener
-    public void requestEventListener(RequestHandledEvent e){
-        MainLogger.info(e.getShortDescription() + "(" + e.getProcessingTimeMillis() + "ms)");
-    }
 }
