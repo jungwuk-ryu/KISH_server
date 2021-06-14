@@ -36,14 +36,6 @@ public class PostApiController {
 
     public PostApiController(KishServer main){
         this.main = main;
-
-        Timer scheduler = new Timer();
-        scheduler.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                checkNewPost();
-            }
-        }, 1000 * 60 * 5, 1000 * 60 * 30);     // 30분 마다 반복
     }
 
     public void checkNewPost(){

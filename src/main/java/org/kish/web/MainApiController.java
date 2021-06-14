@@ -33,24 +33,6 @@ public class MainApiController {
     public MainApiController(KishServer kishServer){
         MainLogger.info("Api Server Controller 초기화중");
         this.main = kishServer;
-
-        MainLogger.info("학사일정 준비중");
-        //this.makeCalendar();
-        Timer scheduler = new Timer();
-        scheduler.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                makeCalendar();
-            }
-        }, 1000 * 60, 1000 * 60 * 50);
-
-        Timer scheduler2 = new Timer();
-        scheduler2.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                updateLunchMenu();
-            }
-        }, 1000, 1000 * 60 * 10);
     }
 
     /**
@@ -227,13 +209,13 @@ public class MainApiController {
         //return this.calendar.getJson();
     }
 
-    private void updateLunchMenu(){
+    public void updateLunchMenu(){
         MainLogger.warn("급식 업데이트중 ...");
         ArrayList<LunchMenu> menus = KishWebParser.parseLunch();
         kishDao.updateLunchMenus(false, menus);
     }
 
-    private void makeCalendar(){
+    public void makeCalendar(){
         int added = 0;
         int removed = 0;
         Calendar date = Calendar.getInstance();

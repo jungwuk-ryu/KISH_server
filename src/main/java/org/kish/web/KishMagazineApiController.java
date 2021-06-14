@@ -38,14 +38,6 @@ public class KishMagazineApiController {
 
     public KishMagazineApiController(){
         this.libraryResourceDir = new File(KishServer.RESOURCE_PATH.getAbsolutePath() + File.separator + DIR_NAME);
-
-        Timer scheduler = new Timer();
-        scheduler.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                updateArticles();
-            }
-        }, 1000 * 60 * 30, 1000 * 60 * 30);     // 30분 마다 반복
     }
 
     public boolean clearCache(String name) {

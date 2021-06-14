@@ -16,12 +16,14 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.EventListener;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.context.support.RequestHandledEvent;
 
 import java.io.File;
 import java.util.Properties;
 
 @EnableCaching
+@EnableScheduling
 @SpringBootApplication(scanBasePackages = {"org.kish", "org.kish.web", "org.kish.database"})
 public class KishServer {
     public static final String KISH_WEB_ROOT = "http://hanoischool.net";
