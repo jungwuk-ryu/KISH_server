@@ -1,6 +1,5 @@
 package org.kish.utils;
 
-import io.github.bangjunyoung.KoreanChar;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.pdfbox.cos.COSName;
@@ -29,15 +28,6 @@ import java.util.*;
 
 @SuppressWarnings("unchecked")
 public class Utils {
-    public static String makeChoseongSentence(String sentence){
-        StringBuilder choseongSb = new StringBuilder();
-        for(char c : sentence.toCharArray()){
-            if(KoreanChar.isSyllable(c)) c = KoreanChar.getCompatChoseong(c);
-            choseongSb.append(c);
-        }
-        return choseongSb.toString();
-    }
-
     @Deprecated
     public static ArrayList<String> getContentTokens(String postContent){
         if(postContent == null || postContent.isEmpty()) return null;
