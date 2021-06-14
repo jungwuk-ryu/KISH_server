@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+
 @Component
 public class Scheduler {
     @Autowired
@@ -15,6 +17,8 @@ public class Scheduler {
     public PostApiController postApiController;
     @Autowired
     public KishMagazineApiController kishMagazineApiController;
+    @Autowired
+    public Interceptor interceptor;
 
     @Scheduled(fixedDelay = 1000 * 60 * 10, initialDelay = 1000 * 60)
     public void updateLunchMenu() {
@@ -34,5 +38,29 @@ public class Scheduler {
     @Scheduled(fixedDelay = 1000 * 60 * 30, initialDelay = 1000 * 60 * 30)
     public void updateKishMagazine() {
         kishMagazineApiController.updateArticles();
+    }
+
+    @Scheduled(fixedDelay = 1000 * 60 * 10)
+    public void SessionMonitor() {
+        int in10min = 0;
+        int in1Hour = 0;
+
+        ArrayList<String> list = new ArrayList<>();
+        long current = System.currentTimeMillis();
+        for (String ip : interceptor.sessions.keySet()) {
+            long time = interceptor.sessions.get(ip);
+            long diff = current - time;
+
+            if (diff > 1000 * 60 * 60) {
+                list.add(ip);
+            } else {
+                if (diff <= 1000 * 60 * 10) {
+                    in10min++;
+                }
+                in1Hour++;
+            }
+        }
+
+        MainLogger.info("sessions: " + in1Hour + " (1h), " + in10min + " (10m)");
     }
 }

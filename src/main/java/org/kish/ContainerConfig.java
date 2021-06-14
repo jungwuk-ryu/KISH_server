@@ -6,11 +6,13 @@
 package org.kish;
 
 import org.apache.catalina.connector.Connector;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -20,6 +22,8 @@ import java.io.File;
 public class ContainerConfig implements WebMvcConfigurer {
     @Value("${ajp.port}")
     int ajpPort;
+    @Autowired
+    public Interceptor interceptor;
 
     @Bean
     public ServletWebServerFactory servletContainer() {
@@ -42,5 +46,11 @@ public class ContainerConfig implements WebMvcConfigurer {
         registry
                 .addResourceHandler("/resource/**")
                 .addResourceLocations("file:" + KishServer.RESOURCE_PATH.getAbsolutePath() + File.separator);
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(interceptor)
+                .addPathPatterns("/**");
     }
 }
