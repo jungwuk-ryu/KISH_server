@@ -41,14 +41,14 @@ public class Scheduler {
     }
 
     @Scheduled(fixedDelay = 1000 * 60 * 10)
-    public void SessionMonitor() {
+    public void clientMonitor() {
         int in10min = 0;
         int in1Hour = 0;
 
         ArrayList<String> list = new ArrayList<>();
         long current = System.currentTimeMillis();
-        for (String ip : interceptor.sessions.keySet()) {
-            long time = interceptor.sessions.get(ip);
+        for (String ip : interceptor.clients.keySet()) {
+            long time = interceptor.clients.get(ip);
             long diff = current - time;
 
             if (diff > 1000 * 60 * 60) {
@@ -61,6 +61,6 @@ public class Scheduler {
             }
         }
 
-        MainLogger.info("sessions: " + in1Hour + " (1h), " + in10min + " (10m)");
+        MainLogger.info("Clients: " + in1Hour + " (1h), " + in10min + " (10m)");
     }
 }

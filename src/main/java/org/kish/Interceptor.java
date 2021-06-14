@@ -11,14 +11,14 @@ import java.util.concurrent.ConcurrentHashMap;
 @Log4j2
 @Component
 public class Interceptor extends HandlerInterceptorAdapter {
-    public ConcurrentHashMap<String, Long> sessions = new ConcurrentHashMap<>();
+    public ConcurrentHashMap<String, Long> clients = new ConcurrentHashMap<>();
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
         super.afterCompletion(request, response, handler, ex);
 
         long current = System.currentTimeMillis();
-        sessions.put(request.getRemoteAddr(), current);
+        clients.put(request.getRemoteAddr(), current);
 
         StringBuilder sb = new StringBuilder();
         sb.append("url=[").append(request.getRequestURI())
