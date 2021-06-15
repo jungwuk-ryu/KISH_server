@@ -72,7 +72,7 @@ public class PostApiController {
                         , "새 글이 올라왔습니다.\n메뉴 : " + menuName + "\n작성자 : " + post.getAuthor());
                 noti.setData(data);
 
-                this.main.getFirebaseManager().sendFCM(noti);
+                this.main.getFirebaseManager().sendFcmWithTopic(noti);
                 postCount++;
 
                 try {

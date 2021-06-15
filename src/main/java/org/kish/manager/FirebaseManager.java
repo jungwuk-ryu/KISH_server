@@ -68,7 +68,33 @@ public class FirebaseManager {
         this.sendFCM("admin", title, content, data);
     }*/
 
-    public void sendFCM(Noti notification) {
+    public void sendFcmWithTopic(Noti notification) {
+        if(!isReady) {
+            MainLogger.warn("Firebase is not ready.");
+            return;
+        }
+
+        FirebaseMessaging firebaseMessaging = FirebaseMessaging.getInstance();
+
+        Message message = Message.builder()
+                .setAndroidConfig(AndroidConfig.builder()
+                        .setTtl(3600 * 1000)
+                        .setPriority(notification.getPriority())
+                        .setNotification(AndroidNotification.builder()
+                                .setColor(notification.getColor())
+                                .build())
+                        .build())
+                .setNotification(
+                        new Notification(notification.getTitle()
+                                , notification.getContent()))
+                .putAllData(notification.getData())
+                .setTopic(notification.getTopic())
+                .build();
+        firebaseMessaging.sendAsync(message);
+    }
+
+    @Deprecated
+    public void sendFcm(Noti notification) {
         if(!isReady) {
             MainLogger.warn("Firebase is not ready.");
             return;
