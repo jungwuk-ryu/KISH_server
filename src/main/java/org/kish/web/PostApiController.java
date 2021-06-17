@@ -67,12 +67,12 @@ public class PostApiController {
                 }
 
                 Noti noti
-                        = new Noti("newPost"
+                        = new Noti("newKishPostNoti"
                         , post.getTitle()
                         , "새 글이 올라왔습니다.\n메뉴 : " + menuName + "\n작성자 : " + post.getAuthor());
                 noti.setData(data);
-
                 this.main.getFirebaseManager().sendFcmWithTopic(noti);
+
                 postCount++;
 
                 try {
