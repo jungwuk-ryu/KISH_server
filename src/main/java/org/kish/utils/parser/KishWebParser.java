@@ -5,7 +5,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.kish.KishServer;
 import org.kish.MainLogger;
+import org.kish.config.ConfigOption;
 import org.kish.entity.LunchMenu;
 import org.kish.entity.Post;
 import org.kish.entity.SimplePost;
@@ -165,7 +167,17 @@ public class KishWebParser {
             post.setHasAttachments(attachmentElements.size());
             if(attachmentElements.size() > 0){
                 attachmentElements.forEach(element -> {
-                    post.addAttachment(element.text(), element.attr("href"));
+                    String href = element.attr("href");
+
+                    if (KishServer.CONFIG != null) {
+                        String downloadBaseUrl = (String) KishServer.CONFIG.get(ConfigOption.DOWNLAOD_BASE_URL);
+                        if (downloadBaseUrl.charAt(downloadBaseUrl.length() - 1) != '/') {
+                            downloadBaseUrl += "/";
+                        }
+                        href = href.replace(ROOT_URL, downloadBaseUrl);
+                    }
+
+                    post.addAttachment(element.text(), href);
                 });
             }
         } catch (IOException e) {
