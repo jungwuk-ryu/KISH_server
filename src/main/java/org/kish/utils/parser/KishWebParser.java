@@ -19,7 +19,7 @@ import java.util.Calendar;
 import java.util.LinkedHashMap;
 
 public class KishWebParser {
-    public static final String BASE_URL = "http://www.hanoischool.net/";
+    public static final String BASE_URL = "http://hanoischool.net/";
 
     public static ArrayList<LunchMenu> parseLunch(){
         return parseLunch("");
