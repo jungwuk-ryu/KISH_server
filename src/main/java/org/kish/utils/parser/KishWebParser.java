@@ -5,7 +5,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.kish.KishServer;
 import org.kish.MainLogger;
+import org.kish.config.ConfigOption;
 import org.kish.entity.LunchMenu;
 import org.kish.entity.Post;
 import org.kish.entity.SimplePost;
@@ -17,7 +19,7 @@ import java.util.Calendar;
 import java.util.LinkedHashMap;
 
 public class KishWebParser {
-    public static final String ROOT_URL = "http://www.hanoischool.net/";
+    public static final String BASE_URL = "http://hanoischool.net/";
 
     public static ArrayList<LunchMenu> parseLunch(){
         return parseLunch("");
@@ -26,7 +28,7 @@ public class KishWebParser {
     public static ArrayList<LunchMenu> parseLunch(String changeDate){
         ArrayList<LunchMenu> list = new ArrayList<>();
         try {
-            Document doc = Jsoup.connect(ROOT_URL + "?menu_no=47&ChangeDate=" + changeDate).get();
+            Document doc = Jsoup.connect(BASE_URL + "?menu_no=47&ChangeDate=" + changeDate).get();
             Elements items = doc.select(".h_line_dot");
             items.addAll(doc.select(".h_line_color"));
 
@@ -85,7 +87,7 @@ public class KishWebParser {
 
     public static ArrayList<SimplePost> parseMenu(String menuId, String page){
         ArrayList<SimplePost> list = new ArrayList<>();
-        String url = ROOT_URL + "?menu_no=" + menuId + "&page=" + page;
+        String url = BASE_URL + "?menu_no=" + menuId + "&page=" + page;
         try {
             Document doc = Jsoup.connect(url).get();
             Elements items = doc.select(".h_line_dot");
@@ -111,7 +113,7 @@ public class KishWebParser {
                 String postDate = elements.get(3).text();
 
                 String attachmentIconUrl = elements.select("img").attr("src");
-                String postUrl = ROOT_URL + elements.select("a").attr("href");
+                String postUrl = BASE_URL + elements.select("a").attr("href");
 
                 list.add(
                         new SimplePost(postUrl, Integer.parseInt(menuId), Integer.parseInt(postId), title, author, postDate, attachmentIconUrl));
@@ -165,7 +167,17 @@ public class KishWebParser {
             post.setHasAttachments(attachmentElements.size());
             if(attachmentElements.size() > 0){
                 attachmentElements.forEach(element -> {
-                    post.addAttachment(element.text(), element.attr("href"));
+                    String href = element.attr("href");
+
+                    if (KishServer.CONFIG != null) {
+                        String downloadBaseUrl = (String) KishServer.CONFIG.get(ConfigOption.DOWNLAOD_BASE_URL);
+                        if (downloadBaseUrl.charAt(downloadBaseUrl.length() - 1) != '/') {
+                            downloadBaseUrl += "/";
+                        }
+                        href = href.replace(BASE_URL, downloadBaseUrl);
+                    }
+
+                    post.addAttachment(element.text(), href);
                 });
             }
         } catch (IOException e) {
