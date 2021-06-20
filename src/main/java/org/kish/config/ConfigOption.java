@@ -20,7 +20,7 @@ public enum ConfigOption {
     JOD_PORT("jod_converter_port", 2002L),
 
     RESOURCE_PATH("resource_path", "./resource/"),
-    DOWNLAOD_BASE_URL("download_base_url", "http://www.hanoischool.net/");
+    DOWNLAOD_BASE_URL("download_base_url", "http://hanoischool.net/");
 
     private final String key;
     private final Object defValue;
