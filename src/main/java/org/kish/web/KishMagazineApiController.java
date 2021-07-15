@@ -128,7 +128,9 @@ public class KishMagazineApiController {
 
     @GetMapping(value = "home")
     @ResponseBody
-    public String homeApi(@RequestParam String parent, @RequestParam String category, @RequestParam(required = false, defaultValue = "false") boolean ios) {
+    public String homeApi(@RequestParam String parent,
+                          @RequestParam String category,
+                          @RequestParam(required = false, defaultValue = "false") boolean ios) {
         if (category.equals("all")) {
             ArrayList<Object> result = new ArrayList<>();
             for (Object childCategory : gson.fromJson(getCategoryListApi(parent), ArrayList.class)) {
